@@ -1,7 +1,8 @@
 ---
-title: "Example Template for Data Analysis Project"
+title: "William Norfolk MADA Course Project Water Quality"
 subtitle: ""
-author: Andreas Handel
+content author: "William Norfolk" 
+template author: "Andreas Handel"
 institute: "University of Georgia"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
@@ -13,32 +14,8 @@ bibliography: ../references.bib
 csl: ../apa.csl
 ---
 
-
 # Summary/Abstract
 _Write a summary of your project._
-
-# Illustrating setup
-_This section is only there to show how to insert results from other places in the project and how to cite figures and other references. Delete this whole section at some point._
-
-
-This paper [@Leek2015a] discusses types of analyses. 
-
-
-Figure \@ref(fig:resultfigure) shows a result figure from the analysis.
-
-```{r resultfigure,  fig.cap='Analysis figure.', echo=FALSE}
-knitr::include_graphics("../../results/resultfigure.png")
-```
-
-Table \@ref(tab:resulttable) shows a result table from the analysis.
-
-```{r resulttable,  echo=FALSE}
-resulttable=readRDS("../../results/resulttable.rds")
-knitr::kable(resulttable, caption = 'Result Table.')
-```
-
-
-Note that this cited reference will show up at the end of the document, the reference formatting is determined by the CSL file specified in the YAML header. Many more style files for almost any journal [are available](https://www.zotero.org/styles). You also specify the location of your bibtex reference file in the YAML. You can call your reference file anything you like, I just used the generic word `references.bib` but giving it a more descriptive name is probably better.
 
 
 # Introduction (required for part 1)
@@ -47,7 +24,9 @@ Note that this cited reference will show up at the end of the document, the refe
 _Provide enough background on your topic that others can understand the why and how of your analysis_ 
 
 ## Description of data and data source
-_Describe what the data is, what it contains, where it is from, etc._
+These data are water quality measurements collected in Key Largo, Florida by the Marine Resources Development Foundation from 2010 to 2019. The Marine Resources Development Foundation is an environmental education non-profit that provides an immersive experience into the field of marine science for students ranging from fourth grade to undergraduates. Marinelab students take a variety of courses to educate them about the local ecosystems, and complement their laboratory and classroom time with daily field trips to the ecosystem of interest. Many courses within the Marinelab curriculum contain integrative data collection programs which task students with the collection of citizen science data on the health of local ecosystems. All data collected in the field on paper data sheets and is entered into a master raw database by a Marinelab staff member. Specific types of citizen science data collected through the programs are passed onto other agencies for further processing and based on individual need and interest.
+
+These data are raw water quality data collected from various sampling sites frequented by Marinelab vessels. Water quality data is characterized by 9 distinct variables: location, instructor name, group name, pH, ammonia, dissolved oxygen, water temperature, salinity, and equipment. The Marine Resources Development Foundation has a desire to learn the large-scale patterns of the local water quality to better educate students enrolled in the program. Though this data has been collected for some time, no formal analysis of the data has ever been conducted on a large-scale with the master data. 
 
 ## Questions/Hypotheses to be addressed
 _State the research questions you plan to answer with this analysis_
