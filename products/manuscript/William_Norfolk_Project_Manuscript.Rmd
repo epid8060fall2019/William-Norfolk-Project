@@ -26,10 +26,20 @@ _Provide enough background on your topic that others can understand the why and 
 ## Description of data and data source
 These data are water quality measurements collected in Key Largo, Florida by the Marine Resources Development Foundation from 2010 to 2019. The Marine Resources Development Foundation is an environmental education non-profit that provides an immersive experience into the field of marine science for students ranging from fourth grade to undergraduates. Marinelab students take a variety of courses to educate them about the local ecosystems, and complement their laboratory and classroom time with daily field trips to the ecosystem of interest. Many courses within the Marinelab curriculum contain integrative data collection programs which task students with the collection of citizen science data on the health of local ecosystems. All data collected in the field on paper data sheets and is entered into a master raw database by a Marinelab staff member. Specific types of citizen science data collected through the programs are passed onto other agencies for further processing and based on individual need and interest.
 
-These data are raw water quality data collected from various sampling sites frequented by Marinelab vessels. Water quality data is characterized by 9 distinct variables: location, instructor name, group name, pH, ammonia, dissolved oxygen, water temperature, salinity, and equipment. The Marine Resources Development Foundation has a desire to learn the large-scale patterns of the local water quality to better educate students enrolled in the program. Though this data has been collected for some time, no formal analysis of the data has ever been conducted on a large-scale with the master data. 
+These data are raw water quality data collected from various sampling sites frequented by Marinelab vessels. Water quality data is characterized by 11 distinct variables: date, time, location, instructor name, group name, pH, ammonia, dissolved oxygen, water temperature, salinity, and equipment. The variables: date, time, location, instructor name, group name, and equipment are all clerical data which provides information on the measuring techniques and site characteristics of a sample. The variables: pH, temperature, dissolved oxygen, salinity, and ammoinia are water quality paramaters used to assess the abiotic conditions of the sample site. The Marine Resources Development Foundation has a desire to learn the large-scale patterns of the local water quality to better educate students enrolled in the program. Though this data has been collected for some time, no formal analysis of the data has ever been conducted at a large-scale with the master data. 
 
 ## Questions/Hypotheses to be addressed
-_State the research questions you plan to answer with this analysis_
+Question 1: What are the major differences in water quality paramaters between Oceanside and Bayside site locations?
+Null Hypothesis: There are no differences in any of the five water quality paramaters measured between Oceanside and Bayside sample sites.
+Alternative Hypothesis: Bayside sample sites exhibit a larger range of water quality paramaters when compared to Oceanside sites. 
+
+Question 2: Have the water quality conditions of highly visited sites changed over time?
+
+Question 3: Are there visible seasonal changes in the abiotic conditions of the water?
+
+Question 4: Can we see a change in the abiotic conditions before and after Hurricane Irma?
+
+Question 5: How precise are measurements by high school or higher students compared to the measurements collected by younger students? (may remove if cannot evaluate).
 
 
 
