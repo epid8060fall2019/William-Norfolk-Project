@@ -54,11 +54,8 @@ Develop a script for the immediate processing of data collected by groups active
 
 
 ## Methods
-All data was collected by students or instructors of the Marinelab environmental education program. All collectors are required to complete a one-hour training program to familiarize themselves with the testing materials before they are permitted to collect data. Data is collected in the field at various sampling locations. Sample location is dictated by the needs of the program, accessibility of location, and weather conditions. On site, a grab sample of water is collected and brought onto the boat. Abiotic conditions are measured immediately following collection and scored onto a paper record sheet.
-
-####Insert Parameter Specifics#######
-
-All measures are taken using semiquantative testing equipment or with a YSI Sonde. All data sheets are collected and entered into the master database upon return to shore. 
+All data was collected by students or instructors of the Marinelab environmental education program. All collectors are required to complete a one-hour training program to familiarize themselves with the testing materials and data recording before they are permitted to work in the field. Data is collected in the field at various sampling locations dictated by the needs of the program, accessibility of location, and weather conditions. On site, a grab sample of water is collected and brought onto the vessel for testing. Abiotic conditions are measured immediately following collection and scored onto a paper record sheet. All measures are taken using semiquantative testing equipment or with a YSI Sonde. Temperature is measured in Celsius using a standard thermometer attached to a string to ensure body heat does not skew the data. Salinity is measured with a standard hydrometer in ppt. Dissolved Oxygen is measured using a colormetric ampoule analysis in mg/L. Ammonia and pH are both measured using standardized test kits contiaing test strips and reagent solution respectively.
+All data sheets are collected and entered into the master database upon return to shore. 
 
 
 ## Data Acquisition
