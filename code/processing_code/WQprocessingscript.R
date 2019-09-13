@@ -23,10 +23,10 @@ dplyr::glimpse(wqrawdata)
 #the program properly and will cause problems downstream so it is best to solve
 #this issue by reformatting the data entries in Excel by adding new columns to 
 #replace the date and time variables. Date will now be represented as the new
-#variable "Numeric Date" which has reformatted the date to a mm.dd.yy format. 
+#variable "Numeric Date" which has reformatted the date to a mm.dd.yy style. 
 #Time will be represented as the new variable "Military Time" which has 
-#reformatted the time to numeric military time. Both original variables will be 
-#kept in the raw data set, but will be removed by further r processing.
+#reformatted the time to standard numeric military time. Both original variables 
+#will be kept in the raw data set, but will be removed by further r processing.
 
 
 #Reload the data with the reformatted Excel sheet.
