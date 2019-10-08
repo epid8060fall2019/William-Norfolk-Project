@@ -12,7 +12,7 @@ library(tidyverse)
 
 #Load the data. path is relative to project directory.
 wqrawdata <- readxl::read_excel("./data/raw_data/RAW_WQ DATA.xlsx")
-
+wqrawdata <- readxl::read_excel("./data/raw_data/RAW_WQ Data.xlsx")
 
 #Take a look at the data
 dplyr::glimpse(wqrawdata)

@@ -1,0 +1,194 @@
+---
+title: "WQProcessing_cleaning"
+author: "William Norfolk"
+date: "10/7/2019"
+output:
+  word_document: default
+  html_document: default
+---
+
+Load needed packages. make sure they are installed.
+
+```{r}
+library(readxl)
+library(dplyr)
+library(tidyverse)
+library(forcats)
+library(ggthemes)
+library(knitr)
+
+```
+
+Load the data. This path is relative to the processinf code folder in the project directory.
+
+```{r}
+wqrawdata <- readxl::read_excel("../../data/raw_data/RAW_WQ Data.xlsx")
+```
+
+
+Take a look at the data.
+
+```{r}
+
+glimpse(wqrawdata)
+
+```
+
+
+At a glance there is clearly some cleaning to be done. First the values for the variables "Date" and "Time" did not read into r properly. This is likely due to the autoformatting of dates by Excel. These data will not read into the program properly and will cause problems downstream so it is best to solve this issue by reformatting the data entries in Excel by adding new columns to replace the date and time variables. Date will now be represented as the new variable "Numeric Date" which has reformatted the date to a mm.dd.yy style. Time will be represented as the new variable "Military Time" which has reformatted the time to standard numeric military time. Both original variables will be kept in the raw data set, but will be removed by further r processing.
+
+
+Reload the data with the reformatted Excel sheet.
+
+```{r}
+wqrawdata <- readxl::read_excel("../../data/raw_data/RAW_WQ DATA_TimeModified.xlsx")
+
+```
+
+Take a look at the data once more. 
+
+```{r}
+glimpse(wqrawdata)
+
+```
+
+We should have 11 variables in our data set but it seems that 15 have been loaded. The variables "Timestamp" and "...15" are errors and should be dropped. Also the old "Date" and "Time" variables should be removed.
+
+```{r}
+wqrawdata_11 <- select(wqrawdata, -c(Timestamp, ...15, Date, Time))
+
+glimpse(wqrawdata_11)
+```
+
+The resulting data set is a tibble with 522 observations and 11 variables. Next the correct classes must be assigned to each variable so the data can be properly manipulated. All variables are currently listed as "characters" we must change Military Time, pH, Dissolved Oxygen, Ammonia, Water Temp, and Salinity to numeric classes. 
+
+A few of our variables have been introduced into R with a few extra bits (some ` and units for salinity and temperature) and spaces between words rather than underscores. These will likely cause problems and/or frequent typos downstream so we will recode the variables to a more R-friendly format. 
+
+```{r}
+wqraw_reformat <- wqrawdata_11 %>% rename(numeric_date = `Numeric Date`,
+                        military_time = `Military Time`,
+                        location = Location,
+                        instructor_name = `Instructor Name`,
+                        group_name = `Group Name`,
+                        ph = pH,
+                        ammonia = Ammonia,
+                        dissolved_oxygen = `Dissolved Oxygen`,
+                        water_temp = `Water Temp (C)`,
+                        salinity = `Salinity (ppt)`,
+                        equipment = Equipment)
+
+glimpse(wqraw_reformat)
+
+
+```
+
+
+Next we will need to convert our variables from their loaded format to a working formay. Variables Military Time, pH, Ammoina, Dissolved Oxygen, Water Temp (C), and Salinity (ppt) should be numeric so they can be used for exploratory analysis.  
+
+```{r}
+wqraw_reformat$military_time <- as.numeric(as.character(wqraw_reformat$military_time))
+wqraw_reformat$ph <- as.numeric(as.character(wqraw_reformat$ph))
+wqraw_reformat$ammonia <- as.numeric(as.character(wqraw_reformat$ammonia))
+wqraw_reformat$dissolved_oxygen <- as.numeric(as.character(wqraw_reformat$dissolved_oxygen))
+wqraw_reformat$water_temp <- as.numeric(as.character(wqraw_reformat$water_temp))
+wqraw_reformat$salinity <- as.numeric(as.character(wqraw_reformat$salinity))
+
+glimpse(wqraw_reformat)
+
+```
+
+Next, we will want to compare sites that were located on the Bayside (Gulf of Mexico side) of the island to sites on the Oceanside of the island (Atlantic Ocean). There is site specific data for each location, however bay vs. ocean is not specified so we will need to add a new variable based on the specific site data. 
+
+First take a look at all fo the unique responses for location to see what is present and if any cleaning is needed. 
+
+```{r}
+unique(wqraw_reformat$location)
+```
+
+There is definitely some disagreement with the correct site names and spelling so we will have to correct these before moving forward. A number of the locations are showing a simple typo in entry, or the instructor entered a different variant of a synonym for the site so we will correct with the code below.   
+
+```{r}
+recodelocation <- wqraw_reformat %>% mutate(location = recode(location, 
+                          "Largo Sound" = "Boat Ramp",
+                          "Higdens" = "Higdon's",
+                          "Higdons" = "Higdon's",
+                          "Dry Rocks" = "Key Largo Dry Rocks",
+                          "key Largo Dry Rocks" = "Key Largo Dry Rocks",
+                          "Molasses Reef" = "Molasses",
+                          "Radabob" = "El Radabob",
+                          "North Dry Rocks" = "Minnow Caves",
+                          "North Dry Rocks/Minnow Caves" = "Minnow Caves",
+                          "Sexton Cov" = "Sexton Cove",
+                          "Sexton" = "Sexton Cove",
+                          "Whitmore Bite" = "Whitmore Bight",
+                          "Whitmore" = "Whitmore Bight",
+                          "Hardbottom" = "Whitmore Bight",
+                          "Whitmore bite" = "Whitmore Bight",
+                          "whitmore" = "Whitmore Bight",
+                          "Grotto" = "The Grotto",
+                          "Swash Key" = "Swash Keys",
+                          "Plane Wreck" = "Rodriguez Key",
+                          "Rodriguez" = "Rodriguez Key",
+                          "Rodriguez Key (MG/SG Side)" = "Rodriguez Key",
+                          "Rodriguez Key (North)" = "Rodriguez Key",
+                          "Canon Patch" = "Cannon Patch",
+                          "Danas Cove" = "Dana's Cove",
+                          "Elbow" = "The Elbow",
+                          "Elbow Nursery" = "The Elbow",
+                          "Lakewatch 2" = "Tarpon Basin",
+                          "North North" = "North North Dry Rocks",
+                          "Deep Blue (off molasses)" = "Deep Blue",
+                          "Deep Blue (Elbow)" = "Deep Blue",
+                          "Tarpon Basin (Tarpon Island)" = "Tarpon Island"))
+
+unique(recodelocation$location)
+```
+
+Now that there is no overlap with the site names we can create a new variable that determines if an observation is in the bayside or oceanside.
+
+```{r}
+add_bay_or_ocean <- recodelocation %>% mutate(island_side = 
+                      ifelse(location == "Rodriguez Key", "ocean",
+                      ifelse(location == "Molasses", "ocean",
+                      ifelse(location == "Minnow Caves", "ocean",
+                      ifelse(location == "Cannon Patch", "ocean",
+                      ifelse(location == "French Reef", "ocean",
+                      ifelse(location == "Marker 37", "ocean",
+                      ifelse(location == "Mosquito", "ocean",
+                      ifelse(location == "Grecian Dry Rocks", "ocean",
+                      ifelse(location == "Horseshoe", "ocean",
+                      ifelse(location == "Key Largo Dry Rocks", "ocean",
+                      ifelse(location == "El Radabob", "ocean",
+                      ifelse(location == "Banana", "ocean",
+                      ifelse(location == "Whitmore Bight", "ocean",
+                      ifelse(location == "Ocean Reef Club", "ocean",
+                      ifelse(location == "North North Dry Rocks", "ocean",
+                      ifelse(location == "Deep Blue", "ocean",
+                      ifelse(location == "Lagoon", "ocean",
+                      ifelse(location == "South Sound Creek", "ocean", 
+                      ifelse(location == "Higdon's", "ocean",
+                      ifelse(location == "The Elbow", "ocean", 
+                      ifelse(location == "The Barge", "ocean", 
+                      ifelse(location == "Benny Poo", "ocean",
+                      ifelse(location == "Boat Ramp", "ocean",
+                      ifelse(location == "Tarpon Basin", "bay",
+                      ifelse(location == "Pelican Key", "bay",
+                      ifelse(location == "Scott's Channel", "bay",
+                      ifelse(location == "Captain's Point", "bay", 
+                      ifelse(location == "The Grotto", "bay", 
+                      ifelse(location == "Tarpon Island", "bay", 
+                      ifelse(location == "Nest Key", "bay",
+                      ifelse(location == "Sexton Cove", "bay", 
+                      ifelse(location == "Dana's Cove", "bay", 
+                      ifelse(location == "Bayside", "bay", 
+                      ifelse(location == "Blackwater Sound", "bay", 
+                      ifelse(location == "Bush Point", "bay", 
+                      ifelse(location == "Swash Keys", "bay", 
+                      ifelse(location == "Buttonwood", "bay", 
+                      ifelse(location == "Tarpon Deep", "bay", 
+                      ifelse(location == "Hidden Lake", "bay", 
+                      "no"))))))))))))))))))))))))))))))))))))))))
+
+```
+
+
