@@ -16,6 +16,7 @@ library(tidyverse)
 library(forcats)
 library(ggthemes)
 library(knitr)
+library(naniar)
 
 ```
 
@@ -188,6 +189,202 @@ add_bay_or_ocean <- recodelocation %>% mutate(island_side =
                       ifelse(location == "Tarpon Deep", "bay", 
                       ifelse(location == "Hidden Lake", "bay", 
                       "no"))))))))))))))))))))))))))))))))))))))))
+
+```
+
+
+It will also be useful to know which type of site we are looking at with out data. Of the locations visited there are three different categories of sites: Seagrass/Mangroves, Coral Reefs, Pelagic, and Patch Reef/Hardbottom. Each of these types of ecosystems have characteristic water quality differences which may be useful for comparison for the full analysis we we will code them in as well using similar code to above. 
+
+```{r}
+add_site_type <- add_bay_or_ocean %>% mutate(site_type = 
+                      ifelse(location == "Rodriguez Key", "Patch Reef/Hardbottom",
+                      ifelse(location == "Molasses", "Coral Reef",
+                      ifelse(location == "Minnow Caves", "Coral Reef",
+                      ifelse(location == "Cannon Patch", "Patch Reef/Hardbottom",
+                      ifelse(location == "French Reef", "Coral Reef",
+                      ifelse(location == "Marker 37", "Patch Reef/Hardbottom",
+                      ifelse(location == "Mosquito", "Patch Reef/Hardbottom",
+                      ifelse(location == "Grecian Dry Rocks", "Coral Reef",
+                      ifelse(location == "Horseshoe", "Coral Reef",
+                      ifelse(location == "Key Largo Dry Rocks", "Coral Reef",
+                      ifelse(location == "El Radabob", "Seagrass/Mangroves",
+                      ifelse(location == "Banana", "Coral Reef",
+                      ifelse(location == "Whitmore Bight", "Patch Reef/Hardbottom",
+                      ifelse(location == "Ocean Reef Club", "Coral Reef",
+                      ifelse(location == "North North Dry Rocks", "Coral Reef",
+                      ifelse(location == "Deep Blue", "Pelagic",
+                      ifelse(location == "Lagoon", "Seagrass/Mangrove",
+                      ifelse(location == "South Sound Creek", "Seagrass/Mangrove", 
+                      ifelse(location == "Higdon's", "Patch Reef/Hardbottom",
+                      ifelse(location == "The Elbow", "Coral Reef", 
+                      ifelse(location == "The Barge", "Patch Reef/Hardbottom", 
+                      ifelse(location == "Benny Poo", "Seagrass/Mangrove",
+                      ifelse(location == "Boat Ramp", "Seagrass/Mangrove",
+                      ifelse(location == "Tarpon Basin", "Seagrass/Mangrove",
+                      ifelse(location == "Pelican Key", "Seagrass/Mangrove",
+                      ifelse(location == "Scott's Channel", "Seagrass/Mangrove",
+                      ifelse(location == "Captain's Point", "Seagrass/Mangrove", 
+                      ifelse(location == "The Grotto", "Seagrass/Mangrove", 
+                      ifelse(location == "Tarpon Island", "Seagrass/Mangrove", 
+                      ifelse(location == "Nest Key", "Seagrass/Mangrove",
+                      ifelse(location == "Sexton Cove", "Seagrass/Mangrove", 
+                      ifelse(location == "Dana's Cove", "Seagrass/Mangrove", 
+                      ifelse(location == "Bayside", "Seagrass/Mangrove", 
+                      ifelse(location == "Blackwater Sound", "Seagrass/Mangrove", 
+                      ifelse(location == "Bush Point", "Seagrass/Mangrove", 
+                      ifelse(location == "Swash Keys", "Seagrass/Mangrove", 
+                      ifelse(location == "Buttonwood", "Seagrass/Mangrove", 
+                      ifelse(location == "Tarpon Deep", "Seagrass/Mangrove", 
+                      ifelse(location == "Hidden Lake", "Seagrass/Mangrove", 
+                      "no"))))))))))))))))))))))))))))))))))))))))
+```
+
+Now that we have all of our proper variables to compare the data,let's check the numeric variables to see if there are any observations that need addressing. 
+
+pH data looks good!
+
+```{r}
+unique(add_site_type$ph)
+```
+
+Some of these ammoina measures seem a bit high. Typically ammonia does not get over 1.0 unless there is severe contamination, however it is not impossible to have values ranging from 1.0-5.0 so we will not make any changes here. 34.0 is way too high to be possible, we will impute this value from the mean of the other observations. 
+
+```{r}
+unique(add_site_type$ammonia)
+
+mean(add_site_type$ammonia, na.rm = TRUE)
+
+add_site_type$ammonia[add_site_type$ammonia == "34"] <- "0.064"
+
+class(add_site_type$ammonia)
+
+```
+
+Looks like that swap changes the variable back to a character class so convert back to numeric.
+
+```{r}
+add_site_type$ammonia <- as.numeric(as.character(add_site_type$ammonia))
+
+
+class(add_site_type$ammonia)
+```
+
+
+Similarly to ammonia, dissolved oxygen also has an impossible outlier of 29 so lets impute the mean as well.
+
+```{r}
+unique(add_site_type$dissolved_oxygen)
+
+mean(add_site_type$dissolved_oxygen, na.rm = TRUE)
+
+add_site_type$dissolved_oxygen[add_site_type$dissolved_oxygen == "29"] <- "5.63"
+
+class(add_site_type$dissolved_oxygen)
+
+```
+
+```{r}
+add_site_type$dissolved_oxygen <- as.numeric(as.character(add_site_type$dissolved_oxygen))
+
+class(add_site_type$dissolved_oxygen)
+
+```
+
+Water temperature looks good!
+
+```{r}
+
+unique(add_site_type$water_temp)
+
+```
+
+Salinity looks interesting. All site should represent salt or brackish water so we should not see any values below ~10 but there is a possiblilty some fresh sites were sampled as comparison. We will leave them for now but may have to extract after some exploratory analysis. 
+
+```{r}
+unique(add_site_type$salinity)
+```
+
+Next let's take a look at the instructor_name variable. This is not of primary interest to our data analysis of water quality but could be useful for quality control. There is some recoding to do here to account for some name overlaps between upper and lower case, however the majorty of the input looks good. 
+
+```{r}
+unique(add_site_type$instructor_name)
+
+instructor_recode <- add_site_type %>% mutate(instructor_name = recode(instructor_name, "maria" = "Maria", "Laure" = "Lauren", "maddie" = "Maddie", "n/a" = "NA"))
+
+```
+
+Lastly, the group_name variable could be relatively interesting as well for some quality control.
+
+```{r}
+
+unique(instructor_recode$group_name)
+```
+
+Lots of synonyms in this list so we will recode those groups that are entered differently but the same.
+
+```{r}
+group_recode <- instructor_recode %>% mutate(group_name = recode(group_name, 
+                                  "Hamilton West HS" = "Hamilton HS West",
+                                  "Hamilton West" = "Hamilton HS West",
+                                  "Hamilton High" = "Hamilton HS West",
+                                  "New Hanover HS" = "New Hanover",
+                                  "Episcopal" = "St. Stephen's Episcopal",
+                                  "St. Paul Lutheren" = "St. Paul",
+                                  "Naples/Barron HS" = "Barron/Naples",
+                                  "Naples / Barron" = "Barron/Naples",
+                                  "Naples" = "Barron/Naples",
+                                  "Georgia Military" = "GMC",
+                                  "Georgia Military Academy" = "GMC",
+                                  "GMC HS" = "GMC",
+                                  "Woodland" = "Woodland Park",
+                                  "Woodland Park MS" = "Woodland Park",
+                                  "Two Rivers HS" = "Two Rivers",
+                                  "Fairfield" = "Fairfield Middle",
+                                  "Lutheren" = "Lutheren Schools MW",
+                                  "Classen SAS" = "Classen",
+                                  "Dive Ia" = "Dive In",
+                                  "Teacher Workshop" = "TWS",
+                                  "Teacher Workshop-Advanced" = "TWS",
+                                  "Teacher Workshop-CS" = "TWS",
+                                  "TWS Advanced" = "TWS",
+                                  "Treasure Village Montessori" = "Treasure Village",
+                                  "Plantation Key" = "Plantation Key School",
+                                  "Plantation Key ES" = "Plantation Key School",
+                                  "Monarch HS" = "Monarch High School",
+                                  "Viera" = "Viera HS",
+                                  "Vierra" = "Viera HS",
+                                  "Paran" = "Mount Paran",
+                                  "Mt. Paran HS" = "Mount Paran",
+                                  "Manitowoc" = "UM Manitowoc",
+                                  "McLean HS" = "McLean High School",
+                                  "McClean" = "McLean High School",
+                                  "Three Oaks Middle School" = "Three Oaks",
+                                  "Three Oaks MS" = "Three Oaks",
+                                  "Bell" = "BELL",
+                                  "Key Largo School" = "KLS",
+                                  "Ocean Reef" = "ORC",
+                                  "Marinelab" = "MarineLab",
+                                  "MarineLab Phyto" = "MarineLab",
+                    "Alabama school for the deaf" = "AL Insitute for Deaf & Blind",
+                                  "Lutz" = "Lutz Prep",
+                                  "Unity" = "Unity School"))
+```
+
+Rename the data as clean then take a final glimpse.
+
+```{r}
+WQ_clean_data <- group_recode
+
+glimpse(WQ_clean_data)
+
+```
+
+Save the data as an RDS.
+
+```{r}
+
+saveRDS(WQ_clean_data, file = "../../data/processed_data/processeddata.rds")
+
 
 ```
 
