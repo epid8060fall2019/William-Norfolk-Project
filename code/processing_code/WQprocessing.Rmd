@@ -313,7 +313,7 @@ instructor_recode <- add_site_type %>% mutate(instructor_name = recode(instructo
 
 ```
 
-Lastly, the group_name variable could be relatively interesting as well for some quality control.
+The group_name variable could be relatively interesting as well for some quality control.
 
 ```{r}
 
@@ -370,10 +370,17 @@ group_recode <- instructor_recode %>% mutate(group_name = recode(group_name,
                                   "Unity" = "Unity School"))
 ```
 
-Rename the data as clean then take a final glimpse.
+Lastly, we will need to break the date into three new variables Month, Day, Year for seasonal analysis.
 
 ```{r}
-WQ_clean_data <- group_recode
+split_dates <- separate(group_recode, "numeric_date", into = c("Month", "Day", "Year"), sep = "\\.", extra = "drop")
+```
+
+
+Finally, rename the data as clean then take a final glimpse.
+
+```{r}
+WQ_clean_data <- split_dates
 
 glimpse(WQ_clean_data)
 

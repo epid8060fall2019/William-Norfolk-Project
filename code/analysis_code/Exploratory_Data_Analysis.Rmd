@@ -1,0 +1,28 @@
+---
+title: "Exploratory Data Analysis"
+author: "William Norfolk"
+date: "10/9/2019"
+output: word_document
+---
+
+Load the required libraries for exploratory analysis.
+
+```{r}
+library(readxl)
+library(dplyr)
+library(tidyverse)
+library(forcats)
+library(ggthemes)
+library(knitr)
+library(naniar)
+library(broom)
+```
+
+Load the processed data from the RDS. Then take a look!
+
+```{r}
+WQ_clean_data <- readRDS("../../data/processed_data/processeddata.rds")
+
+glimpse(WQ_clean_data)
+```
+
