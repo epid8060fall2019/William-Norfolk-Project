@@ -28,14 +28,75 @@ glimpse(WQ_clean_data)
 ```
 
 
-Now lets generate some scatter plots to compare ocean vs bay. 
+Now lets generate some plots to compare ocean vs bay. 
+
+Looks like pH is pretty consistent between the ocean and bayside.
 
 ```{r}
 WQ_clean_data %>% ggplot() + 
   geom_boxplot(aes(x = island_side, y = ph), na.rm = TRUE)
 
 WQ_clean_data %>% ggplot() + 
-  geom_jitter(aes(x = military_time, y = ph, color = island_side), alpha = 0.5)
+  geom_jitter(aes(x = island_side, y = ph))
+```
+
+Looks like salinity may be a little more interesting. Ocean side appears to have a narrower range of values compared to the bayside,  which is expected due to the size of the body of water.
+
+```{r}
+
+WQ_clean_data %>% ggplot() + 
+  geom_boxplot(aes(x = island_side, y = salinity), na.rm = TRUE)
+
+WQ_clean_data %>% ggplot() + 
+  geom_jitter(aes(x = island_side, y = salinity))
+```
+
+
+
+```{r}
+WQ_clean_data %>% ggplot() + 
+  geom_boxplot(aes(x = island_side, y = water_temp), na.rm = TRUE)
+
+WQ_clean_data %>% ggplot() + 
+  geom_jitter(aes(x = island_side, y = water_temp))
+```
+
+```{r}
+WQ_clean_data %>% ggplot() + 
+  geom_boxplot(aes(x = island_side, y = dissolved_oxygen), na.rm = TRUE)
+
+WQ_clean_data %>% ggplot() + 
+  geom_jitter(aes(x = island_side, y = dissolved_oxygen))
+```
+
+```{r}
+WQ_clean_data %>% ggplot() + 
+  geom_boxplot(aes(x = island_side, y = ammonia), na.rm = TRUE)
+
+WQ_clean_data %>% ggplot() + 
+  geom_jitter(aes(x = island_side, y = ammonia))
+```
+
+
+
+```{r}
+WQ_clean_data %>% ggplot() + 
+  geom_jitter(aes(x = site_type, y = salinity))
+```
+
+```{r}
+WQ_clean_data %>% ggplot() + 
+  geom_jitter(aes(x = site_type, y = water_temp))
+```
+
+```{r}
+WQ_clean_data %>% ggplot() + 
+  geom_jitter(aes(x = site_type, y = dissolved_oxygen))
+```
+
+```{r}
+WQ_clean_data %>% ggplot() + 
+  geom_jitter(aes(x = site_type, y = ammonia))
 ```
 
 

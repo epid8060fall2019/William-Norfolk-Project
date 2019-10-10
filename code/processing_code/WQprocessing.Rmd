@@ -207,7 +207,7 @@ add_site_type <- add_bay_or_ocean %>% mutate(site_type =
                       ifelse(location == "Grecian Dry Rocks", "Coral Reef",
                       ifelse(location == "Horseshoe", "Coral Reef",
                       ifelse(location == "Key Largo Dry Rocks", "Coral Reef",
-                      ifelse(location == "El Radabob", "Seagrass/Mangroves",
+                      ifelse(location == "El Radabob", "Seagrass/Mangrove",
                       ifelse(location == "Banana", "Coral Reef",
                       ifelse(location == "Whitmore Bight", "Patch Reef/Hardbottom",
                       ifelse(location == "Ocean Reef Club", "Coral Reef",
@@ -256,7 +256,7 @@ pH data looks good!
 unique(add_site_type$ph)
 ```
 
-Some of these ammoina measures seem a bit high. Typically ammonia does not get over 1.0 unless there is severe contamination, however it is not impossible to have values ranging from 1.0-5.0 so we will not make any changes here. 34.0 is way too high to be possible, we will impute this value from the mean of the other observations. 
+Some of these ammoina measures seem a bit high. Typically ammonia does not get over 1.0 unless there is severe contamination (none of which was noted during this time). 34.0, 5.0, and 4.0 are too high to be possible for our standard conditions so, we will impute this value from the mean of the other observations. 
 
 ```{r}
 unique(add_site_type$ammonia)
@@ -264,6 +264,8 @@ unique(add_site_type$ammonia)
 mean(add_site_type$ammonia, na.rm = TRUE)
 
 add_site_type$ammonia[add_site_type$ammonia == "34"] <- "0.064"
+add_site_type$ammonia[add_site_type$ammonia == "5"] <- "0.064"
+add_site_type$ammonia[add_site_type$ammonia == "4"] <- "0.064"
 
 class(add_site_type$ammonia)
 
