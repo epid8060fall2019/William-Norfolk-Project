@@ -206,10 +206,45 @@ site_type_filter %>% ggplot() +
 
 ```
 
+```{r}
+WQ_clean_data$Month <- as.numeric(as.character(WQ_clean_data$Month))
+```
+
+
+```{r}
+mean_water_temp <- aggregate(water_temp ~ Month + Year, WQ_clean_data, mean) 
+
+subset(mean_water_temp, Year == "16") %>% ggplot() + 
+  geom_smooth(aes(x = Month, y = water_temp))
+```
+
+```{r}
+WQ_clean_data %>% ggplot(aes(x = Month, y = water_temp, color = Year)) + geom_jitter() + geom_smooth() + scale_x_continuous(breaks = c(1:12))
+```
+
+```{r}
+WQ_clean_data %>% ggplot(aes(x = Month, y = salinity, color = Year)) + geom_jitter() + geom_smooth() + scale_x_continuous(breaks = c(1:12))
+```
+
+```{r}
+WQ_clean_data %>% ggplot(aes(x = Month, y = ammonia, color = Year)) + geom_jitter() + geom_smooth() + scale_x_continuous(breaks = c(1:12))
+```
+
+```{r}
+WQ_clean_data %>% ggplot(aes(x = Month, y = dissolved_oxygen, color = Year)) + geom_jitter() + geom_smooth() + scale_x_continuous(breaks = c(1:12))
+```
+
 
 To Do:
 
-Better plot for seasonal change? And Hurricane Irma-may not be too visible/statistically powerful due to the lack of observations at the time.
+Make a plot for all months of all years. Ideally with all parameters on seperate lines to view seasons.
 
+Add comentary to this Rmd. 
 
-Basic R sript for realtime visualization analysis-Objective 4
+Paste a few good figures into manuscript.
+
+Add a few citations.
+
+Edit writing.
+
+Basic R sript for realtime visualization analysis-Objective 4-may be more appropriate for final analysis section.
