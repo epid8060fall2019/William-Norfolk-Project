@@ -193,7 +193,7 @@ add_bay_or_ocean <- recodelocation %>% mutate(island_side =
 ```
 
 
-It will also be useful to know which type of site we are looking at with out data. Of the locations visited there are three different categories of sites: Seagrass/Mangroves, Coral Reefs, Pelagic, and Patch Reef/Hardbottom. Each of these types of ecosystems have characteristic water quality differences which may be useful for comparison for the full analysis we we will code them in as well using similar code to above. 
+It will also be useful to know which type of site we are looking at with out data. Of the locations visited there are three different categories of sites: Seagrass/Mangroves, Coral Reefs, and Patch Reef/Hardbottom. Each of these types of ecosystems have characteristic water quality differences which may be useful for comparison for the full analysis we we will code them in as well using similar code to above. 
 
 ```{r}
 add_site_type <- add_bay_or_ocean %>% mutate(site_type = 
@@ -212,7 +212,7 @@ add_site_type <- add_bay_or_ocean %>% mutate(site_type =
                       ifelse(location == "Whitmore Bight", "Patch Reef/Hardbottom",
                       ifelse(location == "Ocean Reef Club", "Coral Reef",
                       ifelse(location == "North North Dry Rocks", "Coral Reef",
-                      ifelse(location == "Deep Blue", "Pelagic",
+                      ifelse(location == "Deep Blue", "Coral Reef",
                       ifelse(location == "Lagoon", "Seagrass/Mangrove",
                       ifelse(location == "South Sound Creek", "Seagrass/Mangrove", 
                       ifelse(location == "Higdon's", "Patch Reef/Hardbottom",
@@ -263,9 +263,9 @@ unique(add_site_type$ammonia)
 
 mean(add_site_type$ammonia, na.rm = TRUE)
 
-add_site_type$ammonia[add_site_type$ammonia == "34"] <- "0.064"
-add_site_type$ammonia[add_site_type$ammonia == "5"] <- "0.064"
-add_site_type$ammonia[add_site_type$ammonia == "4"] <- "0.064"
+add_site_type$ammonia[add_site_type$ammonia == "34"] <- "0.046"
+add_site_type$ammonia[add_site_type$ammonia == "5"] <- "0.046"
+add_site_type$ammonia[add_site_type$ammonia == "4"] <- "0.046"
 
 class(add_site_type$ammonia)
 
@@ -288,7 +288,7 @@ unique(add_site_type$dissolved_oxygen)
 
 mean(add_site_type$dissolved_oxygen, na.rm = TRUE)
 
-add_site_type$dissolved_oxygen[add_site_type$dissolved_oxygen == "29"] <- "5.63"
+add_site_type$dissolved_oxygen[add_site_type$dissolved_oxygen == "29"] <- "5.58"
 
 class(add_site_type$dissolved_oxygen)
 
@@ -309,11 +309,27 @@ unique(add_site_type$water_temp)
 
 ```
 
-Salinity looks interesting. All site should represent salt or brackish water so we should not see any values below ~10 but there is a possiblilty some fresh sites were sampled as comparison. We will leave them for now but may have to extract after some exploratory analysis. 
+Salinity looks interesting. All site should represent salt or brackish water so we should not see any values below ~10. Upon closer inspection of the data, there are three very low salinity measures all which come from ocean side sites. These are clear errors ad will be imputed from the mean.
 
 ```{r}
 unique(add_site_type$salinity)
+
+mean(add_site_type$salinity, na.rm = TRUE)
+
+add_site_type$salinity[add_site_type$salinity == "6"] <- "34.1"
+add_site_type$salinity[add_site_type$salinity == "2.9"] <- "34.1"
+add_site_type$salinity[add_site_type$salinity == "0"] <- "34.1"
+
+
+class(add_site_type$salinity)
 ```
+
+```{r}
+add_site_type$salinity <- as.numeric(as.character(add_site_type$salinity))
+
+class(add_site_type$salinity)
+```
+
 
 Next let's take a look at the instructor_name variable. This is not of primary interest to our data analysis of water quality but could be useful for quality control. There is some recoding to do here to account for some name overlaps between upper and lower case, however the majorty of the input looks good. 
 
