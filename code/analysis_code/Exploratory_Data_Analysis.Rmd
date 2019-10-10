@@ -26,3 +26,7 @@ WQ_clean_data <- readRDS("../../data/processed_data/processeddata.rds")
 glimpse(WQ_clean_data)
 ```
 
+To Do:
+1. Make Bay vs Ocean plots for each paremeter
+2. Make a plot of site type for each parameter
+3. geom_line for view hurricane Irma
