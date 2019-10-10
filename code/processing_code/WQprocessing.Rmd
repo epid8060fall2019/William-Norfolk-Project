@@ -239,7 +239,16 @@ add_site_type <- add_bay_or_ocean %>% mutate(site_type =
                       "no"))))))))))))))))))))))))))))))))))))))))
 ```
 
+Next lets be sure to change any "no" entries to NA so we can remove from plots with ease.
+
+```{r}
+
+add_site_type[add_site_type == "no"] <- NA
+
+```
+
 Now that we have all of our proper variables to compare the data,let's check the numeric variables to see if there are any observations that need addressing. 
+
 
 pH data looks good!
 

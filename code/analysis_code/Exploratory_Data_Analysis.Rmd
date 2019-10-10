@@ -13,6 +13,7 @@ library(dplyr)
 library(tidyverse)
 library(forcats)
 library(ggthemes)
+library(plotly)
 library(knitr)
 library(naniar)
 library(broom)
@@ -25,6 +26,18 @@ WQ_clean_data <- readRDS("../../data/processed_data/processeddata.rds")
 
 glimpse(WQ_clean_data)
 ```
+
+
+Now lets generate some scatter plots to compare ocean vs bay. 
+
+```{r}
+WQ_clean_data %>% ggplot() + 
+  geom_boxplot(aes(x = island_side, y = ph), na.rm = TRUE)
+
+WQ_clean_data %>% ggplot() + 
+  geom_jitter(aes(x = military_time, y = ph, color = island_side), alpha = 0.5)
+```
+
 
 To Do:
 1. Make Bay vs Ocean plots for each paremeter
