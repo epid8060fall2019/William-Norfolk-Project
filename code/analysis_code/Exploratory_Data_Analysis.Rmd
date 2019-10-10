@@ -99,6 +99,22 @@ WQ_clean_data %>% ggplot() +
   geom_jitter(aes(x = site_type, y = ammonia))
 ```
 
+```{r}
+WQ_clean_data %>% ggplot() +
+  geom_jitter(aes(x = Month, y = water_temp, color = site_type))
+```
+
+```{r}
+WQ_clean_data %>% ggplot() +
+  geom_jitter(aes(x = Month, y = ph, color = site_type))
+
+```
+
+```{r}
+WQ_clean_data %>% ggplot() +
+  geom_jitter(aes(x = Month, y = dissolved_oxygen, color = site_type))
+```
+
 
 To Do:
 1. Make Bay vs Ocean plots for each paremeter
