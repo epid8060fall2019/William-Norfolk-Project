@@ -175,20 +175,34 @@ ggsave(filename = "../../results/site_type_ammonia.png",plot = site_type_ammonia
 
 ```
 
+Now that we have baseline visuals of the differet island sides and site types, lets start to look at some seasonal changes and see if we can identify the presence of Hurricane Irma in the data.
+
 ```{r}
 site_type_filter %>% ggplot() +
-  geom_jitter(aes(x = Month, y = water_temp, color = site_type))
+  geom_jitter(aes(x = Month, y = water_temp, color = site_type)) + facet_wrap(~Year)
 ```
 
 ```{r}
 site_type_filter %>% ggplot() +
-  geom_jitter(aes(x = Month, y = ph, color = site_type))
+  geom_jitter(aes(x = Month, y = ph, color = site_type)) + facet_wrap(~Year)
 
 ```
 
 ```{r}
 site_type_filter %>% ggplot() +
-  geom_jitter(aes(x = Month, y = dissolved_oxygen, color = site_type))
+  geom_jitter(aes(x = Month, y = dissolved_oxygen, color = site_type)) + facet_wrap(~Year)
+```
+
+```{r}
+site_type_filter %>% ggplot() +
+  geom_jitter(aes(x = Month, y = salinity, color = site_type)) + facet_wrap(~Year)
+```
+
+```{r}
+
+site_type_filter %>% ggplot() +
+  geom_jitter(aes(x = Month, y = ammonia, color = site_type)) + facet_wrap(~Year)
+
 ```
 
 
