@@ -17,6 +17,7 @@ library(plotly)
 library(knitr)
 library(naniar)
 library(broom)
+library(gridExtra)
 ```
 
 Load the processed data from the RDS. Then take a look!
@@ -207,6 +208,8 @@ site_type_filter %>% ggplot() +
 
 
 To Do:
-1. Make Bay vs Ocean plots for each paremeter
-2. Make a plot of site type for each parameter
-3. geom_line for view hurricane Irma
+
+Better plot for seasonal change? And Hurricane Irma-may not be too visible/statistically powerful due to the lack of observations at the time.
+
+
+Basic R sript for realtime visualization analysis-Objective 4
