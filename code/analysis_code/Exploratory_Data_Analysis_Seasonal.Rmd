@@ -1,0 +1,112 @@
+---
+title: "Exploratory Data Analysis-Seasonal"
+author: "William Norfolk"
+date: "10/10/2019"
+output: word_document
+---
+
+
+
+Load the required libraries for exploratory analysis.
+
+```{r}
+library(readxl)
+library(dplyr)
+library(tidyverse)
+library(forcats)
+library(ggthemes)
+library(plotly)
+library(knitr)
+library(naniar)
+library(broom)
+library(gridExtra)
+library(zoo)
+```
+
+Load the processed data from the RDS. Then take a look!
+
+```{r}
+WQ_clean_data <- readRDS("../../data/processed_data/processeddata.rds")
+
+glimpse(WQ_clean_data)
+```
+
+
+```{r}
+island_side_filter <- filter(WQ_clean_data, !is.na(island_side))
+
+site_type_filter <- filter(WQ_clean_data, !is.na(site_type))
+```
+
+Now that we have baseline visuals of the differet island sides and site types, lets start to look at some seasonal changes and see if we can identify the presence of Hurricane Irma in the data.
+
+```{r}
+site_type_filter %>% ggplot() +
+  geom_jitter(aes(x = Month, y = water_temp, color = site_type)) + facet_wrap(~Year)
+```
+
+```{r}
+site_type_filter %>% ggplot() +
+  geom_jitter(aes(x = Month, y = ph, color = site_type)) + facet_wrap(~Year)
+
+```
+
+```{r}
+site_type_filter %>% ggplot() +
+  geom_jitter(aes(x = Month, y = dissolved_oxygen, color = site_type)) + facet_wrap(~Year)
+```
+
+```{r}
+site_type_filter %>% ggplot() +
+  geom_jitter(aes(x = Month, y = salinity, color = site_type)) + facet_wrap(~Year)
+```
+
+```{r}
+
+site_type_filter %>% ggplot() +
+  geom_jitter(aes(x = Month, y = ammonia, color = site_type)) + facet_wrap(~Year)
+
+```
+
+```{r}
+WQ_clean_data$Month <- as.numeric(as.character(WQ_clean_data$Month))
+```
+
+
+
+
+```{r}
+WQ_clean_data %>% ggplot(aes(x = Month, y = water_temp, color = Year)) + geom_jitter() + geom_smooth() + scale_x_continuous(breaks = c(1:12))
+```
+
+```{r}
+WQ_clean_data %>% ggplot(aes(x = Month, y = salinity, color = Year)) + geom_jitter() + geom_smooth() + scale_x_continuous(breaks = c(1:12))
+```
+
+```{r}
+WQ_clean_data %>% ggplot(aes(x = Month, y = ammonia, color = Year)) + geom_jitter() + geom_smooth() + scale_x_continuous(breaks = c(1:12))
+```
+
+```{r}
+WQ_clean_data %>% ggplot(aes(x = Month, y = dissolved_oxygen, color = Year)) + geom_jitter() + geom_smooth() + scale_x_continuous(breaks = c(1:12))
+```
+
+```{r}
+mean_water_temp <- aggregate(water_temp ~ Month + Year, WQ_clean_data, mean) 
+
+
+
+mean_water_temp$Date <- as.yearmon(paste(mean_water_temp$Month, mean_water_temp$Year, sep = "."), format = "%m.%Y")
+
+mean_water_temp %>% ggplot(aes(x = Date, y = water_temp)) + geom_line()
+```
+
+```{r}
+
+mean_salinity <- aggregate(salinity ~ Month + Year, WQ_clean_data, mean) 
+
+mean_salinity$Date <- as.yearmon(paste(mean_salinity$Month, mean_salinity$Year, sep = "."), format = "%m.%Y")
+
+mean_salinity %>% ggplot(aes(x = Date, y = salinity)) + geom_line()
+
+```

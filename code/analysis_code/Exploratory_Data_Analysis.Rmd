@@ -1,5 +1,5 @@
 ---
-title: "Exploratory Data Analysis"
+title: "Exploratory Data Analysis-Location"
 author: "William Norfolk"
 date: "10/9/2019"
 output: word_document
@@ -18,6 +18,7 @@ library(knitr)
 library(naniar)
 library(broom)
 library(gridExtra)
+library(zoo)
 ```
 
 Load the processed data from the RDS. Then take a look!
@@ -211,12 +212,7 @@ WQ_clean_data$Month <- as.numeric(as.character(WQ_clean_data$Month))
 ```
 
 
-```{r}
-mean_water_temp <- aggregate(water_temp ~ Month + Year, WQ_clean_data, mean) 
 
-subset(mean_water_temp, Year == "16") %>% ggplot() + 
-  geom_smooth(aes(x = Month, y = water_temp))
-```
 
 ```{r}
 WQ_clean_data %>% ggplot(aes(x = Month, y = water_temp, color = Year)) + geom_jitter() + geom_smooth() + scale_x_continuous(breaks = c(1:12))
@@ -232,6 +228,26 @@ WQ_clean_data %>% ggplot(aes(x = Month, y = ammonia, color = Year)) + geom_jitte
 
 ```{r}
 WQ_clean_data %>% ggplot(aes(x = Month, y = dissolved_oxygen, color = Year)) + geom_jitter() + geom_smooth() + scale_x_continuous(breaks = c(1:12))
+```
+
+```{r}
+mean_water_temp <- aggregate(water_temp ~ Month + Year, WQ_clean_data, mean) 
+
+
+
+mean_water_temp$Date <- as.yearmon(paste(mean_water_temp$Month, mean_water_temp$Year, sep = "."), format = "%m.%Y")
+
+mean_water_temp %>% ggplot(aes(x = Date, y = water_temp)) + geom_line()
+```
+
+```{r}
+
+mean_salinity <- aggregate(salinity ~ Month + Year, WQ_clean_data, mean) 
+
+mean_salinity$Date <- as.yearmon(paste(mean_salinity$Month, mean_salinity$Year, sep = "."), format = "%m.%Y")
+
+mean_salinity %>% ggplot(aes(x = Date, y = salinity)) + geom_line()
+
 ```
 
 
