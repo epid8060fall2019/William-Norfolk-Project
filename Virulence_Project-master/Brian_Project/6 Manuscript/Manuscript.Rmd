@@ -1,0 +1,271 @@
+---
+title: 'Virulence-mediated infectiousness and activity trade-offs and their impact on transmission potential of patients infected with influenza'
+author: ""
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: article
+output:
+  bookdown::word_document2:
+    toc: false
+bibliography: ["../SymptomActivity.bib"]
+csl: american-journal-of-epidemiology.csl
+---
+
+```{r setup, include=FALSE, echo=FALSE, cache.lazy=FALSE}
+
+# Setting options for the rest of the document
+knitr::opts_chunk$set(warning=FALSE)
+
+# Rounding rules
+options(digits = 2)
+
+
+#Load clean data from "Data-Cleaning.R" script 
+SympAct<-readRDS("../3 Clean Data/SympAct.Rda") 
+SympAct_Lab_Pos<-readRDS("../3 Clean Data/SympAct_Lab_Pos.Rda") 
+
+
+#Load Results for PCR and Rapid diagnosis group from "Flu Symptoms Activity Univariate Models.R" Script
+LmActvSympLab<-readRDS("../5 Results/Models/LmActvSympLab.Rda")
+
+Impact_Trend_Lab<-readRDS("../5 Results/Models/Impact_Trend_Lab.Rda")
+Trans_Trend_Lab<-readRDS("../5 Results/Models/Trans_Trend_Lab.Rda")
+TvI_Trend_Lab<-readRDS("../5 Results/Models/TvI_Trend_Lab.Rda")
+
+Impact_Cor_Lab<-readRDS("../5 Results/Models/Impact_Cor_Lab.Rda")
+Trans_Cor_Lab<-readRDS("../5 Results/Models/Trans_Cor_Lab.Rda")
+TvI_Cor_Lab<-readRDS("../5 Results/Models/TvI_Cor_Lab.Rda")
+  
+#Load Results for empiric diagnosis group from "Flu Symptoms Activity Univariate Models.R" Script  
+Impact_Trend_Any<-readRDS("../5 Results/Models/Impact_Trend_Any.Rda")
+Trans_Trend_Any<-readRDS("../5 Results/Models/Trans_Trend_Any.Rda")
+TvI_Trend_Any<-readRDS("../5 Results/Models/TvI_Trend_Any.Rda")
+
+Impact_Cor_Any<-readRDS("../5 Results/Models/Impact_Cor_Any.Rda")
+Trans_Cor_Any<-readRDS("../5 Results/Models/Trans_Cor_Any.Rda")
+TvI_Cor_Any<-readRDS("../5 Results/Models/TvI_Cor_Any.Rda")
+
+
+#Load Results from "Flu Sysmptoms Activity Univariate Tables.R"
+SympLabTable<-readRDS("../5 Results/Tables/SympLabTable.Rda")
+
+
+
+# Basic Data analysis for reporting results in the manuscript
+
+#Calculate the median activity and transcore at each level of the morbidity score
+if (require('dplyr')==FALSE) {install.packages('dplyr', repos="https://cran.rstudio.com"); require(dplyr)}
+MedAct<-SympAct_Lab_Pos %>% 
+  group_by(ImpactScoreF) %>%
+  summarise_at(vars(ActivityLevel), funs(median(., na.rm=TRUE)))
+
+# Differnce in median activity between the lowest and highest morbidity scores
+MA0<-filter(MedAct, levels(droplevels(ImpactScoreF))==min(SympAct_Lab_Pos$ImpactScore))
+MA6<-filter(MedAct, levels(droplevels(ImpactScoreF))==max(SympAct_Lab_Pos$ImpactScore))
+
+
+#Calculate the median activity and transcore at each level of the morbidity score
+if (require('dplyr')==FALSE) {install.packages('dplyr', repos="https://cran.rstudio.com"); require(dplyr)}
+MedInF<-SympAct_Lab_Pos %>% 
+  group_by(ImpactScoreF) %>%
+  summarise_at(vars(TransScore), funs(median(., na.rm=TRUE)))
+
+# Differnce in median activity between the lowest and highest morbidity scores
+MI0<-filter(MedInF, levels(droplevels(ImpactScoreF))==min(SympAct_Lab_Pos$ImpactScore))
+MI6<-filter(MedInF, levels(droplevels(ImpactScoreF))==max(SympAct_Lab_Pos$ImpactScore))
+
+
+
+## Counts for different score levels
+#infectiousness score
+TransLabtab<-table(SympAct_Lab_Pos$TransScoreF)
+
+#Morbidity Score
+ImpactLabtab<-table(SympAct_Lab_Pos$ImpactScoreF)
+
+#Total symptom number 
+TotalSympLabtab<-table(SympAct_Lab_Pos$TotalSympF)
+
+#simple lm for reporting stats of multivariate regression in text
+#This is the model indicated by subset selection in mlr 
+subsetlm<-lm(ActivityLevel~ChillsSweats+SubjectiveFever+Headache+WeaknessYN+Insomnia+Vomit, SympAct_Lab_Pos)
+
+# saturated model 
+satlm<-lm(ActivityLevel~CoughYN+  ChestCongestion+ NasalCongestion+ Sneeze+ 
+     RunnyNose+ChillsSweats+ Fatigue+ SubjectiveFever+ Headache+ WeaknessYN+ 
+     MyalgiaYN+ SwollenLymphNodes+
+     AbPain+ ChestPain+ Diarrhea+ EyePn+ Insomnia+ 
+     ItchyEye+ Nausea+ EarPn+ Pharyngitis+ Breathless+ 
+     ToothPn+ Vomit+ Wheeze, SympAct_Lab_Pos)
+
+# These are the univariate linear regression model fits to report the states of the fits presented in the figures 
+infectLM<-lm(ActivityLevel~TransScore, data=SympAct_Lab_Pos)
+
+morbLM<-lm(ActivityLevel~ImpactScore, data=SympAct_Lab_Pos)
+  
+inmorLM<-lm(TransScore~ImpactScore, data=SympAct_Lab_Pos)
+
+# P value formatter found on stack overflow
+
+pvalr <- function(pvals, sig.limit = .01, digits = 2, html = FALSE) {
+
+  roundr <- function(x, digits = 1) {
+    res <- sprintf(paste0('%.', digits, 'f'), x)
+    zzz <- paste0('0.', paste(rep('0', digits), collapse = ''))
+    res[res == paste0('-', zzz)] <- zzz
+    res
+  }
+
+  sapply(pvals, function(x, sig.limit) {
+    if (x < sig.limit)
+      if (html)
+        return(sprintf('&lt; %s', format(sig.limit))) else
+          return(sprintf('< %s', format(sig.limit)))
+    if (x > .1)
+      return(roundr(x, digits = 2)) else
+        return(roundr(x, digits = digits))
+  }, sig.limit = sig.limit)
+}
+
+# Rho and 95% CI reporter 
+
+sprint_CI95 <- function(rho, lwr.ci, upr.ci) {
+  sprintf("%.2f (95%% CI: %.2f, %.2f)", rho, lwr.ci, upr.ci)
+}
+
+
+
+```
+
+
+# Authors
+* Brian McKay^1^, Department of Epidemiology and Biostatistics, The University of Georgia, Athens, GA, USA
+* Mark Ebell, Department of Epidemiology and Biostatistics, The University of Georgia, Athens, GA, USA
+* Ariella Perry, Colorado Department of Public Health and Environment, Denver, CO, USA
+* Ye Shen, Department of Epidemiology and Biostatistics, The University of Georgia, Athens, GA, USA
+* Andreas Handel^1^, Department of Epidemiology and Biostatistics, The University of Georgia, Athens, GA, USA
+
+
+
+^1^ Corresponding Authors: Brian McKay and Andreas Handel
+
+Address: 101 Buck Rd, Miller Hall, Athens, Georgia 30606   
+
+Email: bmckay52@uga.edu or ahandel@uga.edu
+
+#Abstract
+
+Most communicable diseases have some amount of virulence that induces infectiousness-enhancing symptoms. However, too much virulence can cause host morbidity and a reduction in transmission potential. For human diseases, the reduction in transmission opportunities is commonly caused by reduced activity. There is limited data regarding the potential impact of virulence on transmission potential. We analyzed data of `r length(SympAct_Lab_Pos$Unique.Visit)` influenza patients at a university health center during the 2016/2017 influenza season. We classified symptoms as infectiousness-related or morbidity-related and calculated two scores. The scores were used to explore the relationship between infectiousness, morbidity, and activity levels. We found a decrease in activity levels with increasing morbidity scores. There was no consistent pattern between activity level and infectiousness score. We also found a positive correlation between the morbidity and infectiousness scores. Our results provide evidence that for influenza, increasing virulence leads to increased infectiousness and reduced activity. This trade-off determines the transmission potential. Our findings suggest that a reduction of systemic symptoms may increase host activity without reducing infectiousness. Therefore interventions should target both systemic and infectiousness related symptoms to reduce overall transmission potential. Our findings can also inform simulation models to investigate the impact of different interventions on transmission. 
+
+*Keywords*: Infectious diseases; Influenza; Trade-off; Transmission; Virulence
+
+# Introduction
+Many infectious diseases cause symptoms in at least some of their hosts. Often, those symptoms increase the host's infectiousness and facilitate the transmission of the pathogen [@Eames2010; @Antolin2008; @Brown2006]. Coughing and sneezing for respiratory infections are prime examples. On the other hand, symptoms that are too severe may reduce host activity or in extreme cases cause host death, reducing transmission opportunities. The trade-off hypothesis describes the relationship between virulence and transmission potential [@Anderson1982; @Alizon2009; @Cressler2016; @Bull2014; @Ewald1983; @Levin1981; @Levin1996, @Bull1994] and predicts that an intermediate level of virulence leads to maximum fitness (usually quantified by the reproductive number) for the pathogen. At such an optimal level of virulence, the pathogen maximizes transmission by inducing symptoms that increase a host's infectiousness, while minimizing transmission-reducing morbidity symptoms. The optimal virulence level can depend on both population-level and within-host level processes, the implications of which have been theoretically explored previously [@Anderson1979; @Anderson1982; @Alizon2009; @Antia1994; @Sofonea2017; @Coombs2003; @Coombs2007; @Lipsitch1997; @Brown2012; @Gilchrist2006; @Mideo2008; @Gandon2001]. 
+
+The most commonly discussed and studied trade-off is between increasing transmission potential due to increased host infectiousness and decreasing transmission potential due to host mortality [@Alizon2009]. While, this likely applies to many animal diseases and some human diseases (e.g., viral hemorrhagic diseases [@Sofonea2018]), for most human pathogens mortality is low, and it is more likely that increased virulence leads to reduced host activity and thus reduced transmission opportunities. Sub-lethal impacts such as weight loss and effects on host fitness have been suggested [@Thomas2004; @Alizon2009; @Alizon2015; @Cressler2016], and interactions between symptoms, activity, and transmission potential have been recognized [@Handel2015]. Despite this, there is very little data available for human pathogens. One study on *Plasmodium falciparum* infections in humans showed an increase in transmission potential as virulence, quantified by mortality, increased, with no apparent trade-off [@Mackinnon2008]. A study in HIV infected individuals showed a negative relationship between duration of asymptomatic infection and viral load and a positive relationship between infectiousness and viral load with optimal transmission potential occurring at an intermediate viral load [@Fraser2007]. As far as we are aware, no studies for any other human pathogens have examined data to directly determine the relationship between virulence and transmission. 
+
+Here, we investigate this relationship for influenza. Influenza induces symptoms in around 84% of infected individuals [@Leung2015]. Some of the symptoms, such as coughing and sneezing, likely enhance transmission by increasing infectiousness of a host. A recent study provided estimates for the transmission potential of symptomatic versus asymptomatic individuals and found that individuals with symptomatic infections are about 3-12 times as infectious as persons with asymptomatic infections [@VanKerckhove2013]. Other symptoms, such as fever, body aches, and general malaise are more likely to lead to a reduction in transmission by reducing host activity. A previous study on influenza in 146 adults and children in the United Kingdom found that healthy individuals had a mean of 12.72 contacts per day, while sick individuals only had a 3.58 [@Eames2010]. The study also showed that the number of contacts decreased as the number of symptoms increased. These studies suggest that there might be a trade-off between infectiousness and activity for influenza, which together determines overall transmission. In this study, we investigate this relationship. 
+
+
+# METHODS
+
+## Data Collection
+Our patient population consisted of students who made an appointment at the university health center of a large research university during the 2016/2017 flu season. All patients with a primary complaint of respiratory infections were required to fill out an electronic questionnaire. The questionnaire collected data about their current symptoms and activity level. Patients were required to respond to all symptom-related questions when they scheduled their appointments. We included all symptoms collected by the questionnaire in this analysis. The complete questionnaire is available in the supplementary material.
+
+For the symptoms of weakness and body aches, the patient graded the severity of the symptom as none, mild, moderate, and severe. The patient recorded all other symptom data as present or absent. The patient also reported any changes in their normal behavior.  Patients describe their activity level as a number between 0 and 10, with 10 indicating no change in regular activity and 0 being bedridden.   
+
+The study population includes all patients with a diagnosis of influenza. The data and results presented in the main text includes patients diagnosed with a rapid antigen or rapid PCR test. To address the impact of the influenza diagnosis method we performed the same analyses for all patients diagnosed with influenza regardless of the method used. The results are in the supplementary material.
+
+The institutional review board approved the study protocol. Data on PCR results for patients is from a study funded by Roche Diagnostics. 
+
+## Data Cleaning
+We cleaned the data to format the variables and to check for variables with potential errors or missing entries. During the cleaning process, we removed uninformative variables which we defined as any symptoms found to occur in less than 5% of patients. The symptoms of blurred vision and hearing loss both had a prevalence of less than 5%, so they were not considered for further analysis. To allow easy comparison of all symptom variables, we dichotomized weakness and body aches to "absent" or "present".  
+
+## Analysis
+We assessed the univariate relationships between activity and each symptom using linear regression treating activity level as a continuous variable. We also performed multiple linear regression. We determined the variables to include in our final model with a sequential forward floating selection, minimizing the root mean square error (RMSE) on test data through a 5-fold cross validation (20 times repeated) [@Kohavi1997].    
+
+Next, we constructed two cumulative scores, one for overall infectiousness and one for overall morbidity. To that end, we divided all symptoms into those related to infectiousness and those related to morbidity. We defined morbidity symptoms as symptoms that influence overall feelings of well-being but are not associated with infectiousness. Infectiousness symptoms are any symptoms that could plausibly contribute to passing the virus from an infected host to another. Importantly, the grouping of variables to either one of these categories and inclusion of symptoms in the scores was based on *a priori* medical and biologic considerations, independently of any observed correlation with activity level. Doing so prevents any circular reasoning since only including symptoms correlated with activity would, of course, generate a score which would match the impact on activity level.  
+
+To prevent redundant variables from being included in the score, we calculated Yule's Q between symptoms within each category [@Yule1919]. Only one of a pair of symptoms was incorporated in the score if the correlation coefficient was higher than 0.9 [@Warrens2008]. We also performed a sensitivity analysis using 0.75 as the cut off for identifying redundant symptoms. The results of this sensitivity analysis is in the supplementary material. 
+
+For highly correlated symptom pairs, we included the one in the score with the best balance (closest to 50%) of symptom presence or absence. We summed the symptoms in each category based on absence or presence, creating two scores. Correlations between the infectiousness score, morbidity score, and activity were assessed using Spearman correlation [@Hollander1973; @Conover1999] and the generalized Mantel–Haenszel procedure [@Mantel1963; @Kuritz1988]. Linear regression lines are included in the plots to help visualize the relationships.
+
+All analyses were completed using R (version 3.5.3) [@R-base]. We used the mlr package for cross-validation [@Bischl2016], vcdExtra to compute Yule's Q and the CHM trend test [@Meyer2017], DescTools to compute Spearman's rank correlation coefficient and corresponding confidence intervals [@Signorell2019]. The supplementary material includes all of the code and data required to reproduce the results.
+
+# RESULTS
+
+##Study population 
+During the study period, `r length(SympAct$Unique.Visit)` patients had a respiratory complaint and filled out the questionnaire. Among those, `r length(SympAct_Lab_Pos$Unique.Visit)` had a lab-based diagnosis of influenza (PCR or rapid antigen). The following analyses focus on those patients since they are most likely to actually be infected with influenza. For analyses of patients who received a flu diagnosis with either the tests or empirically from a physician, see the supplemental material. 
+
+Those patients with influenza reported activity levels ranging from `r min(SympAct_Lab_Pos$ActivityLevel)` to `r max(SympAct_Lab_Pos$ActivityLevel)` with a median of `r median(SympAct_Lab_Pos$ActivityLevel)` (SM Figure 1). All of the patients reported symptoms, with only `r round(sum(TotalSympLabtab[1:10])/sum(TotalSympLabtab[1:24])*100,0)`% reporting 10 or fewer (out of a total of 25). The most common symptom was coughing and the least common was abdominal pain (Table \@ref(tab:SympLabTable)). 
+
+```{r SympLabTable, echo=FALSE}
+knitr::kable(SympLabTable, caption = "**Out of the 326 patients included the table shows the number of patients who reported having the following symptoms and the corresponding percentage.**")
+```
+
+##Univariate and subset selection
+We assessed correlations between activity level and each symptom in a univariate linear analysis (Table \@ref(tab:LmActvSympLab)). All of the statistically significant symptoms had a negative correlation with activity level (Table \@ref(tab:LmActvSympLab)). 
+Next, we considered a multi-variable regression model and performed variable selection based on cross-validated minimization of RMSE. We found that the best performing model was one that included chest congestion, headache, sleeplessness, subjective fever,  vomiting, and weakness  (Table \@ref(tab:LmActvSympLab)). While vomiting is not a common symptom of influenza, in those patients who did report vomiting it lead to major reductions in their activity. 
+
+```{r LmActvSympLab, echo=FALSE, results='asis'}
+knitr::kable(LmActvSympLab, row.names=FALSE, caption = "**Results of the univariate and multivariate linear regression of symptoms and activity. The coefficients are the estimated effect on activity when the symptom is present. The multivariate model was selected with a sequential forward floating selection, minimizing the RMSE on test data through a 5-fold cross validation (20 times repeated). 95%CI = The 95% confidence interval for the coefficient.**")
+```
+
+##Computation of infectiousness and morbidity scores
+We divided symptoms into infectiousness-related and morbidity-related and used them to construct an infectiousness and morbidity score. To prevent circular reasoning regarding associations between those scores and activity, the division and potential inclusion of symptoms into each score was done based purely on biological considerations, without regard for any associations with activity found in the previous analysis. We classified coughing, chest congestion, sneezing, runny nose, and nasal congestion as infectiousness related symptoms. The symptoms of subjective fever, having chills and or sweats, body aches, weakness, headache, fatigue, sleeplessness, breathlessness, wheezing, chest pain, sore throat, abdominal pain, diarrhea, nausea, vomiting, ear pain, tooth pain, eye pain, itchy eyes, and swollen lymph nodes were classified as morbidity related symptoms.
+
+Among the symptoms related to infectiousness only cough and chest congestion correlated with each other at a level of greater than 0.9 (SM Figure 2). We kept chest congestion since it was more balanced then cough, which was present in 94% of patients. Among the morbidity symptoms, only vomiting and weakness correlated greater than 0.9 (SM Figure 3). Vomiting was included in the score since it was more balanced then weakness, which was present in 94% of patients. For the results of the sensitivity analysis using 0.75 as the cut off for identifying redundant symptoms, see the supplementary material.  
+
+The infectiousness score included all the candidate symptoms except cough, and the morbidity score included all the candidate symptoms except weakness. Each symptom present in a patient, contributed one point to its respective score. The calculated infectiousness score had a possible range of 0 to 4, and the morbidity score had a possible range of 0 to 19.  
+
+The median infectiousness score was `r median(SympAct_Lab_Pos$TransScore)`. Only `r sum(SympAct_Lab_Pos$TransScoreF==0)` patients had an infectiousness score of 0, `r round(sum(TransLabtab[1:3])/sum(TransLabtab[1:5])*100,0)`% had a score of 2 or less, and `r round(sum(TransLabtab[5:5])/sum(TransLabtab[1:5])*100,0)`% of patients had the maximum possible score of 4 (Figure \@ref(fig:IandMScoresFig)A).
+
+The mean morbidity score was `r mean(SympAct_Lab_Pos$ImpactScore)`, and no patients had a morbidity score of 0, 1, 18 or 19 (Figure \@ref(fig:IandMScoresFig)B). The centered distribution was expected since all the patients felt sick enough to seek medical care, but none were sick enough to require urgent care or hospitalization.
+
+```{r IandMScoresFig, fig.cap="(A) The distribution of infectiousness score with counts for each level. (B) The distribution of the morbidity score with counts for each level. There are no patients with a score of 0, 1, 18, and 19.", echo=FALSE}
+knitr::include_graphics("../5 Results/Figures/IandMScoresLabBarChart.tiff")
+```
+
+##Impact of infectiousness score on activity 
+Analysis of the association between the infectiousness score and the patient's self-reported activity level suggests that the value of this score has a small impact on the activity level of a patient, with higher infectiousness correlating with reduced activity. Spearman's rank correlation indicates negative relationship ($r=$ `r sprint_CI95(Trans_Cor_Lab[1], Trans_Cor_Lab[2], Trans_Cor_Lab[3])`) and the Cochran-Mantel-Haenszel trend test is statistically significant ($\chi^2 =$ `r Trans_Trend_Lab$table["cor","Chisq"]`, $df =$ `r Trans_Trend_Lab$table["cor","Df"]`, $p$ `r pvalr(Trans_Trend_Lab$table["cor","Prob"])`) (Figure \@ref(fig:LabTvAFig)). Note however that the data suggest that the relationship between infectiousness and activity is not linear, but instead curved, with lower activity at both the low and high infectiousness score and maximum activity at intermediate infectiousness. We cannot think of a biological mechanism that might lead to this pattern. The reason the overall trend is negative is likely due to the larger sample sizes for infectiousness scores 2-4. Given that the observed negative trend is small and doesn't show a monotone decline, it is most reasonable to assume based on this data that there is no meaningful relationship between infectiousness score and activity level. 
+
+```{r LabTvAFig, fig.cap="Activity level for each level of the infectiousness score. Red diamonds indicate the mean. The solid blue line is the linear regression fit. The shaded area is the 95% confidence interval for the linear regression", echo=FALSE}
+knitr::include_graphics("../5 Results/Figures/ActivityVSTransScore_Lab.tiff")
+```
+
+##Impact of morbidity score on activity
+Analysis of the association between the morbidity score and the patient's self-reported activity level suggests that higher morbidity score is associated with reduced activity levels. Spearman's rank correlation indicates negative relationship ($r=$ `r sprint_CI95(Impact_Cor_Lab[1], Impact_Cor_Lab[2], Impact_Cor_Lab[3])`) and the Cochran-Mantel-Haenszel trend test is statistically significant ($\chi^2 =$ `r Impact_Trend_Lab$table["cor","Chisq"]`, $df =$ `r Impact_Trend_Lab$table["cor","Df"]`, $p$ `r pvalr(Impact_Trend_Lab$table["cor","Prob"])`) (Figure \@ref(fig:LabMvAFig)). The observed pattern is consistent and clear, with a reduction of `r round((MA0$ActivityLevel-MA6$ActivityLevel)/MA0$ActivityLevel*100,0)`% in mean activity level going from the lowest to the highest morbidity score.
+
+```{r LabMvAFig, fig.cap="Activity level for each level of the morbidity score. Red diamonds indicate the mean. The solid blue line is the linear regression fit. The shaded area is the 95% confidence interval for the linear regression", echo=FALSE}
+knitr::include_graphics("../5 Results/Figures/ActivityVSImpactScore_Lab.tiff")
+```
+
+##Impact of morbidity score on infectiousness score  
+Analysis of the relationship between the morbidity and infectiousness scores show a positive correlation. Spearman's rank correlation indicates positive relationship ($r=$ `r sprint_CI95(TvI_Cor_Lab[1], TvI_Cor_Lab[2], TvI_Cor_Lab[3])`) and the Cochran-Mantel-Haenszel trend test is statistically significant ($\chi^2 =$ `r TvI_Trend_Lab$table["cor","Chisq"]`, $df =$ `r TvI_Trend_Lab$table["cor","Df"]`, $p$ `r pvalr(TvI_Trend_Lab$table["cor","Prob"])`) (Figure \@ref(fig:LabMvTFig)). Apart from the mean activity levels for very low morbidity score values (with very small sample sizes), the pattern is consistent and clear, with an increase of `r round((MI6$TransScore-MI0$TransScore)/MI0$TransScore*100,0)`% in the mean infectiousness score going from the lowest to the highest morbidity score. 
+
+```{r LabMvTFig, fig.cap="Infectiousness score for each level of the morbidity score. Red diamonds indicate the mean. The solid blue line is the linear regression fit. The shaded area is the 95% confidence interval for the linear regression", echo=FALSE}
+knitr::include_graphics("../5 Results/Figures/TransScoreVSImpactScore_Lab.tiff")
+```
+
+## Conceptualizing our results
+The hypothesis of virulence-transmission trade-off as explained in the introduction assumes that increasing levels of virulence lead initially to an increase in transmission-enhancing symptoms, but at some point, virulence leads to transmission-reducing symptoms, with an optimum for the pathogen at some intermediate level. One can quantify this by considering overall transmission potential, $T$, to be proportional to the product of per-contact transmission potential, $p$, contact-rate among infected and susceptible, $c$ , and the duration of infectiousness $d$. All 3 quantities can potentially be impacted by virulence, $v$ i.e. $T \sim p(v) \times c(v) \times d(v)$. Unfortunately, for our study we do not have information on the duration of infectiousness. While it is quite likely that  virulence can impact the duration of infectiousness, for the following discussion we assume $d$ to be constant. In that case we have $T \sim p(v) \times c(v)$. Overall transmission potential is optimized when $p \times c$ is maximized. Figure \@ref(fig:HypoFig) illustrates graphically a relation for contact rate, per-contact transmission potential and overall transmission potential as a function of virulence.
+
+We can map our data onto this conceptual figure if we consider the morbidity score as a proxy of virulence, $v$, the infectiousness score as a proxy of per-contact transmission potential, $p$, and patient-reported activity as a proxy for the contact rate, $c$. Since our data is measured in units with indirect and uncertain mapping to actual per-contact transmission potential and actual contact rate, we standardize the data and manually place it on top of the conceptual lines, this should not be considered a quantitative mapping. 
+
+
+Our study population consisted of individuals who felt sick enough to seek medical care, but none were ill enough to require emergency care. We thus expect them to be in the middle of the virulence spectrum. Based on our data, this range is characterized by infectiousness levels that are close to their maximum value (at least as measured with our absence/presence scale) and are not impacted much by changes in morbidity/virulence. In contrast, activity is more strongly impacted by morbidity/virulence. We would expect that a study population that included asymptomatic and mildly symptomatic infected persons would be on the left side of our data, where increases in virulence would lead to increases in infectiousness, with small initial decreases in activity, while severely ill and hospitalized individuals would fall to the right side of our data in the figure.
+
+```{r HypoFig, fig.cap="This figure illustrates conceptually the hypothetical impact of virulence on total transmission potential ($T$) resulting from a trade-off between per-contact transmission potential ($p$) and contact-rate ($c$). The lines are for illustrative purposes only and not fitted to the data. We are using morbidity as a proxy for virulence. We placed our data in the middle of the full virulence scale since we did not capture anyone not sick enough to seek care nor did we capture anyone who was so ill they were hospitalized or died. The values for infectiousness and activity are re-scaled to allow better visualization. The actual mapping between our measured quantities and the theoretical contact rate and per-contact infectiousness are not known, but based on past research it is feasible to expect that a proportional relationship exists.", echo=FALSE}
+knitr::include_graphics("../5 Results/Figures/ConceptFig.tiff")
+```
+
+# DISCUSSION 
+We believe that this is the first study that investigates a trade-off between contact-rate and per contact transmission potential for  influenza in humans [@Alizon2009; @Ebert2003; @Cressler2016; @Geoghegan2018]. We showed that for our population, activity decreased as both morbidity and infectiousness scores increased, and we found a positive association between morbidity and infectiousness symptoms. 
+
+Limitations of the study include not knowing the flu sub-type for those infected. The type and sub-type of the virus can affect the epidemiological features of the disease [@Cowling2010]. Based on influenza surveillance data for the 2016/17 season only 22.1% was influenza B with 77.9% influenza A with the subtype H3N2 making up 97.2% with H1N1 making up the remaining 2.8% [@Blanton2017]. Additionally, we only collected data on individuals who were experiencing symptoms severe enough to seek care. As a result, we do not have data on individuals with low virulence infections. As explained above, such data would allow for a complete exploration across the full range of virulence and to determine relationships between transmission, morbidity, and infectiousness. Finally, our study population was made up of college students, i.e., generally young and healthy individuals. As such their symptoms, infectiousness, and activity behavior distributions might not fully apply to a more general population.
+
+Despite these potential limitations, our study provides valuable information that can be useful to inform current and future interventions targeting influenza. For example, our results suggest that a treatment that only reduces those symptoms that are part of our morbidity score, without affecting symptoms that make up our infectiousness score, could lead to increased transmission. While from the perspective of a patient or clinician a reduction in any symptom may be viewed as a positive, such an intervention might lead to worse outcomes on the population level. Current FDA approval of anti-influenza drugs rely on showing an impact on the symptoms, with a focus on more severe and systemic (i.e., morbidity) symptoms [@Ebell2012;@Hayden2018;@Jefferson2004]. From a population perspective, it is essential that such drugs also reduce host infectiousness [@Jefferson2004;@Nishiura2011;@Goldstein2010]. Some evidence for this has been found in previous studies[@Halloran2006; @Yang2009; Goldstein2010; @Tsang2016].  
+
+Population-level control of infectious diseases makes increasing use of mathematical models [@Lessler2016]. The need for these models to be accurate is critical. Researchers have increasingly recognized that capturing human behavior changes during an infectious disease outbreak, both for uninfected and infected individuals is relevant [@Funk2015;@Carrasco2013]. As far as we are aware, only one previous modeling study for influenza has tried to capture the impact of infection on behavior [@Handel2007]. Previous studies have shown that symptoms aid infectiousness and impact the number of contacts [@Eames2010; @VanKerckhove2013]. In our analysis, we found an `r round((MA0$ActivityLevel-MA6$ActivityLevel)/MA0$ActivityLevel*100,0)`% reduction in median activity as a result of increased morbidity. Using data from our study and past studies [@Eames2010; @VanKerckhove2013] is a starting point for future models that can explore the impacts of infectiousness and contact behavior of infected hosts [@Handel2015].  
+
+# References
