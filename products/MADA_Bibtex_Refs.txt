@@ -1,0 +1,68 @@
+﻿@article{RN4,
+   author = {Barnes, Brian B. and Hu, Chuanmin and Holekamp, Kara L. and Blonski, Slawomir and Spiering, Bruce A. and Palandro, David and Lapointe, Brian},
+   title = {Use of Landsat data to track historical water quality changes in Florida Keys marine environments},
+   journal = {Remote Sensing of Environment},
+   volume = {140},
+   pages = {485-496},
+   ISSN = {0034-4257},
+   DOI = {10.1016/j.rse.2013.09.020},
+   url = {http://proxy-remote.galib.uga.edu/login?url=http://search.ebscohost.com/login.aspx?direct=true&db=edselp&AN=S003442571300357X&site=eds-live},
+   year = {2014},
+   type = {Journal Article}
+}
+
+@article{RN2,
+   author = {Brian, Lapointe and Ryan, H. Smith and Elizabeth, M. Johns and Nelson, Melo and Chuanmin, Hu and Jun, Zhao},
+   title = {Satellite-Observed Black Water Events off Southwest Florida: Implications for Coral Reef Health in the Florida Keys National Marine Sanctuary},
+   journal = {Remote Sensing},
+   number = {1},
+   pages = {415},
+   ISSN = {2072-4292},
+   DOI = {10.3390/rs5010415},
+   url = {http://proxy-remote.galib.uga.edu/login?url=http://search.ebscohost.com/login.aspx?direct=true&db=edsdoj&AN=edsdoj.073d4ab38a1a4b0586b88c50931a530e&site=eds-live},
+   year = {2013},
+   type = {Journal Article}
+}
+
+@article{RN3,
+   author = {Butler, I. V. Mark J. and Weisz, Jeremy B. and Butler, Jack},
+   title = {The effects of water quality on back-reef sponge survival and distribution in the Florida Keys, Florida (USA)},
+   journal = {Journal of Experimental Marine Biology and Ecology},
+   volume = {503},
+   pages = {92-99},
+   ISSN = {0022-0981},
+   DOI = {10.1016/j.jembe.2018.03.001},
+   url = {http://proxy-remote.galib.uga.edu/login?url=http://search.ebscohost.com/login.aspx?direct=true&db=edselp&AN=S0022098117305129&site=eds-live},
+   year = {2018},
+   type = {Journal Article}
+}
+
+@article{RN6,
+   author = {Precht, William F. and Miller, Steven L.},
+   title = {Ecological shifts along the Florida reef tract; the past as a key to the future},
+   journal = {Ecological Studies},
+   volume = {192},
+   pages = {237-312},
+   ISSN = {00708356
+978-0-387-33538-4
+978-0-387-33537-7
+0-387-33538-2
+0-387-33537-4},
+   url = {http://proxy-remote.galib.uga.edu/login?url=http://search.ebscohost.com/login.aspx?direct=true&db=geh&AN=2008-092866&site=eds-live},
+   year = {2007},
+   type = {Journal Article}
+}
+
+@article{RN5,
+   author = {Wagner Daniel, E. and Kramer, Philip and van Woesik, Robert},
+   title = {Species composition, habitat, and water quality influence coral bleaching in southern Florida},
+   journal = {Marine Ecology Progress Series},
+   volume = {408},
+   pages = {65},
+   ISSN = {01718630
+16161599},
+   url = {http://proxy-remote.galib.uga.edu/login?url=http://search.ebscohost.com/login.aspx?direct=true&db=edsjsr&AN=edsjsr.24873952&site=eds-live},
+   year = {2010},
+   type = {Journal Article}
+}
+
