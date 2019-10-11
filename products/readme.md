@@ -1,15 +1,7 @@
-The folders inside this folder should contain all the products of your project.
+This folder contains all of the finished products of the project as well as references materials. 
 
-For a classical academic project, this will be a peer-reviewed manuscript. 
-The `manuscript` folder contains a template. This template is structured as a report for a class, but you can easily adjust it.
+The full manuscript can be found under the _manuscript_ subfolder as both an Rmd file and docx file. To reproduce the manuscript ad a Word document open the Rmd file titled _William_Norfolk_Project_Manuscript_, select _run all chunks_, then _knit to Word doc_ to produce a Word output file (docx). All tables and figures referenced in the text are stored in the _results_ under the project directory, and are embedded vai the realtive path to their locations. Relative visualization paths can be view in the Rmd file of the manuscript embedded code chunks respective to their location within the text.
 
-Most manuscripts these days have supplementary material, place those into the `supplement` folder. (I find this structure easier than moving it inside the manuscript folder, but that's personal choice).
+All references were gathered using the Zotero reference manager and exported as a Bibtext.txt file which is stored in the _products_ folder. 
 
-Often, you might make slides for an oral presentation, place those in the `slides` folder. 
-
-If you make a scientific poster, that should go into the `poster` folder. There are a number of R pacakges that allow you to make a poster in RMarkdown, see [e.g. this list.
-](https://gist.github.com/Pakillo/4854e5d760351206084f6be8abe476b2)
-
-You can add further folders. For instance you could have a `website` folder if you plan to write a blog-post or make an interactive shiny-app for your project.  
-
-Often you need a library of references in bibtex format, as well as a CSL style file that determines reference formatting. Since those files might be used by several of the products, I'm placing them in the main products folder. Feel free to re-organize.
+####Working Note#### Still Receiving consistent errors when attempting to knit with the current reference setup. No such file in director error presents when calling a reference. Possibly due to the fact that the reference file is a txt file? or a format issue? Document will knit if reference path is reverted back to the example provided within the template.

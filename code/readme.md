@@ -1,5 +1,6 @@
-For a detailed breakdown of data import, cleaning, and wrangling please see the WQprocessing.Rmd file in the processing_code subfolder.
+To run processing code or exploratory data analysis code select the desired Rmd file or files from the subfolders _analysis_code_ and/or _processing_code_. To view the results in the RStudio select _Run All Chunks_, to view as a docx output file select _knit to Word doc_. All knitted docx files can also be directly found in the specific code subfolder. 
 
-For a detailed breakdown of the exploratory data analysis please see the Exploratory_Data_Analysis.Rmd file in the analysis_code subfolder. 
+For a detailed breakdown of the data import, cleaning, and wrangling process please reference the written commentary embedded into the Rmd file titled _WQprocessing.Rmd_ in the _processing_code_ subfolder. Commentary is also viewable via the docx output file of the same name included in the _processing code_ subfolder.
 
-A docx knit of each of the above scripts are also located in the respective subfolder for direct download. 
+For a detailed breakdown of the exploratory data analysis please reference the written commentary embedded into the Rmd files titled _Exploratory_Data_Analysis_Location.Rmd_ and _Exploratory_Data_Analysis_Seasonal_ in the _analysis_code_ subfolder. The _Location_ script focuses on variables concerned with the specific habitat type of each sampling site measured within the study. The _Seasonal_ script focuses on variables concerned with seasonal changes in the data and explores the effects of Hurrican Irma landfall on the water quality conditions of Key Largo. Commentary is also viewable via the docx output file of the matching name to the script of interest. 
+
