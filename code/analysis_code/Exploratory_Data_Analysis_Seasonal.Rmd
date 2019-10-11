@@ -5,6 +5,7 @@ date: "10/10/2019"
 output: word_document
 ---
 
+Now that we have dissected the data by island side and site type we will look into seasonal differences.
 
 
 Load the required libraries for exploratory analysis.
@@ -38,12 +39,18 @@ island_side_filter <- filter(WQ_clean_data, !is.na(island_side))
 site_type_filter <- filter(WQ_clean_data, !is.na(site_type))
 ```
 
-Now that we have baseline visuals of the differet island sides and site types, lets start to look at some seasonal changes and see if we can identify the presence of Hurricane Irma in the data.
+We will reload our filters for ease of access.
+
+Let's start with some monthly plots of each parameter across the four years of the study. We will indicate site type by color.
+
+Looking at temperature it appears that standard seasonal fluctions are at play. It is also clear that MarineLab is closed from mid-August to September 1st due to the lack of observations during this time frame.
 
 ```{r}
 site_type_filter %>% ggplot() +
   geom_jitter(aes(x = Month, y = water_temp, color = site_type)) + facet_wrap(~Year)
 ```
+
+pH looks reasonably consistant across all sites and years of measurement.
 
 ```{r}
 site_type_filter %>% ggplot() +
@@ -51,15 +58,23 @@ site_type_filter %>% ggplot() +
 
 ```
 
+Dissolved oxygen shows a decently wide spread across all four years. Deeper analysis may reveal further seasonal details.
+
 ```{r}
 site_type_filter %>% ggplot() +
   geom_jitter(aes(x = Month, y = dissolved_oxygen, color = site_type)) + facet_wrap(~Year)
 ```
 
+Salinity is reasonably consistent across all years. There is a notable drop in late 2017 (around Hurricane Irma timeline) which may be interesting to look at further. It should be noted that there are fewer observations from that time frame due to the inability to sample sites via boat until water were safe.
+
+
 ```{r}
 site_type_filter %>% ggplot() +
   geom_jitter(aes(x = Month, y = salinity, color = site_type)) + facet_wrap(~Year)
 ```
+
+Lastly, ammonia looks reasonably consistent as well across the years.
+
 
 ```{r}
 
@@ -68,28 +83,39 @@ site_type_filter %>% ggplot() +
 
 ```
 
+Next let's overlay some geom_smooth plots with jitter plots to see general trends. We will need the Month variable to be numeric to properly plot.
+
 ```{r}
 WQ_clean_data$Month <- as.numeric(as.character(WQ_clean_data$Month))
 ```
 
-
-
+As expected, temperature appears fairly seasonal with cooler water temp in the winter and warmer in the summer months. It looks like 2016 was the warmest year, which is consistent with previous work and coral bleaching events in the Keys.
 
 ```{r}
 WQ_clean_data %>% ggplot(aes(x = Month, y = water_temp, color = Year)) + geom_jitter() + geom_smooth() + scale_x_continuous(breaks = c(1:12))
 ```
 
+Salinity shows a bit of swing occasionally, but seems to rest pretty consistently at approximately 35 ppt. Though a bit low in late 2017 and early 2018.
+
 ```{r}
 WQ_clean_data %>% ggplot(aes(x = Month, y = salinity, color = Year)) + geom_jitter() + geom_smooth() + scale_x_continuous(breaks = c(1:12))
 ```
+
+Ammonia is pretty consistent across all years except 2017. 2017 spikes upward toward the end of the year which may be attributable to Hurricane Irma nutient influx however, it appears the spike begins earlier (July) while the hurricane was in September.
 
 ```{r}
 WQ_clean_data %>% ggplot(aes(x = Month, y = ammonia, color = Year)) + geom_jitter() + geom_smooth() + scale_x_continuous(breaks = c(1:12))
 ```
 
+LAstly, dissolved oxygen reamins consistent across the years. There is a curious bump in early 2016.
+
 ```{r}
 WQ_clean_data %>% ggplot(aes(x = Month, y = dissolved_oxygen, color = Year)) + geom_jitter() + geom_smooth() + scale_x_continuous(breaks = c(1:12))
 ```
+
+For the last part of exploratory analysis, we will prepares some plots of the entire time scale covered in the study. This is to view seasonal fluctuation in each parameter, and search for Hurricane Irma impacts. To view, we must first take the average of each month data was recorded then plot the timescale agains the parameter.
+
+Temperature measures across the four years show a consistent seasonal fluctuation.
 
 ```{r}
 mean_water_temp <- aggregate(water_temp ~ Month + Year, WQ_clean_data, mean) 
@@ -98,8 +124,12 @@ mean_water_temp <- aggregate(water_temp ~ Month + Year, WQ_clean_data, mean)
 
 mean_water_temp$Date <- as.yearmon(paste(mean_water_temp$Month, mean_water_temp$Year, sep = "."), format = "%m.%Y")
 
-mean_water_temp %>% ggplot(aes(x = Date, y = water_temp)) + geom_line()
+mean_water_temp_plot <- mean_water_temp %>% ggplot(aes(x = Date, y = water_temp)) + geom_line() + xlab("Year") + ylab("Water Temperature (C)")
+
+mean_water_temp_plot
 ```
+
+Salinity shows moderate seasonality likely strongly influenced by bayside sites. There is a distinct drop in salinity around Hurricane Irma timeframe which may be attributable to the large-scale mixing of brackish and salt water, as well as intense rainfall during and after the storm event. Caution should be taken still with the reduced observations from that time frame.
 
 ```{r}
 
@@ -107,6 +137,58 @@ mean_salinity <- aggregate(salinity ~ Month + Year, WQ_clean_data, mean)
 
 mean_salinity$Date <- as.yearmon(paste(mean_salinity$Month, mean_salinity$Year, sep = "."), format = "%m.%Y")
 
-mean_salinity %>% ggplot(aes(x = Date, y = salinity)) + geom_line()
+mean_salinity_plot <- mean_salinity %>% ggplot(aes(x = Date, y = salinity)) + geom_line() + xlab("Year") + ylab("Salinity (ppt)")
+
+mean_salinity_plot
+```
+
+Ammonia remains fairly low on average with the exception of a major spike in late 2017. This spike is very likely a result of hurricane-induced nutrient influx during the storm and afterwards. 
+
+```{r}
+
+mean_ammonia <- aggregate(ammonia ~ Month + Year, WQ_clean_data, mean) 
+
+mean_ammonia$Date <- as.yearmon(paste(mean_ammonia$Month, mean_ammonia$Year, sep = "."), format = "%m.%Y")
+
+mean_ammonia_plot <- mean_ammonia %>% ggplot(aes(x = Date, y = ammonia)) + geom_line() + xlab("Year") + ylab("Ammonia (mg/L)")
+
+mean_ammonia_plot
 
 ```
+
+Dissolved oxygen shows a relatively seasonal trend with the addition of a sharp plunge in concentration in late September 2017. It is probable this is an additional effect of Hurricane Irma damage.
+
+```{r}
+
+mean_dissolved_oxygen <- aggregate(dissolved_oxygen ~ Month + Year, WQ_clean_data, mean) 
+
+mean_dissolved_oxygen$Date <- as.yearmon(paste(mean_dissolved_oxygen$Month, mean_dissolved_oxygen$Year, sep = "."), format = "%m.%Y")
+
+mean_dissolved_oxygen_plot <- mean_dissolved_oxygen %>% ggplot(aes(x = Date, y = dissolved_oxygen)) + geom_line() + xlab("Year") + ylab("Dissolved Oxygen (mg/L)")
+
+mean_dissolved_oxygen_plot
+
+```
+
+pH shows a standard range with no directly apparent seasonality. There is a visible dip in levels around the time of Hurrican Irma, however this drop does not appear to be distinctly different from previously measured levels of pH in the Keys (note 2016). It is interesting to see the general upward trend in pH which may possibly be attributable to ocean acidification. Though not part of our original questions, this may be an interesting analysis.
+
+```{r}
+
+mean_ph <- aggregate(ph ~ Month + Year, WQ_clean_data, mean) 
+
+mean_ph$Date <- as.yearmon(paste(mean_ph$Month, mean_ph$Year, sep = "."), format = "%m.%Y")
+
+mean_ph_plot <- mean_ph %>% ggplot(aes(x = Date, y = ph)) + geom_line() + xlab("Year") + ylab("pH")
+
+mean_ph_plot
+
+```
+
+
+
+```{r}
+combined_seasonal_trends <- grid.arrange(mean_ammonia_plot, mean_ph_plot, mean_salinity_plot, mean_dissolved_oxygen_plot, mean_water_temp_plot, nrow = 2)
+
+ggsave(filename = "../../results/combined_seasonal_trends.png",plot = combined_seasonal_trends) 
+```
+

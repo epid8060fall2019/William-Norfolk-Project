@@ -29,6 +29,7 @@ WQ_clean_data <- readRDS("../../data/processed_data/processeddata.rds")
 glimpse(WQ_clean_data)
 ```
 
+We will add soem filters to make life easy to deal with NAs in our variables of interest.
 
 ```{r}
 island_side_filter <- filter(WQ_clean_data, !is.na(island_side))
@@ -37,9 +38,9 @@ site_type_filter <- filter(WQ_clean_data, !is.na(site_type))
 ```
 
 
-Now lets generate some plots to compare ocean vs bay. 
+Now we generate some plots to compare ocean vs bay. 
 
-Looks like pH is pretty consistent between the ocean and bayside.
+Looks like pH is pretty consistent between the ocean and bayside in both mean and range. This is expected due to the limestone bedrock of the Florida Keys island chain.
 
 ```{r}
 island_side_filter %>% ggplot() + 
@@ -57,11 +58,11 @@ ggsave(filename = "../../results/bay_v_ocean_ph.png",plot = bay_v_ocean_ph)
 
 ```
 
-We will save the violin + jitter plots for use later.
+We will save the violin + jitter plots we generate for use later.
 
 
+Looks like salinity may be a little more interesting. Ocean side appears to have a narrower range of values compared to the bayside, this is likely due to the reduced size and depth range of the Florida Bay compared to the Atlantic Ocean.
 
-Looks like salinity may be a little more interesting. Ocean side appears to have a narrower range of values compared to the bayside,  which is expected due to the size of the body of water.
 
 ```{r}
 
@@ -79,6 +80,7 @@ ggsave(filename = "../../results/bay_v_ocean_salinity.png",plot = bay_v_ocean_sa
 
 ```
 
+The water temperature profiles look similar to the salinity profiles. The oceanside locations appear to have a narrower range compared to the bayside which can get quite cold and warm seasonally.
 
 
 ```{r}
@@ -96,6 +98,9 @@ ggsave(filename = "../../results/bay_v_ocean_water_temp.png",plot = bay_v_ocean_
 
 ```
 
+
+Dissolved oxygen looks pretty similar across the ocean side and bayside on average. The distinct aggregations of jitter points is likely due to the fact that dissolved oxygen measures are recorded on a semiquantative scale using a colormetric comparison.
+
 ```{r}
 island_side_filter %>% ggplot() + 
   geom_boxplot(aes(x = island_side, y = dissolved_oxygen))
@@ -110,6 +115,9 @@ bay_v_ocean_dissolved_oxygen
 ggsave(filename = "../../results/bay_v_ocean_dissolved_oxygen.png",plot = bay_v_ocean_dissolved_oxygen) 
 
 ```
+
+
+Ammonia appears reasonably similar on average as well. Similar to dissolved oxygen, ammonia is also collected using a colormetric scale with semiquantative values which likely caused the grouping of observations seen. Most values appear to be zero or very close which is a healthy measurement of oceanic water typically. In depth analysis of this variable may be illuminating with respect to Hurrican Irma.
 
 ```{r}
 filter(WQ_clean_data, !is.na(island_side)) %>% ggplot() + 
@@ -126,7 +134,9 @@ ggsave(filename = "../../results/bay_v_ocean_ammonia.png",plot = bay_v_ocean_amm
 
 ```
 
+Now we will consider site type. There are a number of sites that are located on the ocean side of the island that are actually mangrove/seagrass sites. Additionally, there is a biological difference between patch reefs/hardbottom sites and the formal reef line. We will compare individual variables as above.
 
+Seperating the salinity data we can see that there is a much wider range for seagrass/mangrove site locations. Patch reefs/hardbottom sites appear similar to coral reefs in salinity, however it should be noted that patch reefs/hardbottom sites have fewer observations recorded.
 
 ```{r}
 site_type_filter %>% ggplot() + 
@@ -139,6 +149,8 @@ site_type_salinity
 ggsave(filename = "../../results/site_type_salinity.png",plot = site_type_salinity) 
 
 ```
+
+Similar to salinity, we see a wide range of water temperature in seagrasss/mangrove site locations. Interestingly, it appears patch reefs/hardbottom has a higher average temperature compared to coral reefs. This may be due to the fact that patch reefs tend to be shallower in depth, however this parameter was not measured in this study.
 
 ```{r}
 site_type_filter %>% ggplot() + 
@@ -153,6 +165,8 @@ ggsave(filename = "../../results/site_type_water_temp.png",plot = site_type_wate
 
 ```
 
+Similar to the island side results, dissolved oxygen looks reasonably consistent across all three site types.
+
 ```{r}
 site_type_filter %>% ggplot() + 
   geom_jitter(aes(x = site_type, y = dissolved_oxygen))
@@ -164,6 +178,8 @@ site_type_dissolved_oxygen
 ggsave(filename = "../../results/site_type_dissolved_oxygen.png",plot = site_type_dissolved_oxygen) 
 
 ```
+
+Lastly, ammonia looks reasonably similar across all site types. There may be a slightly greater ammoina level in seagrass/mangrove sites judging by the distributions, however full analysis is needed to confirm.
 
 ```{r}
 site_type_filter %>% ggplot() + 
@@ -177,89 +193,7 @@ ggsave(filename = "../../results/site_type_ammonia.png",plot = site_type_ammonia
 
 ```
 
-Now that we have baseline visuals of the differet island sides and site types, lets start to look at some seasonal changes and see if we can identify the presence of Hurricane Irma in the data.
 
-```{r}
-site_type_filter %>% ggplot() +
-  geom_jitter(aes(x = Month, y = water_temp, color = site_type)) + facet_wrap(~Year)
-```
-
-```{r}
-site_type_filter %>% ggplot() +
-  geom_jitter(aes(x = Month, y = ph, color = site_type)) + facet_wrap(~Year)
-
-```
-
-```{r}
-site_type_filter %>% ggplot() +
-  geom_jitter(aes(x = Month, y = dissolved_oxygen, color = site_type)) + facet_wrap(~Year)
-```
-
-```{r}
-site_type_filter %>% ggplot() +
-  geom_jitter(aes(x = Month, y = salinity, color = site_type)) + facet_wrap(~Year)
-```
-
-```{r}
-
-site_type_filter %>% ggplot() +
-  geom_jitter(aes(x = Month, y = ammonia, color = site_type)) + facet_wrap(~Year)
-
-```
-
-```{r}
-WQ_clean_data$Month <- as.numeric(as.character(WQ_clean_data$Month))
-```
-
-
-
-
-```{r}
-WQ_clean_data %>% ggplot(aes(x = Month, y = water_temp, color = Year)) + geom_jitter() + geom_smooth() + scale_x_continuous(breaks = c(1:12))
-```
-
-```{r}
-WQ_clean_data %>% ggplot(aes(x = Month, y = salinity, color = Year)) + geom_jitter() + geom_smooth() + scale_x_continuous(breaks = c(1:12))
-```
-
-```{r}
-WQ_clean_data %>% ggplot(aes(x = Month, y = ammonia, color = Year)) + geom_jitter() + geom_smooth() + scale_x_continuous(breaks = c(1:12))
-```
-
-```{r}
-WQ_clean_data %>% ggplot(aes(x = Month, y = dissolved_oxygen, color = Year)) + geom_jitter() + geom_smooth() + scale_x_continuous(breaks = c(1:12))
-```
-
-```{r}
-mean_water_temp <- aggregate(water_temp ~ Month + Year, WQ_clean_data, mean) 
-
-
-
-mean_water_temp$Date <- as.yearmon(paste(mean_water_temp$Month, mean_water_temp$Year, sep = "."), format = "%m.%Y")
-
-mean_water_temp %>% ggplot(aes(x = Date, y = water_temp)) + geom_line()
-```
-
-```{r}
-
-mean_salinity <- aggregate(salinity ~ Month + Year, WQ_clean_data, mean) 
-
-mean_salinity$Date <- as.yearmon(paste(mean_salinity$Month, mean_salinity$Year, sep = "."), format = "%m.%Y")
-
-mean_salinity %>% ggplot(aes(x = Date, y = salinity)) + geom_line()
-
-```
-
-
-To Do:
-
-Make a plot for all months of all years. Ideally with all parameters on seperate lines to view seasons.
-
-Add comentary to this Rmd. 
-
-Paste a few good figures into manuscript.
-
-Add a few citations.
 
 Edit writing.
 
