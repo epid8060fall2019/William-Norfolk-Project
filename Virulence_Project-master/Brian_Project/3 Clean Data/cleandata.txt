@@ -1,4 +1,0 @@
-This folder will contain the processed/cleaned data, which is generated from the raw data by the cleaning script.
-
-The cleaned datasets are processed/analyzed by the scripts in the analysis folder.
-
