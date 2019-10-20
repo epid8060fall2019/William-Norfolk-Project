@@ -21,7 +21,7 @@ _Write a summary of your project._
 _This section is only there to show how to insert results from other places in the project and how to cite figures and other references. Delete this whole section at some point._
 
 
-This paper [@Leek2015a] discusses types of analyses. 
+This paper [@Leek2015a] discusses types of analyses. [@Precht2007]
 
 
 Figure \@ref(fig:resultfigure) shows a result figure from the analysis.
