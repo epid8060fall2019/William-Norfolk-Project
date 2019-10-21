@@ -9,7 +9,7 @@ documentclass: article
 output:
   bookdown::word_document2: 
     toc: false
-bibliography: ../references.bib
+bibliography: ../MADA_Proj_Refs.bib
 csl: ../apa.csl
 ---
 
