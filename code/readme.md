@@ -1,4 +1,4 @@
-##How to Run the Primary Project Scripts
+## How to Run the Primary Project Scripts
 
 To run processing code or exploratory data analysis code select the desired Rmd file or files from the subfolders _analysis_code_ and/or _processing_code_. To view the results in the RStudio select _Run All Chunks_, to view as a docx output file select _knit to Word doc_. All knitted docx files can also be directly found in the specific code subfolder. 
 
@@ -7,7 +7,7 @@ For a detailed breakdown of the data import, cleaning, and wrangling process ple
 For a detailed breakdown of the exploratory data analysis please reference the written commentary embedded into the Rmd files titled _Exploratory_Data_Analysis_Location.Rmd_ and _Exploratory_Data_Analysis_Seasonal_ in the _analysis_code_ subfolder. The _Location_ script focuses on variables concerned with the specific habitat type of each sampling site measured within the study. The _Seasonal_ script focuses on variables concerned with seasonal changes in the data and explores the effects of Hurrican Irma landfall on the water quality conditions of Key Largo. Commentary is also viewable via the docx output file of the matching name to the script of interest. 
 
 
-##How to Run the Citizen Science Processing Script
+## How to Run the Citizen Science Processing Script
 
 This script will produce quick simple figures that can be readily viewed by MarineLab program participants to visualize the data they have collected throughout the program.This script is designed in such a way that individuals that are unfamilar with the usage of Rstudio can successfully generate simple figures to view collected data with a minimal amount of reading.
 
