@@ -1,0 +1,138 @@
+---
+title: "Real-Time Citizen Science Data Visualization"
+author: "William Norfolk"
+date: "11/1/2019"
+output: word_document
+---
+
+This Rmd serves as a simple cleaning and analysis script to produce water quality data visualizations collected through the MarineLab citizen science water quality monitoring program. This script functions using the excel template included in the *data* folder within the *individual_program_data* subfolder. Field data from individual programs should be entered into a copied version of the blank excel template and saved with a unique name to the _individual_program_data_ folder. Following data entry, the newly saved data sheet must be loaded into this script by updating the relative path (detailed in the readme in the *data* folder).
+
+
+Load the required packages to run the script. If an error occurs that reads *"there is no package called..."* install the named package in the error in the console (the bottom left hand screen in Rstudio) using the syntax *install.packages("package name")*.
+
+
+```{r load libs}
+library(readxl)
+library(dplyr)
+library(tidyverse)
+library(forcats)
+library(ggthemes)
+library(knitr)
+library(naniar)
+library(gridExtra)
+```
+
+
+Load the data using the realitve path. _This is the only part of the script where any modification of code should occur!_
+
+To update the script with the new data from a given program ensure that the program's excel file is saved in the *individual_program_data* folder and change the file location in the path below. To change the path delete _only_ the following text:
+_individual_program_data_template_example_ replace this text with name you gave the new excel file for the program. Be aware R is case and space sensitive so if you named your file _VALPO Data_ your new relative path will be _"../../data/individual_program_data/VALPO Data.xlsx"_
+
+```{r load data}
+wqdata <- readxl::read_excel("../../data/individual_program_data/individual_program_data_template_example.xlsx")
+
+```
+
+Once you have updated the relative path, you can run the script to produce a word document containing the generate visuals. To run click the _knit_ buttom located in the upper left side of the script screen (the button has a yarn icon on it). Select _knit to Word_ or simply click the button (the default setting is knit to word). 
+
+The code chunks from here down contain all of the processing code. I will provide commentary about each section, however no modifications are required to run the script (nor should they be made, unless you are familar with R). Feel free to read the commentarty to learn more about the function of each individual code chunk.
+
+
+Start by taking a look at the data.
+
+```{r view data}
+glimpse(wqdata)
+
+```
+
+You should see our dataset contains 11 variables. The number of observations will be dependant on the amount of data collected. For this example there are 5 observations. Looking at the variables 5 of them are assigned as _character_ variables and 6 are _double_ (numeric). The class of variable is very important to the proper functioning of R. The _double_ variables are just fine the way they are, however some of the character variables need to be converted to factors. Factor variables are essentially variables that group data into different categories. 
+
+We will recode the variables _site_type and island_side_ to factors.
+
+```{r convert cats}
+wqdata$site_type <- as.factor(as.character(wqdata$site_type))
+
+wqdata$island_side <- as.factor(as.character(wqdata$island_side))
+
+```
+
+
+Next we need to ensure there are no NA values in the data. Since each program is likely to have a low number of observations it is important that there are no NAs in the data, as such every effort should be taken in the field to ensure all measures are recorded. To keep the script simple to use we will have to drop measurements that have NA values for any of the variables so it is important to try to reduce this occurance. 
+The code chunk below drops any observations that have an NA value for any of the variables. If the data contains no NA values the code chunk below should do nothing to the data (this is the ideal occurance).
+
+```{r na drop}
+na_check <- drop_na(wqdata)
+
+```
+
+Now we can start making some visuals!
+
+Lets start by comparing all of the water quality parameters with the ocean side and bay side.
+
+This code chunk produces individual box plots so the individual water quality parameters can be compared between ocean and bay side.
+
+```{r}
+
+ocean_vs_bay_temp <- ggplot(wqdata, aes(x = island_side, y = water_temp)) + geom_boxplot() + ggtitle("Ocean vs. Bay Temp") + xlab("Island Side") + ylab("Temperature (C)")
+
+ocean_vs_bay_temp
+
+ocean_vs_bay_salinity <- ggplot(wqdata, aes(x = island_side, y = salinity)) + geom_boxplot() + ggtitle("Ocean vs. Bay Salinity") + xlab("Island Side") + ylab("Salinity (ppt)")
+
+ocean_vs_bay_salinity
+
+ocean_vs_bay_ph <- ggplot(wqdata, aes(x = island_side, y = ph)) + geom_boxplot() + ggtitle("Ocean vs. Bay pH") + xlab("Island Side") + ylab("pH")
+
+ocean_vs_bay_ph
+
+ocean_vs_bay_ammonia <- ggplot(wqdata, aes(x = island_side, y = ammonia)) + geom_boxplot() + ggtitle("Ocean vs. Bay Ammonia") + xlab("Island Side") + ylab("Ammonia (mg/L")
+
+ocean_vs_bay_ammonia
+
+ocean_vs_bay_do <- ggplot(wqdata, aes(x = island_side, y = dissolved_oxygen)) + geom_boxplot() + ggtitle("Ocean vs. Bay DO") + xlab("Island Side") + ylab("Dissolved Oxygen (mg/L)")
+
+ocean_vs_bay_do
+```
+
+The code chunk below takes the individual plots produced above places them onto a combined viewing pane if this visual is more informative. 
+
+```{r}
+grid.arrange(ocean_vs_bay_temp, ocean_vs_bay_salinity, ocean_vs_bay_ph, ocean_vs_bay_do, ocean_vs_bay_ammonia, nrow = 2)
+```
+
+The code chunk below generates the same boxplots as above, but instead seperated parameters by site type.
+
+```{r}
+site_temp <- ggplot(wqdata, aes(x = site_type, y = water_temp)) + geom_boxplot() + ggtitle("Ocean vs. Bay Temp") + xlab("Site Type") + ylab("Temperature (C)")
+
+site_temp
+
+site_salinity <- ggplot(wqdata, aes(x = site_type, y = salinity)) + geom_boxplot() + ggtitle("Ocean vs. Bay Salinity") + xlab("Site Type") + ylab("Salinity (ppt)")
+
+site_salinity
+
+site_ph <- ggplot(wqdata, aes(x = site_type, y = ph)) + geom_boxplot() + ggtitle("Ocean vs. Bay pH") + xlab("Site Type") + ylab("pH")
+
+site_ph
+
+site_ammonia <- ggplot(wqdata, aes(x = site_type, y = ammonia)) + geom_boxplot() + ggtitle("Ocean vs. Bay Ammonia") + xlab("Site Type") + ylab("Ammonia (mg/L")
+
+site_ammonia
+
+site_do <- ggplot(wqdata, aes(x = site_type, y = dissolved_oxygen)) + geom_boxplot() + ggtitle("Ocean vs. Bay DO") + xlab("Site Type") + ylab("Dissolved Oxygen (mg/L)")
+
+site_do
+```
+
+```{r}
+
+x <- ggplot(wqdata, aes(x = seq_along(water_temp), y = water_temp, color = island_side)) + geom_jitter()
+
+x
+
+```
+
+
+
+
+
