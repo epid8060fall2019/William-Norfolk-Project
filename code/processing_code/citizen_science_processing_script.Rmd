@@ -5,7 +5,9 @@ date: "11/1/2019"
 output: word_document
 ---
 
-This Rmd serves as a simple cleaning and analysis script to produce water quality data visualizations collected through the MarineLab citizen science water quality monitoring program. This script functions using the excel template included in the *data* folder within the *individual_program_data* subfolder. Field data from individual programs should be entered into a copied version of the blank excel template and saved with a unique name to the _individual_program_data_ folder. Following data entry, the newly saved data sheet must be loaded into this script by updating the relative path (detailed in the readme in the *data* folder).
+This Rmd serves as a cleaning and analysis script to produce simple water quality data visualizations collected through the MarineLab citizen science water quality monitoring program. The purplose of this script is to porduce small visualizations that can be used to educate participants about the data they collected in the field at the conclusion of their educational program.
+
+This script functions using the excel template included in the *data* folder within the *individual_program_data* subfolder. Field data from individual programs should be entered into a copied version of the blank excel template and saved with a unique name to the _individual_program_data_ folder. Following data entry, the newly saved data sheet must be loaded into this script by updating the relative path (detailed in the readme in the *data* folder).
 
 
 Load the required packages to run the script. If an error occurs that reads *"there is no package called..."* install the named package in the error in the console (the bottom left hand screen in Rstudio) using the syntax *install.packages("package name")*.
@@ -20,6 +22,7 @@ library(ggthemes)
 library(knitr)
 library(naniar)
 library(gridExtra)
+library(ggpubr)
 ```
 
 
@@ -34,6 +37,9 @@ wqdata <- readxl::read_excel("../../data/individual_program_data/individual_prog
 ```
 
 Once you have updated the relative path, you can run the script to produce a word document containing the generate visuals. To run click the _knit_ buttom located in the upper left side of the script screen (the button has a yarn icon on it). Select _knit to Word_ or simply click the button (the default setting is knit to word). 
+
+If the knit was successful, Rstudio should readily generate a word document with all of the code and commentary pasted directly into the files. Visualizations can be directly copied from the word document and pasted into a PowerPoint (or other presentation program) for viewing. _To avoid cluttering_ of the folder, drag the generated docx files(it will be titled citizen_science_processing_script.docx) into the _knitted_documents_ subfolder in the _processing code_ folder. Once moved, rename the docx file with a unique identifier (i.e VALPO_2018). If you do not rename the folder output files will be overwritten when moved ot the knitted documents folder because they will have identical names.
+
 
 The code chunks from here down contain all of the processing code. I will provide commentary about each section, however no modifications are required to run the script (nor should they be made, unless you are familar with R). Feel free to read the commentarty to learn more about the function of each individual code chunk.
 
@@ -94,7 +100,7 @@ ocean_vs_bay_do <- ggplot(wqdata, aes(x = island_side, y = dissolved_oxygen)) + 
 ocean_vs_bay_do
 ```
 
-The code chunk below takes the individual plots produced above places them onto a combined viewing pane if this visual is more informative. 
+The code chunk below take the individual plots produced above places them onto a combined viewing pane if this visual is more informative. 
 
 ```{r}
 grid.arrange(ocean_vs_bay_temp, ocean_vs_bay_salinity, ocean_vs_bay_ph, ocean_vs_bay_do, ocean_vs_bay_ammonia, nrow = 2)
@@ -103,36 +109,50 @@ grid.arrange(ocean_vs_bay_temp, ocean_vs_bay_salinity, ocean_vs_bay_ph, ocean_vs
 The code chunk below generates the same boxplots as above, but instead seperated parameters by site type.
 
 ```{r}
-site_temp <- ggplot(wqdata, aes(x = site_type, y = water_temp)) + geom_boxplot() + ggtitle("Ocean vs. Bay Temp") + xlab("Site Type") + ylab("Temperature (C)")
+site_temp <- ggplot(wqdata, aes(x = site_type, y = water_temp, color = site_type)) + geom_boxplot() + ggtitle("Ocean vs. Bay Temp") + xlab("Site Type") + ylab("Temperature (C)") + theme(legend.position = "none")
 
 site_temp
 
-site_salinity <- ggplot(wqdata, aes(x = site_type, y = salinity)) + geom_boxplot() + ggtitle("Ocean vs. Bay Salinity") + xlab("Site Type") + ylab("Salinity (ppt)")
+site_salinity <- ggplot(wqdata, aes(x = site_type, y = salinity, color = site_type)) + geom_boxplot() + ggtitle("Ocean vs. Bay Salinity") + xlab("Site Type") + ylab("Salinity (ppt)") + theme(legend.position = "none")
 
 site_salinity
 
-site_ph <- ggplot(wqdata, aes(x = site_type, y = ph)) + geom_boxplot() + ggtitle("Ocean vs. Bay pH") + xlab("Site Type") + ylab("pH")
+site_ph <- ggplot(wqdata, aes(x = site_type, y = ph, color = site_type)) + geom_boxplot() + ggtitle("Ocean vs. Bay pH") + xlab("Site Type") + ylab("pH") + theme(legend.position = "none")
 
 site_ph
 
-site_ammonia <- ggplot(wqdata, aes(x = site_type, y = ammonia)) + geom_boxplot() + ggtitle("Ocean vs. Bay Ammonia") + xlab("Site Type") + ylab("Ammonia (mg/L")
+site_ammonia <- ggplot(wqdata, aes(x = site_type, y = ammonia, color = site_type)) + geom_boxplot() + ggtitle("Ocean vs. Bay Ammonia") + xlab("Site Type") + ylab("Ammonia (mg/L") + theme(legend.position = "none")
 
 site_ammonia
 
-site_do <- ggplot(wqdata, aes(x = site_type, y = dissolved_oxygen)) + geom_boxplot() + ggtitle("Ocean vs. Bay DO") + xlab("Site Type") + ylab("Dissolved Oxygen (mg/L)")
+site_do <- ggplot(wqdata, aes(x = site_type, y = dissolved_oxygen, color = site_type)) + geom_boxplot() + ggtitle("Ocean vs. Bay DO") + xlab("Site Type") + ylab("Dissolved Oxygen (mg/L)") + theme(legend.position = "none")
 
 site_do
+
+#site_do_2
+```
+
+Now the same as above for the combined view. This structure requires a bit more coding to account for overlapping x-axis tick names. Also we will use garrange instead of grid.Extra to place the plots because it is friendlier to legend positions. 
+
+```{r}
+site_temp_2 <- site_temp + theme(axis.text.x = element_blank())
+
+site_sal_2 <- site_salinity + theme(axis.text.x = element_blank())
+
+site_ammonia_2 <- site_ammonia + theme(axis.text.x = element_blank())
+
+site_ph_2 <- site_ph + theme(axis.text.x = element_blank())
+
+site_do_2 <- site_do + theme(axis.text.x = element_blank())
 ```
 
 ```{r}
-
-x <- ggplot(wqdata, aes(x = seq_along(water_temp), y = water_temp, color = island_side)) + geom_jitter()
-
-x
-
+ggarrange(site_temp_2, site_sal_2, site_ph_2, site_do_2, site_ammonia_2, ncol = 3, nrow = 2, common.legend = TRUE, legend = "bottom")
 ```
 
+Thus this script produces a very simple collection of plots that are readily producable and presentable for quick visualization of data gathered in the field. The hope is that this script will provide students visuals the actual data they have collected in the field that are quick to produce and easy to understand. Through the usage of data visualization we can inspire future citizen scientists and continued/collaborative data collection. 
 
+For troubleshooting, errors, explicit explinations of code contents, or further code development please contact William Norfolk at william.norfolk@uga.edu.
 
 
 
