@@ -223,9 +223,18 @@ ggarrange(month_vs_ph_16, month_vs_ph_17, month_vs_ph_18, month_vs_ph_19, nrow =
 ```
 pH visualization does not show any distinct patterns across various seasons of measurement. This is consistent with expected results due to the fact that both the ocean and bay are strongly influenced by the alkaline limestone bedrock of the Keys. 
 
-Month vs params
+Overall, the there seems to be little seasonal fluctuation in ammonia, dissolved oxygen and pH measurements. This is not suprising due to the fact that these parameters are largely independent of one another (barring some unique event). Water temperature shows standard seasonal fluctuation with warmer and cooler months, and bays side waters exhibit a wider ranger of temperatures. Salinity is reasonable unique in terms of observations. Oceanside water have distinctly greater salinity for the vast majority of the year and have a very narrow range. Bayside waters typically have a reduced salinity, however large spikes upward can be associated with the dry season. 
 
-Year vs params
+Despite these overall trends, there is a notable break in most of the parameters consistent with the timing of Hurricane Irma landfall (September 2017). Ammonia most noteably spkies drastically at this time. This is likely due to hurricane-induced nutrint influx. Salinity drops substantially from the normal levels, likely due to storm water influx. Water temperature shows a notable decrease, but it is likely this can be attributed to standard seasonal fluctuation. Both pH and dissolved oxygen do not show any unusual trends during this time. This is a suprising result for dissolved oxygen. It should be noted that post Hirricane Irma observations are limited in number due to the inability to collect samples directly following the storm. 
+
+Since we can see these trends visually, lets see if there is a significant difference between the fall 2017 and the fall season of the other years.
+
+
+Test statistical significance of the months surrounding Irma?
+
+
+Lets take a step closer in and take a look at seasonal changes by individual site. Here we will use raster plots to visualize the "heat" differences in water quality parameter. 
+
 
 raster with site names 1 pred and and island side
 
