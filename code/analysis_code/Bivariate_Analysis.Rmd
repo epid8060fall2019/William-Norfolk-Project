@@ -1,0 +1,231 @@
+---
+title: "Bivariate Analysis"
+author: "William Norfolk"
+date: "11/3/2019"
+output: word_document
+---
+
+This script runs bivariate/deeper analysis of the water quality dataset to produce additional/complex data visualizations. This script operates using the _processed_data_ file produced via running the _WQprocessing_ script located inside the _code_ folder and _processing_code_ subfolder loacted within this project.
+
+Start by loading required libraries
+```{r load libs}
+library(readxl)
+library(dplyr)
+library(tidyverse)
+library(forcats)
+library(ggthemes)
+library(plotly)
+library(knitr)
+library(naniar)
+library(broom)
+library(gridExtra)
+library(zoo)
+library(ggpubr)
+
+```
+
+
+Load the data and take a look at the variables.
+
+```{r load data}
+
+WQ_clean_data <- readRDS("../../data/processed_data/processeddata.rds")
+
+glimpse(WQ_clean_data)
+
+```
+
+Lets start by taking a look at the five water quality parameters plotted against one another with bivariate visualizations. For this data we will use jitter plots.
+
+```{r WQ params vs each other}
+temp_and_salt <- ggplot(WQ_clean_data, aes(x = salinity, y = water_temp, color = island_side)) + geom_jitter()
+
+temp_and_salt
+
+temp_and_ph <- ggplot(WQ_clean_data, aes(x = ph, y = water_temp, color = island_side)) + geom_jitter()
+
+temp_and_ph
+
+temp_and_do <- ggplot(WQ_clean_data, aes(x = dissolved_oxygen, y = water_temp, color = island_side)) + geom_jitter()
+
+temp_and_do
+
+temp_and_ammonia <- ggplot(WQ_clean_data, aes(x = ammonia, y = water_temp, color = island_side)) + geom_jitter()
+
+temp_and_ammonia
+
+salt_and_ph <- ggplot(WQ_clean_data, aes(x = salinity, y = ph, color = island_side)) + geom_jitter()
+
+salt_and_ph
+
+salt_and_do <- ggplot(WQ_clean_data, aes(x = salinity, y = dissolved_oxygen, color = island_side)) + geom_jitter()
+
+salt_and_do
+
+salt_and_ammonia <- ggplot(WQ_clean_data, aes(x = salinity, y = ammonia, color = island_side)) + geom_jitter()
+
+salt_and_ammonia
+
+ph_and_do <- ggplot(WQ_clean_data, aes(x = ph, y = dissolved_oxygen, color = island_side)) + geom_jitter()
+
+ph_and_do
+
+ph_and_ammonia <- ggplot(WQ_clean_data, aes(x = ph, y = ammonia, color = island_side)) + geom_jitter()
+
+ph_and_ammonia
+
+do_and_ammonia <- ggplot(WQ_clean_data, aes(x = ammonia, y = dissolved_oxygen, color = island_side)) + geom_jitter()
+
+do_and_ammonia
+
+```
+
+It looks like these comparisons are not terribly informative. This is not suprising due to the geographic spread of the site locations. While ocean waters and bay waters are quite different interms of abiotic conditions, typically the difference is primairly apparent when viewing the range of abiotic conditions rather than individual correlations. These ranges are better visualized with the violin-jitter plots produced in the _Exploratory_Data_Analysis_Location_ script. 
+
+It may be more informative to view seasonal and annual changes in conditions using bivariate analysis. We will break down the information for each year and predictor to get a more in depth visualization of seasonality.
+
+We will start with monthly data to view seasons.
+
+```{r year subsets}
+year_16 <- subset(WQ_clean_data, Year == "16")
+year_17 <- subset(WQ_clean_data, Year == "17")
+year_18 <- subset(WQ_clean_data, Year == "18")
+year_19 <- subset(WQ_clean_data, Year == "19")
+
+year_16$Month <- as.numeric(as.character(year_16$Month))
+year_17$Month <- as.numeric(as.character(year_17$Month))
+year_18$Month <- as.numeric(as.character(year_18$Month))
+year_19$Month <- as.numeric(as.character(year_19$Month))
+
+year_16 <- year_16[!is.na(year_16$island_side), ]
+year_17 <- year_17[!is.na(year_17$island_side), ]
+year_18 <- year_18[!is.na(year_18$island_side), ]
+year_19 <- year_19[!is.na(year_19$island_side), ]
+```
+
+
+```{r water temp seasonality}
+
+month_vs_temp_16 <- ggplot(year_16, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("Water Temperature (C)")
+
+month_vs_temp_16 
+
+month_vs_temp_17 <- ggplot(year_17, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2017)") + ylab("Water Temperature (C)")
+
+month_vs_temp_17
+
+
+month_vs_temp_18 <- ggplot(year_18, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2018)") + ylab("Water Temperature (C)")
+
+month_vs_temp_18
+
+month_vs_temp_19 <- ggplot(year_19, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2019)") + ylab("Water Temperature (C)")
+
+month_vs_temp_19
+
+ggarrange(month_vs_temp_16, month_vs_temp_17, month_vs_temp_18, month_vs_temp_19, nrow = 2, ncol = 2, common.legend = TRUE, legend = "bottom")
+
+```
+
+
+```{r}
+month_vs_sal_16 <- ggplot(year_16, aes(x = Month, y = salinity, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("Salinity (ppt)")
+
+month_vs_sal_16 
+
+month_vs_sal_17 <- ggplot(year_17, aes(x = Month, y = salinity, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2017)") + ylab("Salinity (ppt)")
+
+month_vs_sal_17
+
+
+month_vs_sal_18 <- ggplot(year_18, aes(x = Month, y = salinity, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2018)") + ylab("Salinity (ppt)")
+
+month_vs_sal_18
+
+month_vs_sal_19 <- ggplot(year_19, aes(x = Month, y = salinity, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2019)") + ylab("Salinity (ppt)")
+
+month_vs_sal_19
+
+ggarrange(month_vs_sal_16, month_vs_sal_17, month_vs_sal_18, month_vs_sal_19, nrow = 2, ncol = 2, common.legend = TRUE, legend = "bottom")
+```
+
+```{r}
+month_vs_do_16 <- ggplot(year_16, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(1, 10)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("Dissolved Oxygen (mg/L")
+
+month_vs_do_16 
+
+month_vs_do_17 <- ggplot(year_17, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(1, 10)) + geom_smooth(se = FALSE) + xlab("Month (2017)") + ylab("Dissolved Oxygen (mg/L")
+
+month_vs_do_17
+
+
+month_vs_do_18 <- ggplot(year_18, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(1, 10)) + geom_smooth(se = FALSE) + xlab("Month (2018)") + ylab("Dissolved Oxygen (mg/L")
+
+month_vs_do_18
+
+month_vs_do_19 <- ggplot(year_19, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(1, 10)) + geom_smooth(se = FALSE) + xlab("Month (2019)") + ylab("Dissolved Oxygen (mg/L")
+
+month_vs_do_19
+
+ggarrange(month_vs_do_16, month_vs_do_17, month_vs_do_18, month_vs_do_19, nrow = 2, ncol = 2, common.legend = TRUE, legend = "bottom")
+```
+
+```{r}
+month_vs_amm_16 <- ggplot(year_16, aes(x = Month, y = ammonia, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(0, 0.3)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("Ammonia (mg/L)")
+
+month_vs_amm_16 
+
+month_vs_amm_17 <- ggplot(year_17, aes(x = Month, y = ammonia, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(0, 0.3)) + geom_smooth(se = FALSE) + xlab("Month (2017)") + ylab("Ammonia (mg/L)")
+
+month_vs_amm_17
+
+
+month_vs_amm_18 <- ggplot(year_18, aes(x = Month, y = ammonia, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(0, 0.3)) + geom_smooth(se = FALSE) + xlab("Month (2018)") + ylab("Ammonia (mg/L)")
+
+month_vs_amm_18
+
+month_vs_amm_19 <- ggplot(year_19, aes(x = Month, y = ammonia, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(0, 0.3)) + geom_smooth(se = FALSE) + xlab("Month (2019)") + ylab("Ammonia (mg/L)")
+
+month_vs_amm_19
+
+ggarrange(month_vs_amm_16, month_vs_amm_17, month_vs_amm_18, month_vs_amm_19, nrow = 2, ncol = 2, common.legend = TRUE, legend = "bottom")
+```
+
+```{r}
+month_vs_ph_16 <- ggplot(year_16, aes(x = Month, y = ph, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(7, 9)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("pH")
+
+month_vs_ph_16 
+
+month_vs_ph_17 <- ggplot(year_17, aes(x = Month, y = ph, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(7, 9)) + geom_smooth(se = FALSE) + xlab("Month (2017)") + ylab("pH")
+
+month_vs_ph_17
+
+
+month_vs_ph_18 <- ggplot(year_18, aes(x = Month, y = ph, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(7, 9)) + geom_smooth(se = FALSE) + xlab("Month (2018)") + ylab("pH")
+
+month_vs_ph_18
+
+month_vs_ph_19 <- ggplot(year_19, aes(x = Month, y = ph, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(7, 9)) + geom_smooth(se = FALSE) + xlab("Month (2019)") + ylab("pH")
+
+month_vs_ph_19
+
+ggarrange(month_vs_ph_16, month_vs_ph_17, month_vs_ph_18, month_vs_ph_19, nrow = 2, ncol = 2, common.legend = TRUE, legend = "bottom")
+```
+
+
+Month vs params
+
+Year vs params
+
+raster with site names 1 pred and and island side
+
+
+
+
+
+
+
+
+
+
+
