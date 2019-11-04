@@ -230,13 +230,120 @@ Despite these overall trends, there is a notable break in most of the parameters
 Since we can see these trends visually, lets see if there is a significant difference between the fall 2017 and the fall season of the other years.
 
 
-Test statistical significance of the months surrounding Irma?
+############Test statistical significance of the months surrounding Irma?
 
 
-Lets take a step closer in and take a look at seasonal changes by individual site. Here we will use raster plots to visualize the "heat" differences in water quality parameter. 
+Lets take a step closer in and take a look at seasonal changes by individual site. Here we will use raster plots to visualize the "heat" differences in water quality parameter. To avoid clutter we will drop NAs from the individual predictors. The will not provide much information in these plots if they are not present. 
+
+```{r remove NA predictor values}
+temp_drop_na <- WQ_clean_data[!is.na(WQ_clean_data$water_temp), ]
+sal_drop_na <- WQ_clean_data[!is.na(WQ_clean_data$salinity), ]
+do_drop_na <- WQ_clean_data[!is.na(WQ_clean_data$dissolved_oxygen), ]
+ph_drop_na <- WQ_clean_data[!is.na(WQ_clean_data$ph), ]
+amm_drop_na <- WQ_clean_data[!is.na(WQ_clean_data$ammonia), ]
 
 
-raster with site names 1 pred and and island side
+```
+
+
+```{r}
+
+temp_drop_na_1 <- temp_drop_na[!is.na(temp_drop_na$island_side), ]
+temp_drop_na_2 <- temp_drop_na_1[!is.na(temp_drop_na_1$site_type), ]
+
+raster_by_site_temp <- ggplot(temp_drop_na, aes(x = Month, y = location, fill = water_temp)) + geom_raster()
+
+raster_by_site_temp
+
+raster_by_island_side_temp <- ggplot(temp_drop_na_1, aes(x = Month, y = island_side, fill = water_temp)) + geom_raster(interpolate = TRUE) + scale_fill_gradientn(colors = c("blue", "yellow"))
+
+raster_by_island_side_temp
+
+raster_by_site_type_temp <- ggplot(temp_drop_na_2, aes(x = Month, y = site_type, fill = water_temp)) + geom_raster(interpolate = TRUE) + scale_fill_gradientn(colors = c("blue", "yellow"))
+
+raster_by_site_type_temp
+```
+
+```{r}
+
+sal_drop_na_1 <- sal_drop_na[!is.na(sal_drop_na$island_side), ]
+sal_drop_na_2 <- sal_drop_na_1[!is.na(sal_drop_na_1$site_type), ]
+
+raster_by_site_sal <- ggplot(sal_drop_na, aes(x = Month, y = location, fill = salinity)) + geom_raster()
+
+raster_by_site_sal
+
+raster_by_island_side_sal <- ggplot(sal_drop_na_1, aes(x = Month, y = island_side, fill = salinity)) + geom_raster(interpolate = TRUE) + scale_fill_gradientn(colors = c("blue", "yellow"))
+
+raster_by_island_side_sal
+
+raster_by_site_type_sal <- ggplot(sal_drop_na_2, aes(x = Month, y = site_type, fill = salinity)) + geom_raster(interpolate = TRUE) + scale_fill_gradientn(colors = c("blue", "yellow"))
+
+raster_by_site_type_sal
+```
+
+```{r}
+
+do_drop_na_1 <- do_drop_na[!is.na(do_drop_na$island_side), ]
+do_drop_na_2 <- do_drop_na_1[!is.na(do_drop_na_1$site_type), ]
+
+raster_by_site_do <- ggplot(do_drop_na, aes(x = Month, y = location, fill = dissolved_oxygen)) + geom_raster()
+
+raster_by_site_do
+
+raster_by_island_side_do <- ggplot(do_drop_na_1, aes(x = Month, y = island_side, fill = dissolved_oxygen)) + geom_raster(interpolate = TRUE) + scale_fill_gradientn(colors = c("blue", "yellow"))
+
+raster_by_island_side_do
+
+raster_by_site_type_do <- ggplot(do_drop_na_2, aes(x = Month, y = site_type, fill = dissolved_oxygen)) + geom_raster(interpolate = TRUE) + scale_fill_gradientn(colors = c("blue", "yellow"))
+
+raster_by_site_type_do
+```
+
+```{r}
+
+amm_drop_na_1 <- amm_drop_na[!is.na(amm_drop_na$island_side), ]
+amm_drop_na_2 <- amm_drop_na_1[!is.na(amm_drop_na_1$site_type), ]
+
+raster_by_site_amm <- ggplot(amm_drop_na, aes(x = Month, y = location, fill = ammonia)) + geom_raster()
+
+raster_by_site_amm
+
+raster_by_island_side_amm <- ggplot(amm_drop_na_1, aes(x = Month, y = island_side, fill = ammonia)) + geom_raster(interpolate = TRUE) + scale_fill_gradientn(colors = c("blue", "yellow"))
+
+raster_by_island_side_amm
+
+raster_by_site_type_amm <- ggplot(amm_drop_na_2, aes(x = Month, y = site_type, fill = ammonia)) + geom_raster(interpolate = TRUE) + scale_fill_gradientn(colors = c("blue", "yellow"))
+
+raster_by_site_type_amm
+```
+
+```{r}
+
+ph_drop_na_1 <- ph_drop_na[!is.na(ph_drop_na$island_side), ]
+ph_drop_na_2 <- ph_drop_na_1[!is.na(ph_drop_na_1$site_type), ]
+
+raster_by_site_ph <- ggplot(ph_drop_na, aes(x = Month, y = location, fill = ph)) + geom_raster()
+
+raster_by_site_ph
+
+raster_by_island_side_ph <- ggplot(ph_drop_na_1, aes(x = Month, y = island_side, fill = ph)) + geom_raster(interpolate = TRUE) + scale_fill_gradientn(colors = c("blue", "yellow"))
+
+raster_by_island_side_ph
+
+raster_by_site_type_ph <- ggplot(ph_drop_na_2, aes(x = Month, y = site_type, fill = ph)) + geom_raster(interpolate = TRUE) + scale_fill_gradientn(colors = c("blue", "yellow"))
+
+raster_by_site_type_ph
+```
+
+
+Specific look at Irma year.
+
+```{r}
+irma_raster <- ggplot(year_17, aes(x = Month, y = island_side, fill = ph)) + geom_tile()
+
+irma_raster
+```
 
 
 
