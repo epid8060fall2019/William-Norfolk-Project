@@ -92,11 +92,13 @@ year_17 <- subset(WQ_clean_data, Year == "17")
 year_18 <- subset(WQ_clean_data, Year == "18")
 year_19 <- subset(WQ_clean_data, Year == "19")
 
+#To scale all figures to same axis
 year_16$Month <- as.numeric(as.character(year_16$Month))
 year_17$Month <- as.numeric(as.character(year_17$Month))
 year_18$Month <- as.numeric(as.character(year_18$Month))
 year_19$Month <- as.numeric(as.character(year_19$Month))
 
+#To get rid of clutter in the figures
 year_16 <- year_16[!is.na(year_16$island_side), ]
 year_17 <- year_17[!is.na(year_17$island_side), ]
 year_18 <- year_18[!is.na(year_18$island_side), ]
@@ -127,6 +129,7 @@ ggarrange(month_vs_temp_16, month_vs_temp_17, month_vs_temp_18, month_vs_temp_19
 
 ```
 
+From the looks of these figures it seems that temperature fluctuates in a manner that is to be expected (i.e. cold in the winter and warmer in the summer). It is also pretty consistent that the temperature range is greater for the bayside waters than the ocean side waters which is consistent withe previously generated violin plots from _Exploratory_Data_Analysis_Seasonal_.
 
 ```{r}
 month_vs_sal_16 <- ggplot(year_16, aes(x = Month, y = salinity, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("Salinity (ppt)")
@@ -148,6 +151,8 @@ month_vs_sal_19
 
 ggarrange(month_vs_sal_16, month_vs_sal_17, month_vs_sal_18, month_vs_sal_19, nrow = 2, ncol = 2, common.legend = TRUE, legend = "bottom")
 ```
+Salinity loos pretty consistent with the exploratory plots as well. Ocean side water are consistently higher in salinity than the bay side, which is expected since the bay is an estuary. Additionally, there is wa wider range of salinity on the bay side, this is consistent with exploratory analysis. There is an odd jump in the salinity around April. This may simply be a result of few observations taken during that time or it is possibly due to a very low rainfall year (salinitly tends to spike in the bay when rainfall is reduced). We will explore this further in discussion.
+
 
 ```{r}
 month_vs_do_16 <- ggplot(year_16, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(1, 10)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("Dissolved Oxygen (mg/L")
@@ -170,6 +175,10 @@ month_vs_do_19
 ggarrange(month_vs_do_16, month_vs_do_17, month_vs_do_18, month_vs_do_19, nrow = 2, ncol = 2, common.legend = TRUE, legend = "bottom")
 ```
 
+Dissolved oxygen does not appear to show any distict patterns across all years sampled. Though the 2019 plot does show clearly a large upswing in total number of observations taken. 
+
+
+
 ```{r}
 month_vs_amm_16 <- ggplot(year_16, aes(x = Month, y = ammonia, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(0, 0.3)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("Ammonia (mg/L)")
 
@@ -190,6 +199,7 @@ month_vs_amm_19
 
 ggarrange(month_vs_amm_16, month_vs_amm_17, month_vs_amm_18, month_vs_amm_19, nrow = 2, ncol = 2, common.legend = TRUE, legend = "bottom")
 ```
+Ammonia appears quite interesting. Most of the observations are fairly consistent with very low to negligable ammonia levels in the water. There is a distinct increase in fall 2017 which is consistent with the timing of Hurricane Irma landfall.
 
 ```{r}
 month_vs_ph_16 <- ggplot(year_16, aes(x = Month, y = ph, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(7, 9)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("pH")
@@ -211,7 +221,7 @@ month_vs_ph_19
 
 ggarrange(month_vs_ph_16, month_vs_ph_17, month_vs_ph_18, month_vs_ph_19, nrow = 2, ncol = 2, common.legend = TRUE, legend = "bottom")
 ```
-
+pH visualization does not show any distinct patterns across various seasons of measurement. This is consistent with expected results due to the fact that both the ocean and bay are strongly influenced by the alkaline limestone bedrock of the Keys. 
 
 Month vs params
 
