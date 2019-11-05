@@ -223,17 +223,8 @@ ggarrange(month_vs_ph_16, month_vs_ph_17, month_vs_ph_18, month_vs_ph_19, nrow =
 ```
 pH visualization does not show any distinct patterns across various seasons of measurement. This is consistent with expected results due to the fact that both the ocean and bay are strongly influenced by the alkaline limestone bedrock of the Keys. 
 
-Overall, the there seems to be little seasonal fluctuation in ammonia, dissolved oxygen and pH measurements. This is not suprising due to the fact that these parameters are largely independent of one another (barring some unique event). Water temperature shows standard seasonal fluctuation with warmer and cooler months, and bays side waters exhibit a wider ranger of temperatures. Salinity is reasonable unique in terms of observations. Oceanside water have distinctly greater salinity for the vast majority of the year and have a very narrow range. Bayside waters typically have a reduced salinity, however large spikes upward can be associated with the dry season. 
 
-Despite these overall trends, there is a notable break in most of the parameters consistent with the timing of Hurricane Irma landfall (September 2017). Ammonia most noteably spkies drastically at this time. This is likely due to hurricane-induced nutrint influx. Salinity drops substantially from the normal levels, likely due to storm water influx. Water temperature shows a notable decrease, but it is likely this can be attributed to standard seasonal fluctuation. Both pH and dissolved oxygen do not show any unusual trends during this time. This is a suprising result for dissolved oxygen. It should be noted that post Hirricane Irma observations are limited in number due to the inability to collect samples directly following the storm. 
-
-Since we can see these trends visually, lets see if there is a significant difference between the fall 2017 and the fall season of the other years.
-
-
-############Test statistical significance of the months surrounding Irma?
-
-
-Lets take a step closer in and take a look at seasonal changes by individual site. Here we will use raster plots to visualize the "heat" differences in water quality parameter. To avoid clutter we will drop NAs from the individual predictors. The will not provide much information in these plots if they are not present. 
+Next lets visualize the data using raster plots to see if we can see any differences in the correlations or additional patterns. To avoid clutter we will drop NAs from the individual predictors since they will not provide any information in the raster. 
 
 ```{r remove NA predictor values}
 temp_drop_na <- WQ_clean_data[!is.na(WQ_clean_data$water_temp), ]
@@ -336,22 +327,90 @@ raster_by_site_type_ph <- ggplot(ph_drop_na_2, aes(x = Month, y = site_type, fil
 raster_by_site_type_ph
 ```
 
+Unsuprisingly, the raster visualizations show results consistent with the individual jitter-smooth plots above. Most of the distinct patterns are easily visualized using the raster images, however the rasters strongly emphasize the missing data values form our dataset more than any of the actual predictor information. There is a large piece of missing data in August (primairly from Seagrass/Mangrove sites) is is due to the fact that the sampling facility is typically closed for the majority of this month, and the few trips that are operated at this time tend to be reef trips since the weather is typically very good. Additionally, there is a data gap for Patch Reef/Hardbottom locations in January. Is likely due to the fact that winter winds typicaly make patch/hardbottom site more difficult to access safely at this time. 
+
+Though visualy appealing, the line graphs produced above show data patterns that are more consistent with the actual measures of interest thus rasters will be relegated to supplemental information. 
+
+
+Lastly in our bivariate analysis we will zoom into three specific locations that represent the most numerous observations of Seagrass/Mangrove, Patch Reef/Hardbottom, and Coral Reef site types to visualize specific seasonal impacts on these locations. 
+
+First we must determine the most abundant locations of each type and subset the data. 
+```{r}
+patch_hb_subset <- subset(WQ_clean_data, site_type == "Patch Reef/Hardbottom")
+sg_mg_subset <- subset(WQ_clean_data, site_type == "Seagrass/Mangrove")
+coral_reef_subset <- subset(WQ_clean_data, site_type == "Coral Reef")
+
+patch_plot <- ggplot(patch_hb_subset, aes(x = location)) + geom_bar() + coord_flip()
+sg_mg_plot <- ggplot(sg_mg_subset, aes(x = location)) + geom_bar() + coord_flip()
+coral_plot <- ggplot(coral_reef_subset, aes(x = location)) + geom_bar() + coord_flip()
+
+grid.arrange(patch_plot, sg_mg_plot, coral_plot, nrow = 1)
+
+
+```
+
+So it looks like our most numerous observation for Patch Reef/Hardbottom is Rodriguez Key, Seagrass/Mangrove is Tarpon Basin, and Coral Reef is Grecian Dry Rocks. This is unsuprising as all of these sites are in close proximity to the marina and are typically better sheltered on windy days, thus permitting more frequent access. 
+
+Let's subset these locations and visualize.
+
+```{r}
+roddy_subset <- subset(WQ_clean_data, location == "Rodriguez Key")
+tarpon_subset <- subset(WQ_clean_data, location == "Tarpon Basin")
+grecian_subset <- subset(WQ_clean_data, location == "Grecian Dry Rocks")
+
+```
+
+Lets start with Rodriguez Key!
+
+```{r}
+mean_temp_roddy <- aggregate(water_temp ~ Month + Year, roddy_subset, mean) 
+
+mean_temp_roddy$Date <- as.yearmon(paste(mean_temp_roddy$Month, mean_temp_roddy$Year, sep = "."), format = "%m.%Y")
+
+mean_temp_plot_roddy <- mean_temp_roddy %>% ggplot(aes(x = Date, y = water_temp)) + geom_line() + xlab("Year") + ylab("Water Temp (C)") + ggtitle("Mean Water Temp Rodriguez Key") + scale_y_continuous(limits=c(18, 35))
+
+mean_temp_plot_roddy
+
+mean_temp_tarpon <- aggregate(water_temp ~ Month + Year, tarpon_subset, mean) 
+
+mean_temp_tarpon$Date <- as.yearmon(paste(mean_temp_tarpon$Month, mean_temp_tarpon$Year, sep = "."), format = "%m.%Y")
+
+mean_temp_plot_tarpon <- mean_temp_tarpon %>% ggplot(aes(x = Date, y = water_temp)) + geom_line() + xlab("Year") + ylab("Water Temp (C)") + ggtitle("Mean Water Temp Tarpon Basin") + scale_y_continuous(limits=c(18, 35))
+
+mean_temp_plot_tarpon
+
+mean_temp_grecian <- aggregate(water_temp ~ Month + Year, grecian_subset, mean) 
+
+mean_temp_grecian$Date <- as.yearmon(paste(mean_temp_grecian$Month, mean_temp_grecian$Year, sep = "."), format = "%m.%Y")
+
+mean_temp_plot_grecian <- mean_temp_grecian %>% ggplot(aes(x = Date, y = water_temp)) + geom_line() + xlab("Year") + ylab("Water Temp (C)") + ggtitle("Mean Water Temp Grecian Dry Rocks") + scale_y_continuous(limits=c(18, 35))
+
+mean_temp_plot_grecian
+
+grid.arrange(mean_temp_plot_roddy, mean_temp_plot_tarpon, mean_temp_plot_grecian, nrow = 2)
+
+
+```
+
+
+
 #########################################################
 Specific look at Irma year. Still working below here...
 
 Determine raster keep or not
 
-```{r}
-irma_raster <- ggplot(year_17, aes(x = Month, y = island_side, fill = ph)) + geom_tile()
-
-irma_raster
-```
 
 
+Overall, the there seems to be little seasonal fluctuation in ammonia, dissolved oxygen and pH measurements. This is not suprising due to the fact that these parameters are largely independent of one another (barring some unique event). Water temperature shows standard seasonal fluctuation with warmer and cooler months, and bays side waters exhibit a wider ranger of temperatures. Salinity is reasonable unique in terms of observations. Oceanside water have distinctly greater salinity for the vast majority of the year and have a very narrow range. Bayside waters typically have a reduced salinity, however large spikes upward can be associated with the dry season. 
+
+Despite these overall trends, there is a notable variation in some of the parameters consistent with the timing of Hurricane Irma landfall (September 2017). Ammonia most noteably spkies drastically at this time. This is likely due to hurricane-induced nutrint influx. Salinity drops substantially from the normal levels, likely due to storm water influx. Water temperature shows a notable decrease, but it is likely this can be attributed to standard seasonal fluctuation. Both pH and dissolved oxygen do not show any unusual trends during this time. This is a suprising result for dissolved oxygen. It should be noted that post Hirricane Irma observations are limited in number due to the inability to collect samples directly following the storm. 
 
 
 
+Since we can see these trends visually, lets see if there is a significant difference between the fall 2017 and the fall season of the other years.
 
+
+############Test statistical significance of the months surrounding Irma?
 
 
 
