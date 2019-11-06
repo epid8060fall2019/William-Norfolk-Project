@@ -1,0 +1,134 @@
+---
+title: "Hurricane Irma Analysis"
+author: "William Norfolk"
+date: "11/5/2019"
+output: word_document
+---
+
+Based on the results of the exploratory and bivariate analyses a deeper dive into the specific trends of Hurricane Irma are warrented. 
+
+First load the libraries.
+
+```{r load libs}
+library(readxl)
+library(dplyr)
+library(tidyverse)
+library(forcats)
+library(ggthemes)
+library(plotly)
+library(knitr)
+library(naniar)
+library(broom)
+library(gridExtra)
+library(zoo)
+```
+
+
+Next load the clean data and take a look.
+
+```{r}
+WQ_clean_data <- readRDS("../../data/processed_data/processeddata.rds")
+
+glimpse(WQ_clean_data)
+```
+
+For this analysis we will subset the data to isolate the time frame close to Irma landfall. Landfall took place on September 10, 2017. We will selct data from 2017-2018 to view hurricane effects
+
+```{r subset data}
+year_2017 <- subset(WQ_clean_data, Year == "17")
+year_2018 <- subset(WQ_clean_data, Year == "18")
+
+#We also need to recode month for 2018 so it adds continiously.
+
+year_2018 <- year_2018 %>% dplyr::mutate(Month = recode(Month,
+                                  "01" = "13",
+                                  "02" = "14",
+                                  "03" = "15",
+                                  "04" = "16",
+                                  "05" = "17",
+                                  "06" = "18",
+                                  "07" = "19",
+                                  "08" = "20",
+                                  "09" = "21",
+                                  "10" = "22",
+                                  "11" = "23",
+                                  "12" = "24"))
+
+irma_subset <- rbind(year_2017, year_2018)
+
+#Then convert Month back to numeric
+irma_subset$Month <- as.numeric(as.character(irma_subset$Month))
+```
+
+Lets take a quick look at the parameters for this subset.
+
+
+```{r}
+irma_temp_plot <- ggplot(irma_subset, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.5) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1)
+
+irma_temp_plot
+
+mean_temp_irma <- aggregate(water_temp ~ Month + Year +island_side, irma_subset, mean)
+
+irma_mean_temp_plot <- ggplot(mean_temp_irma, aes(x = Month, y = water_temp, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1)
+
+irma_mean_temp_plot + geom_point()
+```
+
+```{r}
+irma_sal_plot <- ggplot(irma_subset, aes(x = Month, y = salinity, color = island_side)) + geom_jitter(alpha = 0.5) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1)
+
+irma_sal_plot
+
+mean_sal_irma <- aggregate(salinity ~ Month + Year +island_side, irma_subset, mean)
+
+irma_mean_sal_plot <- ggplot(mean_sal_irma, aes(x = Month, y = salinity, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1)
+
+irma_mean_sal_plot + geom_point()
+```
+
+```{r}
+irma_amm_plot <- ggplot(irma_subset, aes(x = Month, y = ammonia, color = island_side)) + geom_jitter(alpha = 0.5) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1)
+
+irma_amm_plot
+
+mean_amm_irma <- aggregate(ammonia ~ Month + Year +island_side, irma_subset, mean)
+
+irma_mean_amm_plot <- ggplot(mean_amm_irma, aes(x = Month, y = ammonia, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1)
+
+irma_mean_amm_plot + geom_point()
+```
+
+
+```{r}
+irma_do_plot <- ggplot(irma_subset, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_jitter(alpha = 0.5) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1)
+
+irma_do_plot
+
+mean_do_irma <- aggregate(dissolved_oxygen ~ Month + Year +island_side, irma_subset, mean)
+
+irma_mean_do_plot <- ggplot(mean_do_irma, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1)
+
+irma_mean_do_plot + geom_point()
+```
+
+```{r}
+irma_ph_plot <- ggplot(irma_subset, aes(x = Month, y = ph, color = island_side)) + geom_jitter(alpha = 0.5) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1)
+
+irma_ph_plot
+
+mean_ph_irma <- aggregate(ph ~ Month + Year +island_side, irma_subset, mean)
+
+irma_mean_ph_plot <- ggplot(mean_ph_irma, aes(x = Month, y = ph, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1)
+
+irma_mean_ph_plot + geom_point()
+```
+
+
+
+
+
+
+
+
+
