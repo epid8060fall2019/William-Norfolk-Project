@@ -35,6 +35,8 @@ glimpse(WQ_clean_data)
 
 ```
 
+## Bivariate Visualization of Water Quality Parameters
+
 Lets start by taking a look at the five water quality parameters plotted against one another with bivariate visualizations. For this data we will use jitter plots.
 
 ```{r WQ params vs each other}
@@ -80,6 +82,8 @@ do_and_ammonia
 
 ```
 
+## In Depth Seasonality
+
 It looks like these comparisons are not very informative. This is not suprising due to the geographic spread of the site locations. While ocean waters and bay waters are quite different interms of abiotic conditions, typically the difference is primairly apparent when viewing the range of abiotic conditions rather than individual correlations. These ranges are better visualized with the violin-jitter plots produced in the _Exploratory_Data_Analysis_Location_ script. 
 
 In our exploratory analysis we reviewed broad-scale seasonal changes (primairly using the average measure for each month). It would be worthwhile to delve deeper into the seasonal aspects of the data to see if there are any additional/stronger/weat=ker correlations we can observe. We will break down the information for each year and predictor to get a more in depth visualization of seasonality.
@@ -108,71 +112,86 @@ year_19 <- year_19[!is.na(year_19$island_side), ]
 
 ```{r water temp seasonality}
 
-month_vs_temp_16 <- ggplot(year_16, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("Water Temperature (C)")
+month_vs_temp_16 <- ggplot(year_16, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("Water Temperature (C)") + labs(color = "Island Side")
+
 
 month_vs_temp_16 
 
-month_vs_temp_17 <- ggplot(year_17, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2017)") + ylab("Water Temperature (C)")
+month_vs_temp_17 <- ggplot(year_17, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2017)") + ylab("Water Temperature (C)") + labs(color = "Island Side")
 
 month_vs_temp_17
 
 
-month_vs_temp_18 <- ggplot(year_18, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2018)") + ylab("Water Temperature (C)")
+month_vs_temp_18 <- ggplot(year_18, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2018)") + ylab("Water Temperature (C)") + labs(color = "Island Side")
 
 month_vs_temp_18
 
-month_vs_temp_19 <- ggplot(year_19, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2019)") + ylab("Water Temperature (C)")
+month_vs_temp_19 <- ggplot(year_19, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2019)") + ylab("Water Temperature (C)") + labs(color = "Island Side")
+
 
 month_vs_temp_19
 
-ggarrange(month_vs_temp_16, month_vs_temp_17, month_vs_temp_18, month_vs_temp_19, nrow = 2, ncol = 2, common.legend = TRUE, legend = "bottom")
+temp_by_year <- ggarrange(month_vs_temp_16, month_vs_temp_17, month_vs_temp_18, month_vs_temp_19, nrow = 2, ncol = 2, common.legend = TRUE, legend = "bottom")
+
+temp_by_year
+
+ggsave(filename = "../../results/temp_by_year.png", plot = temp_by_year) 
 
 ```
 
 From the looks of these figures it seems that temperature fluctuates in a manner that is to be expected (i.e. cold in the winter and warmer in the summer). It is also pretty consistent that the temperature range is greater for the bayside waters than the ocean side waters which is consistent with the previously generated violin plots from _Exploratory_Data_Analysis_Seasonal_. Aside from basic seasonality there does not appear to be any additional trends or oddities in the temperature data. 
 
 ```{r salinity seasonality}
-month_vs_sal_16 <- ggplot(year_16, aes(x = Month, y = salinity, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("Salinity (ppt)")
+month_vs_sal_16 <- ggplot(year_16, aes(x = Month, y = salinity, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("Salinity (ppt)") + labs(color = "Island Side")
+
 
 month_vs_sal_16 
 
-month_vs_sal_17 <- ggplot(year_17, aes(x = Month, y = salinity, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2017)") + ylab("Salinity (ppt)")
+month_vs_sal_17 <- ggplot(year_17, aes(x = Month, y = salinity, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2017)") + ylab("Salinity (ppt)") + labs(color = "Island Side")
 
 month_vs_sal_17
 
 
-month_vs_sal_18 <- ggplot(year_18, aes(x = Month, y = salinity, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2018)") + ylab("Salinity (ppt)")
+month_vs_sal_18 <- ggplot(year_18, aes(x = Month, y = salinity, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2018)") + ylab("Salinity (ppt)") + labs(color = "Island Side")
 
 month_vs_sal_18
 
-month_vs_sal_19 <- ggplot(year_19, aes(x = Month, y = salinity, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2019)") + ylab("Salinity (ppt)")
+month_vs_sal_19 <- ggplot(year_19, aes(x = Month, y = salinity, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2019)") + ylab("Salinity (ppt)") + labs(color = "Island Side")
 
 month_vs_sal_19
 
-ggarrange(month_vs_sal_16, month_vs_sal_17, month_vs_sal_18, month_vs_sal_19, nrow = 2, ncol = 2, common.legend = TRUE, legend = "bottom")
+sal_by_year <- ggarrange(month_vs_sal_16, month_vs_sal_17, month_vs_sal_18, month_vs_sal_19, nrow = 2, ncol = 2, common.legend = TRUE, legend = "bottom")
+
+sal_by_year
+
+ggsave(filename = "../../results/sal_by_year.png", plot = sal_by_year) 
 ```
-Salinity loos pretty consistent with the exploratory plots as well. Ocean side water are consistently higher in salinity than the bay side, which is expected since the bay is an estuary. Additionally, there is a wider range of salinity on the bay side, which is consistent with exploratory analysis. There is an odd jump in the salinity around April-May for 2016 and 2019. This may simply be a result of few observations taken during that time or it is possibly due to a very low rainfall year (salinitly tends to spike in the bay when rainfall is reduced). In 2017, there is a distinct salinity drop in bayside locations. The timing of this drop is correlated with the timing of Hurricane Irma landfall. We will explore more details of Irma impacts in the _Hurricane_Irma_Analysis_ script. 
+Salinity looks pretty consistent with the exploratory plots as well. Ocean side water are consistently higher in salinity than the bay side, which is expected since the bay is an estuary. Additionally, there is a wider range of salinity on the bay side, which is consistent with exploratory analysis. There is an odd jump in the salinity around April-May for 2016 and 2019. This may simply be a result of few observations taken during that time or it is possibly due to a very low rainfall year (salinitly tends to spike in the bay when rainfall is reduced). In 2017, there is a distinct salinity drop in bayside locations. The timing of this drop is correlated with the timing of Hurricane Irma landfall. We will explore more details of Irma impacts in the _Hurricane_Irma_Analysis_ script. 
 
 
 ```{r dissolved oxygen seasonality}
-month_vs_do_16 <- ggplot(year_16, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(1, 10)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("Dissolved Oxygen (mg/L)")
+month_vs_do_16 <- ggplot(year_16, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(1, 10)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("Dissolved Oxygen (mg/L)") + labs(color = "Island Side")
 
 month_vs_do_16 
 
-month_vs_do_17 <- ggplot(year_17, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(1, 10)) + geom_smooth(se = FALSE) + xlab("Month (2017)") + ylab("Dissolved Oxygen (mg/L)")
+month_vs_do_17 <- ggplot(year_17, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(1, 10)) + geom_smooth(se = FALSE) + xlab("Month (2017)") + ylab("Dissolved Oxygen (mg/L)") + labs(color = "Island Side")
 
 month_vs_do_17
 
 
-month_vs_do_18 <- ggplot(year_18, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(1, 10)) + geom_smooth(se = FALSE) + xlab("Month (2018)") + ylab("Dissolved Oxygen (mg/L)")
+month_vs_do_18 <- ggplot(year_18, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(1, 10)) + geom_smooth(se = FALSE) + xlab("Month (2018)") + ylab("Dissolved Oxygen (mg/L)") + labs(color = "Island Side")
 
 month_vs_do_18
 
-month_vs_do_19 <- ggplot(year_19, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(1, 10)) + geom_smooth(se = FALSE) + xlab("Month (2019)") + ylab("Dissolved Oxygen (mg/L)")
+month_vs_do_19 <- ggplot(year_19, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(1, 10)) + geom_smooth(se = FALSE) + xlab("Month (2019)") + ylab("Dissolved Oxygen (mg/L)") + labs(color = "Island Side")
 
 month_vs_do_19
 
-ggarrange(month_vs_do_16, month_vs_do_17, month_vs_do_18, month_vs_do_19, nrow = 2, ncol = 2, common.legend = TRUE, legend = "bottom")
+do_by_year <- ggarrange(month_vs_do_16, month_vs_do_17, month_vs_do_18, month_vs_do_19, nrow = 2, ncol = 2, common.legend = TRUE, legend = "bottom")
+
+do_by_year
+
+ggsave(filename = "../../results/do_by_year.png", plot = do_by_year) 
 ```
 
 Dissolved oxygen does not appear to show any distict seasonal patterns for either the bay side or the ocean side. There is a somewhat notable drop in the dissolved oxygen levels towards the end of the 2019 data for bayside samples, however or dataset ends in July of that year so it is unclear if this is just a standard fluctuation or not. It would be advised to monitor that situation if the pattern continued. 
@@ -180,49 +199,58 @@ Dissolved oxygen does not appear to show any distict seasonal patterns for eithe
 
 
 ```{r ammonia seasonality}
-month_vs_amm_16 <- ggplot(year_16, aes(x = Month, y = ammonia, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(0, 0.3)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("Ammonia (mg/L)")
+month_vs_amm_16 <- ggplot(year_16, aes(x = Month, y = ammonia, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(0, 0.3)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("Ammonia (mg/L)") + labs(color = "Island Side")
 
 month_vs_amm_16 
 
-month_vs_amm_17 <- ggplot(year_17, aes(x = Month, y = ammonia, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(0, 0.3)) + geom_smooth(se = FALSE) + xlab("Month (2017)") + ylab("Ammonia (mg/L)")
+month_vs_amm_17 <- ggplot(year_17, aes(x = Month, y = ammonia, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(0, 0.3)) + geom_smooth(se = FALSE) + xlab("Month (2017)") + ylab("Ammonia (mg/L)") + labs(color = "Island Side")
 
 month_vs_amm_17
 
 
-month_vs_amm_18 <- ggplot(year_18, aes(x = Month, y = ammonia, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(0, 0.3)) + geom_smooth(se = FALSE) + xlab("Month (2018)") + ylab("Ammonia (mg/L)")
+month_vs_amm_18 <- ggplot(year_18, aes(x = Month, y = ammonia, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(0, 0.3)) + geom_smooth(se = FALSE) + xlab("Month (2018)") + ylab("Ammonia (mg/L)") + labs(color = "Island Side")
 
 month_vs_amm_18
 
-month_vs_amm_19 <- ggplot(year_19, aes(x = Month, y = ammonia, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(0, 0.3)) + geom_smooth(se = FALSE) + xlab("Month (2019)") + ylab("Ammonia (mg/L)")
+month_vs_amm_19 <- ggplot(year_19, aes(x = Month, y = ammonia, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(0, 0.3)) + geom_smooth(se = FALSE) + xlab("Month (2019)") + ylab("Ammonia (mg/L)") + labs(color = "Island Side")
 
 month_vs_amm_19
 
-ggarrange(month_vs_amm_16, month_vs_amm_17, month_vs_amm_18, month_vs_amm_19, nrow = 2, ncol = 2, common.legend = TRUE, legend = "bottom")
+amm_by_year <- ggarrange(month_vs_amm_16, month_vs_amm_17, month_vs_amm_18, month_vs_amm_19, nrow = 2, ncol = 2, common.legend = TRUE, legend = "bottom")
+
+amm_by_year
+
+ggsave(filename = "../../results/amm_by_year.png", plot = amm_by_year) 
 ```
 Ammonia appears quite interesting. Most of the observations are fairly consistent with very low to negligable ammonia levels in the water. There is a distinct increase in fall 2017 which is consistent with the timing of Hurricane Irma landfall.
 
 ```{r ph seasonality}
-month_vs_ph_16 <- ggplot(year_16, aes(x = Month, y = ph, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(7, 9)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("pH")
+month_vs_ph_16 <- ggplot(year_16, aes(x = Month, y = ph, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(7, 9)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("pH") + labs(color = "Island Side")
 
 month_vs_ph_16 
 
-month_vs_ph_17 <- ggplot(year_17, aes(x = Month, y = ph, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(7, 9)) + geom_smooth(se = FALSE) + xlab("Month (2017)") + ylab("pH")
+month_vs_ph_17 <- ggplot(year_17, aes(x = Month, y = ph, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(7, 9)) + geom_smooth(se = FALSE) + xlab("Month (2017)") + ylab("pH") + labs(color = "Island Side")
 
 month_vs_ph_17
 
 
-month_vs_ph_18 <- ggplot(year_18, aes(x = Month, y = ph, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(7, 9)) + geom_smooth(se = FALSE) + xlab("Month (2018)") + ylab("pH")
+month_vs_ph_18 <- ggplot(year_18, aes(x = Month, y = ph, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(7, 9)) + geom_smooth(se = FALSE) + xlab("Month (2018)") + ylab("pH") + labs(color = "Island Side")
 
 month_vs_ph_18
 
-month_vs_ph_19 <- ggplot(year_19, aes(x = Month, y = ph, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(7, 9)) + geom_smooth(se = FALSE) + xlab("Month (2019)") + ylab("pH")
+month_vs_ph_19 <- ggplot(year_19, aes(x = Month, y = ph, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(7, 9)) + geom_smooth(se = FALSE) + xlab("Month (2019)") + ylab("pH") + labs(color = "Island Side")
 
 month_vs_ph_19
 
-ggarrange(month_vs_ph_16, month_vs_ph_17, month_vs_ph_18, month_vs_ph_19, nrow = 2, ncol = 2, common.legend = TRUE, legend = "bottom")
+ph_by_year <- ggarrange(month_vs_ph_16, month_vs_ph_17, month_vs_ph_18, month_vs_ph_19, nrow = 2, ncol = 2, common.legend = TRUE, legend = "bottom")
+
+ph_by_year
+
+ggsave(filename = "../../results/ph_by_year.png", plot = ph_by_year) 
 ```
 pH visualization does not show any distinct patterns across various seasons of measurement. This is consistent with expected results due to the fact that both the ocean and bay are strongly influenced by the alkaline limestone bedrock of the Keys. 
 
+## Seasonality With Raster Plots
 
 Next lets visualize the data using raster plots to see if we can see any differences in the correlations or additional patterns. To avoid clutter we will drop NAs from the individual predictors since they will not provide any information in the raster. 
 
@@ -332,7 +360,9 @@ Unsuprisingly, the raster visualizations show results consistent with the indivi
 Though visualy appealing, the line graphs produced above show data patterns that are more consistent with the actual measures of interest thus rasters will be relegated to supplemental information. 
 
 
-Lastly in our bivariate analysis we will zoom into three specific locations that represent the most numerous observations of Seagrass/Mangrove, Patch Reef/Hardbottom, and Coral Reef site types to visualize specific seasonal impacts on these locations. 
+## Most Frequent Site Visited By Type
+
+Lastly in our bivariate analysis we will zoom into three specific locations that have the most recorded observations of Seagrass/Mangrove, Patch Reef/Hardbottom, and Coral Reef site types to visualize specific seasonal impacts on these locations. 
 
 First we must determine the most abundant locations of each type and subset the data. 
 ```{r}
@@ -354,13 +384,42 @@ So it looks like our most numerous observation for Patch Reef/Hardbottom is Rodr
 Let's subset these locations and visualize.
 
 ```{r}
+
 roddy_subset <- subset(WQ_clean_data, location == "Rodriguez Key")
 tarpon_subset <- subset(WQ_clean_data, location == "Tarpon Basin")
 grecian_subset <- subset(WQ_clean_data, location == "Grecian Dry Rocks")
 
+group_subset <- rbind(roddy_subset, tarpon_subset, grecian_subset)
 ```
 
-Lets start with Rodriguez Key!
+We will start by grouping them all togeather with each of the five predictors and then compare seasonal fluctuations across the entire sampling timeframe. 
+
+```{r}
+freq_site_temp <- ggplot(group_subset, aes(x = Month, y = water_temp, color = location)) + geom_jitter()
+
+freq_site_temp
+
+freq_site_sal <- ggplot(group_subset, aes(x = Month, y = salinity, color = location)) + geom_jitter()
+
+freq_site_sal
+
+freq_site_amm <- ggplot(group_subset, aes(x = Month, y = ammonia, color = location)) + geom_jitter()
+
+freq_site_sal
+
+freq_site_do <- ggplot(group_subset, aes(x = Month, y = dissolved_oxygen, color = location)) + geom_jitter()
+
+freq_site_do
+
+freq_site_ph <- ggplot(group_subset, aes(x = Month, y = ph, color = location)) + geom_jitter()
+
+freq_site_ph
+```
+
+These plots are very consistent with the plots of the full data set.
+
+
+Lastly lets take the seasonal means for each parameter and apply them to our three sites of interest. We will generate line graphs to show specific fluctuation between sites.
 
 ```{r}
 mean_temp_roddy <- aggregate(water_temp ~ Month + Year, roddy_subset, mean) 
@@ -387,30 +446,144 @@ mean_temp_plot_grecian <- mean_temp_grecian %>% ggplot(aes(x = Date, y = water_t
 
 mean_temp_plot_grecian
 
-grid.arrange(mean_temp_plot_roddy, mean_temp_plot_tarpon, mean_temp_plot_grecian, nrow = 2)
+grid.arrange(mean_temp_plot_roddy, mean_temp_plot_tarpon, mean_temp_plot_grecian, nrow = 3)
 
 
 ```
 
+Temperature looks pretty seasonally consistent withe the other plots previously generated.
+
+```{r}
+mean_sal_roddy <- aggregate(salinity ~ Month + Year, roddy_subset, mean) 
+
+mean_sal_roddy$Date <- as.yearmon(paste(mean_sal_roddy$Month, mean_sal_roddy$Year, sep = "."), format = "%m.%Y")
+
+mean_sal_plot_roddy <- mean_sal_roddy %>% ggplot(aes(x = Date, y = salinity)) + geom_line() + xlab("Year") + ylab("Salinity (ppt)") + ggtitle("Mean Salinity Rodriguez Key") + scale_y_continuous(limits=c(20, 40))
+
+mean_sal_plot_roddy
+
+mean_sal_tarpon <- aggregate(salinity ~ Month + Year, tarpon_subset, mean) 
+
+mean_sal_tarpon$Date <- as.yearmon(paste(mean_sal_tarpon$Month, mean_sal_tarpon$Year, sep = "."), format = "%m.%Y")
+
+mean_sal_plot_tarpon <- mean_sal_tarpon %>% ggplot(aes(x = Date, y = salinity)) + geom_line() + xlab("Year") + ylab("Salinity (ppt)") + ggtitle("Mean Salinity Tarpon Basin") + scale_y_continuous(limits=c(20, 40))
+
+mean_sal_plot_tarpon
+
+mean_sal_grecian <- aggregate(salinity ~ Month + Year, grecian_subset, mean) 
+
+mean_sal_grecian$Date <- as.yearmon(paste(mean_sal_grecian$Month, mean_sal_grecian$Year, sep = "."), format = "%m.%Y")
+
+mean_sal_plot_grecian <- mean_sal_grecian %>% ggplot(aes(x = Date, y = salinity)) + geom_line() + xlab("Year") + ylab("Salinity (ppt)") + ggtitle("Mean Salinity Grecian") + scale_y_continuous(limits=c(20, 40))
+
+mean_sal_plot_grecian
+
+grid.arrange(mean_sal_plot_roddy, mean_sal_plot_tarpon, mean_sal_plot_grecian, nrow = 3)
+```
+
+Salinity shows the distinct between ocean and bayside sites as expected. Additionall we can see a dip in the salinity of Tarpon Basin sharply near the Irma timeframe, this suggests that the bay may have been more impacted by the storm. This makes sense as the bay is shallower. There is also an interesting decline in the salinity of Grecian Dry Rocks at the end of 2019, I am unsure as to what may be the cause of this decline. 
+
+```{r}
+mean_do_roddy <- aggregate(dissolved_oxygen ~ Month + Year, roddy_subset, mean) 
+
+mean_do_roddy$Date <- as.yearmon(paste(mean_do_roddy$Month, mean_do_roddy$Year, sep = "."), format = "%m.%Y")
+
+mean_do_plot_roddy <- mean_do_roddy %>% ggplot(aes(x = Date, y = dissolved_oxygen)) + geom_line() + xlab("Year") + ylab("Dissolved Oxygen (mg/L)") + ggtitle("Mean Dissolved Oxygen Rodriguez Key") + scale_y_continuous(limits=c(2, 10))
+
+mean_do_plot_roddy
+
+mean_do_tarpon <- aggregate(dissolved_oxygen ~ Month + Year, tarpon_subset, mean) 
+
+mean_do_tarpon$Date <- as.yearmon(paste(mean_do_tarpon$Month, mean_do_tarpon$Year, sep = "."), format = "%m.%Y")
+
+mean_do_plot_tarpon <- mean_do_tarpon %>% ggplot(aes(x = Date, y = dissolved_oxygen)) + geom_line() + xlab("Year") + ylab("Dissolved Oxygen (mg/L)") + ggtitle("Mean Dissolved Oxygen Tarpon Basin") + scale_y_continuous(limits=c(2, 10))
+
+mean_do_plot_tarpon
+
+mean_do_grecian <- aggregate(dissolved_oxygen ~ Month + Year, grecian_subset, mean) 
+
+mean_do_grecian$Date <- as.yearmon(paste(mean_do_grecian$Month, mean_do_grecian$Year, sep = "."), format = "%m.%Y")
+
+mean_do_plot_grecian <- mean_do_grecian %>% ggplot(aes(x = Date, y = dissolved_oxygen)) + geom_line() + xlab("Year") + ylab("Dissolved Oxygen (mg/L)") + ggtitle("Mean Dissolved Oxygen Grecian") + scale_y_continuous(limits=c(2, 10))
+
+mean_do_plot_grecian
+
+grid.arrange(mean_do_plot_roddy, mean_do_plot_tarpon, mean_do_plot_grecian, nrow = 3)
 
 
-#########################################################
-Specific look at Irma year. Still working below here...
 
-Determine raster keep or not
+```
+
+Dissolved oxygen is rather interesting. The general patterns of the graphs are similar to the expected variation between sites, however there is a notable decrease in Tarpon Basin around the Irma timeline. This also suggests the bay was strongly impacted by the storm. There is also an interesting spike in DO in early 2016 for Grecian Dry Rocks. I am unsure as to the cause of this.
+
+```{r}
+mean_amm_roddy <- aggregate(ammonia ~ Month + Year, roddy_subset, mean) 
+
+mean_amm_roddy$Date <- as.yearmon(paste(mean_amm_roddy$Month, mean_amm_roddy$Year, sep = "."), format = "%m.%Y")
+
+mean_amm_plot_roddy <- mean_amm_roddy %>% ggplot(aes(x = Date, y = ammonia)) + geom_line() + xlab("Year") + ylab("Ammonia (mg/L)") + ggtitle("Mean Ammonia Rodriguez Key") + scale_y_continuous(limits=c(0, 1))
+
+mean_amm_plot_roddy
+
+mean_amm_tarpon <- aggregate(ammonia ~ Month + Year, tarpon_subset, mean) 
+
+mean_amm_tarpon$Date <- as.yearmon(paste(mean_amm_tarpon$Month, mean_amm_tarpon$Year, sep = "."), format = "%m.%Y")
+
+mean_amm_plot_tarpon <- mean_amm_tarpon %>% ggplot(aes(x = Date, y = ammonia)) + geom_line() + xlab("Year") + ylab("Ammonia (mg/L)") + ggtitle("Mean Ammonia Tarpon Basin") + scale_y_continuous(limits=c(0, 1))
+
+mean_amm_plot_tarpon
+
+mean_amm_grecian <- aggregate(ammonia ~ Month + Year, grecian_subset, mean) 
+
+mean_amm_grecian$Date <- as.yearmon(paste(mean_amm_grecian$Month, mean_amm_grecian$Year, sep = "."), format = "%m.%Y")
+
+mean_amm_plot_grecian <- mean_amm_grecian %>% ggplot(aes(x = Date, y = ammonia)) + geom_line() + xlab("Year") + ylab("Ammonia (mg/L)") + ggtitle("Mean Ammonia Grecian") + scale_y_continuous(limits=c(0, 1))
+
+mean_amm_plot_grecian
+
+grid.arrange(mean_amm_plot_roddy, mean_amm_plot_tarpon, mean_amm_plot_grecian, nrow = 3)
+```
+
+Ammonia is similar to other visuals created above, relatively flat across the board with intermittant spikes and a substantial spike around Irma.
+
+```{r}
+mean_ph_roddy <- aggregate(ph ~ Month + Year, roddy_subset, mean) 
+
+mean_ph_roddy$Date <- as.yearmon(paste(mean_ph_roddy$Month, mean_ph_roddy$Year, sep = "."), format = "%m.%Y")
+
+mean_ph_plot_roddy <- mean_ph_roddy %>% ggplot(aes(x = Date, y = ph)) + geom_line() + xlab("Year") + ylab("pH") + ggtitle("Mean pH Rodriguez Key") + scale_y_continuous(limits=c(7, 9))
+
+mean_ph_plot_roddy
+
+mean_ph_tarpon <- aggregate(ph ~ Month + Year, tarpon_subset, mean) 
+
+mean_ph_tarpon$Date <- as.yearmon(paste(mean_ph_tarpon$Month, mean_ph_tarpon$Year, sep = "."), format = "%m.%Y")
+
+mean_ph_plot_tarpon <- mean_ph_tarpon %>% ggplot(aes(x = Date, y = ph)) + geom_line() + xlab("Year") + ylab("pH") + ggtitle("Mean pH Tarpon Basin") + scale_y_continuous(limits=c(7, 9))
+
+mean_ph_plot_tarpon
+
+mean_ph_grecian <- aggregate(ph ~ Month + Year, grecian_subset, mean) 
+
+mean_ph_grecian$Date <- as.yearmon(paste(mean_ph_grecian$Month, mean_ph_grecian$Year, sep = "."), format = "%m.%Y")
+
+mean_ph_plot_grecian <- mean_ph_grecian %>% ggplot(aes(x = Date, y = ph)) + geom_line() + xlab("Year") + ylab("pH") + ggtitle("Mean pH Grecian") + scale_y_continuous(limits=c(7, 9))
+
+mean_ph_plot_grecian
+
+grid.arrange(mean_ph_plot_roddy, mean_ph_plot_tarpon, mean_ph_plot_grecian, nrow = 3)
+```
+ pH is also quite interesting. Similar to dissolved oxygen, there is a notable drop in pH around hurricane Irma land fall that is not present in the group data. This again suggests the bay was strongly affected by this storm.
 
 
+
+
+## Conclusions
 
 Overall, the there seems to be little seasonal fluctuation in ammonia, dissolved oxygen and pH measurements. This is not suprising due to the fact that these parameters are largely independent of one another (barring some unique event). Water temperature shows standard seasonal fluctuation with warmer and cooler months, and bays side waters exhibit a wider ranger of temperatures. Salinity is reasonable unique in terms of observations. Oceanside water have distinctly greater salinity for the vast majority of the year and have a very narrow range. Bayside waters typically have a reduced salinity, however large spikes upward can be associated with the dry season. 
 
-Despite these overall trends, there is a notable variation in some of the parameters consistent with the timing of Hurricane Irma landfall (September 2017). Ammonia most noteably spkies drastically at this time. This is likely due to hurricane-induced nutrint influx. Salinity drops substantially from the normal levels, likely due to storm water influx. Water temperature shows a notable decrease, but it is likely this can be attributed to standard seasonal fluctuation. Both pH and dissolved oxygen do not show any unusual trends during this time. This is a suprising result for dissolved oxygen. It should be noted that post Hirricane Irma observations are limited in number due to the inability to collect samples directly following the storm. 
+Despite these overall trends, there is a notable variation in some of the parameters consistent with the timing of Hurricane Irma landfall (September 2017). Ammonia most noteably spkies drastically at this time. This is likely due to hurricane-induced nutrint influx. Salinity drops substantially from the normal levels, likely due to storm water influx. Water temperature shows a notable decrease, but it is likely this can be attributed to standard seasonal fluctuation. Both pH and dissolved oxygen do not show any unusual trends with the group data, but show notable changes when aplied to Tarpon Basin measures. Hurricane Irma warrents further investigation and will be analyzed in the _hurricane_irma_analysis_ script. It should be noted that post Hirricane Irma observations are limited in number due to the inability to collect samples directly following the storm. 
 
-
-
-Since we can see these trends visually, lets see if there is a significant difference between the fall 2017 and the fall season of the other years.
-
-
-############Test statistical significance of the months surrounding Irma?
 
 
 
