@@ -1,0 +1,71 @@
+---
+title: "Citizen Science Efficacy Analysis"
+author: "William Norfolk"
+date: "11/6/2019"
+output: word_document
+---
+
+This script measures the efficacy of citizen science data gathered in this study by modeling water quality parameters from data to predict the predict the resulting island side of predicted information. 
+
+## Model Prep
+
+Start by loading the libraries.
+```{r}
+library('tidyr')
+library('dplyr')
+library('forcats')
+library('ggplot2')
+library('knitr')
+library('caret')
+library('doParallel')
+library('rpart')
+library('rpart.plot')
+library('mda')
+library('ranger')
+library('e1071')
+library('visdat')
+```
+Load the data and take a look.
+
+```{r}
+WQ_clean_data <- readRDS("../../data/processed_data/processeddata.rds")
+
+glimpse(WQ_clean_data)
+```
+
+Check for NAs and properly formatted classes.
+
+```{r}
+vis_dat(WQ_clean_data)
+```
+Data looks pretty good, there are some NA values but the tree models should be able to handel these since they are not strongly grouped. 
+
+We do need to recode a few variables in this view. We will make all or date related variables numeric, and the remaining buckets will be factors. Also we can remove instructor_name and kit since they are not very relevent to the data. For now we will leave group_name in the data in case different schools are more effective measurers of water quality. 
+
+
+
+```{r}
+#Drop instructor name and equipment
+reduce_vars <- WQ_clean_data %>% dplyr::select(-instructor_name, -equipment)
+
+#Change numerics
+reduce_vars$Month <- as.numeric(as.character(reduce_vars$Month))
+reduce_vars$Day <- as.numeric(as.character(reduce_vars$Day))
+reduce_vars$Year <- as.numeric(as.character(reduce_vars$Year))
+
+#Change factors
+reduce_vars$group_name <- as.factor(as.character(reduce_vars$group_name))
+reduce_vars$island_side <- as.factor(as.character(reduce_vars$island_side))
+reduce_vars$site_type <- as.factor(as.character(reduce_vars$site_type))
+reduce_vars$location <- as.factor(as.character(reduce_vars$location))
+
+
+vis_dat(reduce_vars)
+```
+
+
+
+
+
+
+
