@@ -5,7 +5,7 @@ date: "11/6/2019"
 output: word_document
 ---
 
-This script measures the efficacy of citizen science data gathered in this study by modeling water quality parameters from data to predict the predict the resulting island side of predicted information. 
+This script measures the efficacy of citizen science data gathered in this study by investigating the individual water quality parameters that characterize the seperation of observations into the selected outcome variable island_side. Selection of island side will be evaluated using tree-based modeling to detemrine which water quality parameters strongly influence the the seperation of water systems. The goal of this analysis is not to determine which parameters are the most powerful for influencing data seperation, but rather to measure the most powerful variables and compare them to known conditions of water quality seperation. If the tree analysis of our citizen science data produces similar keystone predictor variables to our known strong predictors of water quality this will suggest that the citizen science data used is consistent with the actual condition of Key Largo waters thus showing providing a measure of efficacy for the usage of this citizen science data.
 
 ## Model Prep
 
@@ -158,7 +158,7 @@ print(fit1$results)
  Looks like we have pretty high accuracy across the board here. This is likely due to the two predictors mentioned above. Lets take a look at the tree.
 
 ```{r}
-prp(fit1$finalModel, extra = 1, type = 1)
+prp(fit1$finalModel, extra = 1, type = 5)
 ```
 
 As expected our tree splits along the lines of site_type and location. This makes complete sense since island_side and site_type and essentially large subgroups of the various location information.To get a comprehensive picture of water qiality-based predictions we will remove these two variables from our data set. 
@@ -198,10 +198,10 @@ print(fit2$results)
 With those two predictors removed accuracy is a bit higher than the null model (not quite as high as I had hoped). 
 
 ```{r}
-prp(fit2$finalModel, extra = 1, type = 1)
+prp(fit2$finalModel, extra = 1, type = 5)
 
 ```
-The resulting tree (while a bit boring looking) is actually quite interesting. This suggests that salinity alone may be the best predictor of island_side.
+The resulting tree (while a bit boring looking) is actually quite interesting. This suggests that salinity alone may be the best predictor of island_side. While relatively simple, this prediction is consistent with the known seperation of water quality data from bayside and oceanside waters and is thus not suprisingly the strongest factor for island_side. 
 
 
 Lets see if a random forest can break the data down further.
@@ -226,6 +226,7 @@ fit3 = caret::train(island_side ~ ., data=data_train, method="ranger",  trContro
 plot(fit3)
 ```
 
-Based on the rando forest it looks like or data has the greatest accuracy when scaled with 6-7 predictors. 
+Based on the random forest it looks like or data has the greatest accuracy when scaled with 6-7 predictors. 
 
+##### Tree without salinity compare predictors
 
