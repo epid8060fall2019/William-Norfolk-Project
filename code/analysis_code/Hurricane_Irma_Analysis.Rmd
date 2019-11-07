@@ -178,9 +178,6 @@ filter_not_irma_fall <- not_irma_subset %>% dplyr::filter(Month %in% month_list)
 Now that we have our two fall subsets we will compare the individual water quality parameters between each using a Kolmogorov-Smirnov test. Since our data is likely to be seasonally be influenced as well as storm influenced we will use this test since it does not require a normal distribution. 
 
 
-
-
-
 ```{r}
 ks.test(filter_irma_fall$ph, filter_not_irma_fall$ph)
 ks.test(filter_irma_fall$dissolved_oxygen, filter_not_irma_fall$dissolved_oxygen)
@@ -189,6 +186,5 @@ ks.test(filter_irma_fall$water_temp, filter_not_irma_fall$water_temp)
 ks.test(filter_irma_fall$salinity, filter_not_irma_fall$salinity)
 ```
 
-
-###### Split data into bay and ocean
+So it looks like our Two-sample Kolmogorov-Smirnov test shows a significant difference in the salinity and ammonia following Hurricane Irma landfall. This pattern is consistent with known influences of storm surge/heavy rainfall on the salinity and ammonia content of Key Largo waters. It should be noted that our statistical tests are limited strongly by the number of observations taken during the alloted timeframe. Few measurements are taken imediately following Irma landfall, thus grouping statistical tests by bay and ocean side sites (which would be preferrable) would produce n values for the filter_irma_fall dataset which are below 10 therefore we will keep the data as a group. It should be noted that there would likely be larger imapcts to the bayside sites.
 
