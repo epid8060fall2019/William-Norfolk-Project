@@ -141,8 +141,6 @@ ggsave(filename = "../../results/imra_mean_ph_plot.png",plot = irma_mean_ph_plot
 Lastly, pH shows a distinct drop in bayside site location immediately following Irma. This is likely related to the salinity decrease due to heavy rainfall. Keys water tend to be basic (~8.0) and heavy rain fall of a neutral pH reduces the overall pH of smaller/shallow bodies of water. 
 
 
-#################### Last Step to finish is statistical test, T-test? 
-
 Based on the visual differences in data it may be prudent to run a few simple significance tests comparing the data from 2017 to the others years of study. However since Irma made landfall in Sepetember, it is likely effects of the storm lingered for a few months after the event. So it would be prudent to create two new subsets of data and compare them.
 
 ```{r}

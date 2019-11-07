@@ -97,9 +97,83 @@ knitr::include_graphics("../../results/combined_seasonal_trends.png")
 ```
 
 
-## Bivariate analysis
-_Create plots or tables and compute simple statistics (e.g. t-tests, simple regression model with 1 predictor, etc.) to look for associations between your outcome(s) and each individual predictor variable_
+## Bivariate Analysis
 
+Bivariate analysis investigates the deeper associations of the five water quality parameters as well as details the specifics of seasonal variation among the parameters. 
+
+Analysis of the associations between each of the five water quality parameters show no discernable associations between variables that are distinct from the results of the above univariate analysis. The various patterns associated with island side and site type can be visualized in the bivariate comparisions of parameters, however no novel correlations were observed. All bivariate analysis figures can be viewed in the supplementary data folder of the project. 
+
+Bivariate analysis permitted the in depth visualization of all five water quality parameters across the annual time scale allowing for a detailed view of seasonal water conditions. 
+
+```{r Figure 6, echo=FALSE}
+knitr::include_graphics("../../results/temp_by_year.png")
+```
+
+Analysis of water temperature showed distinct seasonal patterns of temperature rise an fall consistent with cooler and warmer months of the year. For all four years of study, bayside site locations showed a greater temperature range when compared to oceanside sites, this finding is consistent with univariate visualizations. 
+
+```{r Figure 7, echo=FALSE}
+knitr::include_graphics("../../results/sal_by_year.png")
+```
+
+Analysis of salinity showed a distinct seperation of bayside and oceanside waters with salinity typically greater in the ocean and reduced in the bay. Bayside site locations showed a much wider range of salinity conditions whereas the ocean was relatively stenohaline. There is a distinct jump in the salinity of bayside site locations in 2016 and 2019 associated with the months of March and April. 2017 showed a distinctive drop in the salinity of the bay associated with the month of September. 
+
+```{r Figure 8, echo=FALSE}
+knitr::include_graphics("../../results/do_by_year.png")
+```
+
+Analysis of dissolved oxygen did not reveal any distinct seasonal patterns in the oxygen levels of Key Largo waters. Bayside sites typically showed a lower minimum dissolved oxygen level, whereas the max was variable between the two island sides. 
+
+```{r Figure 9, echo=FALSE}
+knitr::include_graphics("../../results/amm_by_year.png")
+```
+
+Ammonia analysis did not show any consistent seasonal fluctuation patterns across all years of measure. Levels on both the bayside and oceanside remain relatively low through the course of study, however there is a large spike in 2017 near the month of September. 
+
+```{r Figure 10, echo=FALSE}
+knitr::include_graphics("../../results/ph_by_year.png")
+```
+
+Analysis of pH levels showed no discernable seasonal fluctuations. pH remained relatively constant at both bayside and oceanside site locations. The minimum and maximum pH levels did not show any distinct patterns between island sides. 
+
+## Hurricane Irma Analysis
+
+Hurricane Irma analysis investigated the specific impacts of hurricane Irma landfall on the five water quality parameters measured in this study. Hurricane Irma made landfall on September 10, 2017. Figures in this analysis represent continious time data from the start of 2017 to the end of 2018 to allow visualization of the acute and subacute effects of hurricane landfall.
+
+```{r Figure 11, echo=FALSE}
+knitr::include_graphics("../../results/imra_mean_temp_plot.png")
+```
+
+Water temperature associated with Irma landfall showed a notable drop in the months following the storm. This drop was largest for bayside site locations. IT should be noted this decrease is consistent with the timing of standard seasonal fluctuation of water temperature in the Florida Keys.
+
+```{r Figure 12, echo=FALSE}
+knitr::include_graphics("../../results/imra_mean_sal_plot.png")
+```
+
+Salinity levels associated with hurricane landfall showed a distinctive decrease for bayside site locations. The mean salinity of the ocean however remaind relatively constant following the storm.
+
+```{r Figure 13, echo=FALSE}
+knitr::include_graphics("../../results/imra_mean_do_plot.png")
+```
+
+Dissolved oygen associated with hurricane landfall did not show any notable changes for both bayside and oceanside site locatons. There is a distinct decrease in the mean dissolved oxygen for the bay observed in the latter months of 2018. 
+
+
+```{r Figure 14, echo=FALSE}
+knitr::include_graphics("../../results/imra_mean_amm_plot.png")
+```
+
+Ammonia levels associated wit Hurricane Irma showed a dramatic spike in bayside site locations immediately following landfalland a small increase for oceanside sites. There is an additional drop and upspike in bayside ammonia associated with the spring-summer of 2018. 
+
+```{r Figure 15, echo=FALSE}
+knitr::include_graphics("../../results/imra_mean_ph_plot.png")
+```
+
+pH levels associated with hurricane landfall showed a moderate drop for bayside site locations and little chnge for oceanside waters. The decrease in bayside pH is associated with and acute timeline of hurricane landfall, however the drop is not as substantial as some of the previously recorded fluctuations of pH from the seasonal analysis. 
+
+Water quality parameters of September-Febuary from Irma landfall were compared using a Two-sample Kolmogorov-Smirnov test to water quality measures from the year prior to determine if any of the five parameters were statistically significant. The results of the Kolmogorov-Smirnov test showed a p-value of 0.227 for water temperature, 0.002 for salinity, 0.499 for dissolved oxygen, 0.002 for ammonia, and 0.334 for pH. These results suggest that the salinity and ammonia levels were siginifcantly influenced by the landfall of Hurricane Irma. This significance is consistent with the visuals of univariate, bivariate, and Hurricane Irma analysis. 
+
+
+Overall,  analysis of hurricane Irma landfall revealed notable changes in the levels of salinity and 
 
 ## Full analysis
 _Use one or several suitable statistical/machine learning methods to analyze your data and to produce meaningful figures, tables, etc. This might again be code that is best placed in one or several separate R scripts that need to be well documented. You can then load the results produced by this code_
