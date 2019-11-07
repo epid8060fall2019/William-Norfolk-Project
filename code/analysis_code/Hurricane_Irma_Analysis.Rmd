@@ -64,70 +64,84 @@ Lets take a quick look at the parameters for this subset.
 
 
 ```{r}
-irma_temp_plot <- ggplot(irma_subset, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.5) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1)
+irma_temp_plot <- ggplot(irma_subset, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.5) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1) + ylab("Water Temperature (C)") + labs(color = "Island Side")
 
 irma_temp_plot
 
 mean_temp_irma <- aggregate(water_temp ~ Month + Year +island_side, irma_subset, mean)
 
-irma_mean_temp_plot <- ggplot(mean_temp_irma, aes(x = Month, y = water_temp, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1)
+irma_mean_temp_plot <- ggplot(mean_temp_irma, aes(x = Month, y = water_temp, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1) + ylab("Water Temperature (C)") +labs(color = "Island Side")+ geom_point()
 
-irma_mean_temp_plot + geom_point()
+irma_mean_temp_plot 
+
+ggsave(filename = "../../results/imra_mean_temp_plot.png",plot = irma_mean_temp_plot) 
 ```
+It looks like water temperature takes a dive following Irma landfall, however any temperature changes as a result of a hurricane we would expect to see quickly after landfall and these changes are delayed a few months in both ocean and bayside sites. There is a chance that hurricane influences could reduce the water temperature of the bayside due to heavy rainfall, but the trends visualized here are more likely a result of seasonal temperature change into winter months.  
 
 ```{r}
-irma_sal_plot <- ggplot(irma_subset, aes(x = Month, y = salinity, color = island_side)) + geom_jitter(alpha = 0.5) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1)
+irma_sal_plot <- ggplot(irma_subset, aes(x = Month, y = salinity, color = island_side)) + geom_jitter(alpha = 0.5) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1) + ylab("Salinity (ppt)") + labs(color = "Island Side")
 
 irma_sal_plot
 
 mean_sal_irma <- aggregate(salinity ~ Month + Year +island_side, irma_subset, mean)
 
-irma_mean_sal_plot <- ggplot(mean_sal_irma, aes(x = Month, y = salinity, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1)
+irma_mean_sal_plot <- ggplot(mean_sal_irma, aes(x = Month, y = salinity, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1) + ylab("Salinity (ppt)") + labs(color = "Island Side") +geom_point()
 
-irma_mean_sal_plot + geom_point()
+irma_mean_sal_plot
+
+ggsave(filename = "../../results/imra_mean_sal_plot.png",plot = irma_mean_sal_plot)
 ```
+Salinity shows a distinct drop in bayside sites followinf Hurricane Irma. This is likely due to the storm surge and rainfall influences of the storm. These influences are more strongly noticed on the bayside since the water depth is shallow. It takes a substantial global even to reduce the salinity of the ocean waters so we would not expect to see a strong decrease at these sites. 
+
 
 ```{r}
-irma_amm_plot <- ggplot(irma_subset, aes(x = Month, y = ammonia, color = island_side)) + geom_jitter(alpha = 0.5) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1)
+irma_amm_plot <- ggplot(irma_subset, aes(x = Month, y = ammonia, color = island_side)) + geom_jitter(alpha = 0.5) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1) + ylab("Ammonia (mg/L)") + labs(color = "Island Side")
 
 irma_amm_plot
 
 mean_amm_irma <- aggregate(ammonia ~ Month + Year +island_side, irma_subset, mean)
 
-irma_mean_amm_plot <- ggplot(mean_amm_irma, aes(x = Month, y = ammonia, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1)
+irma_mean_amm_plot <- ggplot(mean_amm_irma, aes(x = Month, y = ammonia, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1) + ylab("Ammonia (mg/L)") + labs(color = "Island Side") + geom_point()
 
-irma_mean_amm_plot + geom_point()
+irma_mean_amm_plot
+
+ggsave(filename = "../../results/imra_mean_amm_plot.png",plot = irma_mean_amm_plot)
 ```
-
+Ammonia shows a sunstantial spike in levels following Hurricane Irma landfall. This is likely due to storm-induced nutrint influx from surge, flooding, rainfall, septig/sewage overflow, etc. It is expected that these effects would be more strongly visualized in the bayside due to the close proximity to point and non-point sources of pollution and the silty substrate of the estuary. There is an interesting dip in the ammonia a few months following the spike, I am unsure as to the nature of this. It is possible there was a large number of measures from a particular site that showed a quicker recovery from the storm during this time frame.
 
 ```{r}
-irma_do_plot <- ggplot(irma_subset, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_jitter(alpha = 0.5) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1)
+irma_do_plot <- ggplot(irma_subset, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_jitter(alpha = 0.5) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1) + ylab("Dissolved Oxygen (mg/L)") + labs(color = "Island Side")
 
 irma_do_plot
 
 mean_do_irma <- aggregate(dissolved_oxygen ~ Month + Year +island_side, irma_subset, mean)
 
-irma_mean_do_plot <- ggplot(mean_do_irma, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1)
+irma_mean_do_plot <- ggplot(mean_do_irma, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1) + ylab("Dissolved Oxygen (mg/L)") + labs(color = "Island Side") + geom_point()
 
-irma_mean_do_plot + geom_point()
+irma_mean_do_plot
+
+ggsave(filename = "../../results/imra_mean_do_plot.png",plot = irma_mean_do_plot)
 ```
+Dissolved oxgen shows a dip in assocation with the hurrincane, however this dip does not look terribly distinct from standard fluctuation. There is a sharp decline later in 2018, this may be associated with a strong algal bloom even in South Florida that summer, however I am unsure of the cause of this decline.
 
 ```{r}
-irma_ph_plot <- ggplot(irma_subset, aes(x = Month, y = ph, color = island_side)) + geom_jitter(alpha = 0.5) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1)
+irma_ph_plot <- ggplot(irma_subset, aes(x = Month, y = ph, color = island_side)) + geom_jitter(alpha = 0.5) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1) + ylab("pH") + labs(color = "Island Side")
 
 irma_ph_plot
 
 mean_ph_irma <- aggregate(ph ~ Month + Year +island_side, irma_subset, mean)
 
-irma_mean_ph_plot <- ggplot(mean_ph_irma, aes(x = Month, y = ph, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1)
+irma_mean_ph_plot <- ggplot(mean_ph_irma, aes(x = Month, y = ph, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1) + ylab("pH") + labs(color = "Island Side") + geom_point()
 
-irma_mean_ph_plot + geom_point()
+irma_mean_ph_plot
+
+ggsave(filename = "../../results/imra_mean_ph_plot.png",plot = irma_mean_ph_plot)
 ```
 
+Lastly, pH shows a distinct drop in bayside site location immediately following Irma. This is likely related to the salinity decrease due to heavy rainfall. Keys water tend to be basic (~8.0) and heavy rain fall of a neutral pH reduces the overall pH of smaller/shallow bodies of water. 
 
 
-
-
+#################### Last Step to finish is statistical test, T-test? 
 
 
 
