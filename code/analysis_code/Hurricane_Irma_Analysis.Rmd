@@ -143,6 +143,52 @@ Lastly, pH shows a distinct drop in bayside site location immediately following 
 
 #################### Last Step to finish is statistical test, T-test? 
 
+Based on the visual differences in data it may be prudent to run a few simple significance tests comparing the data from 2017 to the others years of study. However since Irma made landfall in Sepetember, it is likely effects of the storm lingered for a few months after the event. So it would be prudent to create two new subsets of data and compare them.
+
+```{r}
+month_list <- c(9,10,11,12,13,14)
+filter_irma_fall <- irma_subset %>% dplyr::filter(Month %in% month_list)
+```
 
 
+```{r}
+year_2016 <- subset(WQ_clean_data, Year == "16")
+year_2017_mod <- year_2017
+year_2017_mod <- year_2017_mod %>% dplyr::mutate(Month = recode(Month,
+                                  "01" = "13",
+                                  "02" = "14",
+                                  "03" = "15",
+                                  "04" = "16",
+                                  "05" = "17",
+                                  "06" = "18",
+                                  "07" = "19",
+                                  "08" = "20",
+                                  "09" = "21",
+                                  "10" = "22",
+                                  "11" = "23",
+                                  "12" = "24"))
+
+not_irma_subset <- rbind(year_2016, year_2017_mod)
+
+filter_not_irma_fall <- not_irma_subset %>% dplyr::filter(Month %in% month_list)
+
+
+```
+
+Now that we have our two fall subsets we will compare the individual water quality parameters between each using a Kolmogorov-Smirnov test. Since our data is likely to be seasonally be influenced as well as storm influenced we will use this test since it does not require a normal distribution. 
+
+
+
+
+
+```{r}
+ks.test(filter_irma_fall$ph, filter_not_irma_fall$ph)
+ks.test(filter_irma_fall$dissolved_oxygen, filter_not_irma_fall$dissolved_oxygen)
+ks.test(filter_irma_fall$ammonia, filter_not_irma_fall$ammonia)
+ks.test(filter_irma_fall$water_temp, filter_not_irma_fall$water_temp)
+ks.test(filter_irma_fall$salinity, filter_not_irma_fall$salinity)
+```
+
+
+###### Split data into bay and ocean
 
