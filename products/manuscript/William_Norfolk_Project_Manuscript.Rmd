@@ -20,7 +20,7 @@ _Write a summary of your project._
 # Introduction [@Barnsetal2014]
 
 ## General Background Information
-Water quality assessment is a core component of experimental design in a wide range of scientific disciplines. Water condition is imperative to environmental and human health, both as a direct concern such as in the case of aquatic organisms or indirectly such as in the case of irrigation of crops[@Precht2007]. The utility of water quality data is due to the fact that key parameters can provide information on the baseline health condition of a water system at a relatively low cost in sampling methodology. The efficacy and cost of water sampling has allowed the techniques to become ubiquitous across the field of environmental science and has become a core component of ecosystem health assessment. The relative ease of sampling and low cost of materials is particularly useful for research requiring a large number of samples, such as in ecosystem monitoring.
+Water quality assessment is a core component of experimental design in a wide range of scientific disciplines. Water condition is imperative to environmental and human health, both as a direct concern such as in the case of aquatic organisms or indirectly such as in the case of irrigation of crops[@Precht2007]. The utility of water quality data is due to the fact that key parameters can provide information on the baseline health condition of a water system at a relatively low cost in sampling methodology. The efficacy and cost of water sampling has allowed the techniques to become ubiquitous across the field of environmental science and has become a core component of ecosystem health assessment[@Bertollo2008]. The relative ease of sampling and low cost of materials is particularly useful for research requiring a large number of samples, such as in ecosystem monitoring.
 
 Ecosystem monitoring is the measurement of changes that occur within an ecosystem over time. Monitoring studies gather data on specific health indicators of interest to a locale and use these data to assess long and short-term changes within an ecosystem. Water quality is one of the most common monitoring indicators due to the high level of ecosystem response to changes in abiotic conditions, and the accessibility of methods and equipment. Worldwide programs have been established to gather water quality data though the power of citizen science and outreach. Though a vast amount of data has been collected from various programs, much of the analysis done has been conducted at a state or country scale. Numerous data sets exist at smaller scales which can provide useful information on the local microhabitats of various water systems that may be overlooked when assessed at a larger scale. Here we assess the marine water quality conditions of Key Largo, Florida from 2016 to 2019 through the use of citizen science collected data. 
 
@@ -74,29 +74,29 @@ Exploratory analysis of the cleaned water quality dataset shows general trends a
 
 The first variables explored will be collectively refrred to as the location variables, as they provide site specific information of the sampling locations that is understandable to inividuals that are not familar with the specific sites by name. Loaction variables explored consisted of island_side and site_type. Island_side refers to the specific side of the island the sampling site is located and consists of two categories: oceanside (Atlantic Ocean) and bayside (Gulf of Mexico). Site_type defines the specific type of ecosystem the site represents and consists of three categories: coral reef, seagrass/mangroves, and path reef/hardbottom. The thee site categories are distinguished by distance from shore, seagrass/mangrove represent near shore sites, path reef/hardbottom are mid-shore, and coral reefs are offshore locations. 
 
-Notable location patterns were observed in both salinity and temperature parameters for both island_side and site_type. Oceanside sites typically showed a reduced range of temperature and salinity measures, whereas bayside sites were distinctly dynamic. In terms of site_type, seagrass/mangrove sites generally exhibited a wider range of temperature and salinity, whereas coral reefs and patch reefs/hardbottom sites were less variable. The following trends cna be seen in figures 1-4 below. 
+Notable location patterns were observed in both salinity and temperature parameters for both island_side and site_type. Oceanside sites typically showed a reduced range of temperature and salinity measures, whereas bayside sites were distinctly dynamic. In terms of site_type, seagrass/mangrove sites generally exhibited a wider range of temperature and salinity, whereas coral reefs and patch reefs/hardbottom sites were less variable. The following trends can be seen in figures 1-4 below. 
 
-```{r 1Fig, echo=FALSE}
+```{r 1Fig, fig.cap="Distribution of water temperature (C) for bayside and oceanside site locations.", echo=FALSE}
 knitr::include_graphics("../../results/bay_v_ocean_water_temp.png")
 
 ```
 
-```{r 2Fig, echo=FALSE}
+```{r 2Fig, fig.cap="Distribution of salinity (ppt) for bayside and oceanside site locations.", echo=FALSE}
 knitr::include_graphics("../../results/bay_v_ocean_salinity.png")
 ```
 
-```{r 3Fig, echo=FALSE}
+```{r 3Fig, fig.cap="Distribution of water temperature (C) for Coral Reef, Seagrass/Mangrove, and Patch Reef/Hardbottom site types.", echo=FALSE}
 knitr::include_graphics("../../results/site_type_water_temp.png")
 ```
 
-```{r 4Fig, echo=FALSE}
+```{r 4Fig, fig.cap="Distribution of salinity (ppt) for Coral Reef, Seagrass/Mangrove, and Patch Reef/Hardbottom site types.", echo=FALSE}
 knitr::include_graphics("../../results/site_type_salinity.png")
 ```
 
 The scond half of the exploratory data analysis was focused on the seasonal data associated with the measured observations. Each water quality parameter was averaged and plotted against the total time of the study to determine seasonal fluctuations and look for abiotic impacts of Hurrican Irma which occurred in September 2017. Ammonia showed a steady average spread with minor seasonal variation and a large spike in the fall of 2017 consistent with Hurricane Irma landfall. pH showed a range of values with no discernable seasonal trends. A drop was indicated in pH following Hirrican Irma, however the decline is consistent with previous fluctuations. Salinity showed a moderate seasonal trend with a sharp decrease following Hurricane Irma. Dissolved oxygen showed steady seasonal fluctuations with a slightly lower dip following Hurricane Irma landfall. Water temperature showed a consistent pattern of seasonal fluctuation across the four years of study. It should be noted that despite the apparent alignment of abiotic changes in relation to Hurricane Irma landfall, substantially fewer data was gathered in the months following the storm compared to other years due to the unsafe conditions of water travel.
 
 
-```{r 5Fig, echo=FALSE}
+```{r 5Fig, fig.cap="Annual fluctuation of water quality parameters in Key Largo, Florida from January 2016 to August 2019.", echo=FALSE}
 knitr::include_graphics("../../results/combined_seasonal_trends.png")
 ```
 
