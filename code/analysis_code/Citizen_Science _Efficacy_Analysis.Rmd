@@ -472,6 +472,14 @@ print(fit222$results)
 
 prp(fit222$finalModel, extra = 8, type = 2)
 ```
+```{r}
+cs_not_best_tree <- prp(fit222$finalModel, extra = 8, type = 2, main = "Major Water Quality Predictors of Island Side")
+
+ww=17.8/2.54; wh=ww; #for saving plot
+
+dev.print(device=png,width=ww,height=wh,units="in",res=600,file="cs_not_best_tree.png") #save tree to file
+
+```
 
 Well it appears that salinity prevails once again! The overwhelming success of salinity as a predictor suggests that the issue here is not with our predictors but actually with our outcome. Island side is too strongly influenced by salinity that our model cannot develop a method by which better accuracy is produced through the addition of further variables. This is very interesting information, however it does not address our overall objective to measure the efficacy of citizen science data collection. For this assessment, our alternate outcome of site type is more appropriate. 
 
@@ -536,7 +544,7 @@ print(fit333$results)
 
 ```
 ```{r}
-cs_best_tree <- prp(fit333$finalModel, extra = 8, type = 2, main = "Key Water Quality Predictors of Citizen Science Data")
+cs_best_tree <- prp(fit333$finalModel, extra = 8, type = 2, main = "Major Water Quality Predictors of Site Type")
 cs_best_tree
 
 ww=17.8/2.54; wh=ww; #for saving plot

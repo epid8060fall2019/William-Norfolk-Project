@@ -47,7 +47,11 @@ _Question 3: Seasonal Change_
 
 Are there visible seasonal changes in the abiotic conditions of the water?
 
-_Objective 4: Promoting Future Citizen Science_
+_Question 4: Citizen Science Data Efficacy_
+
+Is citizen science data accurate enough to capture large-scale environmental trends and is the data specific enough to characterize different aquatic habitat types.
+
+_Objective 5: Promoting Future Citizen Science_
 
 Develop a script for the immediate processing of data collected by groups actively in the Marinelab program. The goal of this objective is to write a ready-to-use script that will produce scatter plots of the five water quality parameters to compare and contrast oceanside and bayside locations. These figures will then be used to show students the results of their data collection over the course of their time at Marinelab. The script will be tailored to accept a specifically formatted .xlsx file to ensure the data can be run with minimal to no cleaning required. Detailed instructions for data entry into the .xlsx file, and instructions for loading and running the script will be included in a README.md file in the folder.
 
@@ -168,17 +172,32 @@ Ammonia levels associated wit Hurricane Irma showed a dramatic spike in bayside 
 knitr::include_graphics("../../results/imra_mean_ph_plot.png")
 ```
 
-pH levels associated with hurricane landfall showed a moderate drop for bayside site locations and little chnge for oceanside waters. The decrease in bayside pH is associated with and acute timeline of hurricane landfall, however the drop is not as substantial as some of the previously recorded fluctuations of pH from the seasonal analysis. 
+pH levels associated with hurricane landfall showed a moderate drop for bayside site locations and little chnge for oceanside waters. The decrease in bayside pH is associated with and acute timeline of hurricane landfall, however the drop is not as substantial as some of the previously recorded fluctuations of pH from the seasonal analysis.
+
 
 Water quality parameters of September-Febuary from Irma landfall were compared using a Two-sample Kolmogorov-Smirnov test to water quality measures from the year prior to determine if any of the five parameters were statistically significant. The results of the Kolmogorov-Smirnov test showed a p-value of 0.227 for water temperature, 0.002 for salinity, 0.499 for dissolved oxygen, 0.002 for ammonia, and 0.334 for pH. These results suggest that the salinity and ammonia levels were siginifcantly influenced by the landfall of Hurricane Irma. This significance is consistent with the visuals of univariate, bivariate, and Hurricane Irma analysis. 
 
-
-Overall,  analysis of hurricane Irma landfall revealed notable changes in the levels of salinity and 
-
 ## Full analysis
-_Use one or several suitable statistical/machine learning methods to analyze your data and to produce meaningful figures, tables, etc. This might again be code that is best placed in one or several separate R scripts that need to be well documented. You can then load the results produced by this code_
 
-##Results
+### Question for Dr. Handel
+Is the section below an apprpriate use of a tree-based model? I would like to detemrine if the data collected in this study (by citizen scientists) is accurate enough to correctly determine the major differences in the water quality of site locations. A detailed description is below:
+
+Tree-based models were used to measure the efficacy of citizen science data collection through the classification of different location types. Tree models were developed to identify the major split points for the identification of island side (bayside or ocean) and site type (coral reef, seagrass/mangrove, or patch reef/hardbottom.) Citizen science efficacy was measured through the comparison of classification split points to the known water quality conditions that define the specific site type. 
+
+
+Citizen science efficacy analysis of island side (oceanside or bayside) showed that the major predictor of island side was the salinity. A salinity measure of less than 34ppt represented the major division of the data. Sampling sites with a salinity less than 34ppt were typically associated with the bayside, where as greater than 34ppt sites were typically oceanside. This finding was consistent with previous analyses which showed substantial grouping of ocean and bayside site locations along saline lines. While informative, this characterization does not full assess the efficacy of citizen science data since it was based off of a single variable. The results of this analysis can be viewed in Figure 16 below.
+
+```{r Figure 16, echo=FALSE}
+knitr::include_graphics("../../code/analysis_code/cs_not_best_tree.png")
+```
+
+Secondary efficacy analysis measured the characterization of three site types of interest: Coral Reefs, Seagrass/Mangrove, and Patch Reef/Hardbottom. The results of this showed that site types were classified along three major lines. First, sites were split along salinity lines similar to the island side analysis. A salinity of 33ppt or lower was commonly associated with the Seagrass/Mangrove site type and represented a terminal node. Greater salinity was typically associated with Coral Reef sites, when secondarly split by water temperature. Water temperature above 30 (C) was typically associated with Patch Reef/Hardbottom sites adn represented a terminal node. Cooler waters favored Coral Reefs, which then split again by pH levels. A pH greater than or equal to 8.2 represented Coral Reefs whereas below this value represented Seagrass/Mangrove sites which both ended as terminal nodes. The major split points of the site type tree model are consistent with the defining characteristics of water quality for each site. The results of this analysis can be viewed in figure 17 below.
+
+```{r Figure 17, echo=FALSE}
+knitr::include_graphics("../../code/analysis_code/cs_best_tree.png")
+```
+
+## Results
 
 ## Discussion
 
