@@ -1,5 +1,5 @@
 # How to Run the Primary Project Scripts
-### _Run These Scripts to Reproduce Data Analysis_
+## _Run These Scripts to Reproduce the Full Data Analysis of this Project_
 
 To run processing code select the Rmd file **WQprocessing.Rmd** found within the **code** folder and **processing_code** subfolder. To view the results in the RStudio select **Run All Chunks** or to view as a docx output file select **knit to Word doc**. All knitted docx files can also be directly found in the specific code subfolder. 
 

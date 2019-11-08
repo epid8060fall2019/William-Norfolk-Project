@@ -1,7 +1,14 @@
-This folder contains all of the finished products of the project as well as references materials. 
+# Completed Products
 
-The full manuscript can be found under the _manuscript_ subfolder as both an Rmd file and docx file. To reproduce the manuscript ad a Word document open the Rmd file titled _William_Norfolk_Project_Manuscript_, select _run all chunks_, then _knit to Word doc_ to produce a Word output file (docx). All tables and figures referenced in the text are stored in the _results_ under the project directory, and are embedded vai the realtive path to their locations. Relative visualization paths can be view in the Rmd file of the manuscript embedded code chunks respective to their location within the text.
+This folder contains all of the finished products of the project, reference materials, and formatting filed to produce the completed manuscript. 
 
-All references were gathered using the Zotero reference manager and exported as a Bibtext.txt file which is stored in the _products_ folder. 
+## Manuscript
 
-####Working Note#### Still Receiving consistent errors when attempting to knit with the current reference setup. No such file in director error presents when calling a reference. Possibly due to the fact that the reference file is a txt file? or a format issue? Document will knit if reference path is reverted back to the example provided within the template.
+The full manuscript can be found within the **manuscript**subfolder as both an Rmd file and docx file. To reproduce the manuscript as a Word document open the Rmd file titled **William_Norfolk_Project_Manuscript**, select **run all chunks**, then **knit to Word doc**. All tables and figures referenced in the text are stored in the **results** under the project directory, and are embedded via the realtive path to their locations. Relative visualization paths can be view in the Rmd file of the manuscript embedded code chunks respective to their location within the text.
+
+## References
+
+All references were gathered using the Zotero reference manager and exported as a Bibtext.txt file stored in the **products** folder titled **MADA_Proj_Refs.bib**. 
+
+The file **apa.csl** sets the mapping for Bibtext references in the manuscript. 
+

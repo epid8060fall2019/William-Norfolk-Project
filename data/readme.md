@@ -1,13 +1,15 @@
-The folders inside this folder should contain all data at various stages.
+# Data Storage
 
-You should place the raw data in the raw_data folder and do not edit it. Ever!
+This folder contains all of the raw, stored, and generated data files/templates needed to run all of the analysis of this project. This folder is subdivided into three subfolders: raw_data, processed_data, and indivdiual_program_data.
 
-Ideally, load the raw data into R and do all changes there with code, so everyting is automatically reproducible and documented.
+## Raw Data
 
-Sometimes, you need to edit the files in the format you got. For instance, Excel files are sometimes so poorly formatted that it's close to impossible to read them into R, or the persons you got the data from used color to code some information, which of course won't import into R. In those cases, you might have to make modifications in a software other than R. 
+The **raw_data** subfolder contains the raw water quality data used to produce the primary analysis of this project and manuscript. This folder contains two xlsx filed **RAW_WQ_Data.xlsx** and **RAW_WQ_Data_TimeModified.xlsx**. **RAW_WQ_Data.xlsx** contains the full raw data directly from the MarineLab water quality data base. **RAW_WQ_Data_TimeModified.xlsx** contains the raw data from this database with modifications of the date and time variables to disable excel autoformatting which inhibits proper data upload. 
 
-If you need to make edits in whatever format you got the data (e.g. Excel), make a copy and place those copies in a separate folder, AND ONLY EDIT THOSE COPIES. 
+## Processed Data
 
-Also, write down somewhere the edits you made. 
+The **processed_data** subfolder contains a single rds file titled **processeddata.rds**. This rds file is produced by running the **WQprocessing_script.Rmd** located inside the **code** folder and **processing_code** subfolder. The processed rds file is the clean data upload source that is required to run all subsequent analysis scripts found in the **analysis_code** subfolder.
 
-Add as many sub-folders as suitable. If you only have a single processing step, one sub-folder for processed data is enough. If you have multiple stages of cleaning and processing, additional sub-folders might be useful. Adjust based on the complexity of your project.
+## Individual Program Data
+
+The **individual_program_data** folder contains a template xlsx file titled **individual_program_data_template_example**. This excel template serves as the data entry shell needed to to run the **citizen_science_processing_script** located in the **code** folder and **processing_code** subfolder. This excel template is a structure data entry format designed to integrate directly with the subsequent processing script to produce a quick analysis of individual program sampling data at the conclusion of field collection. New data should be entered into the template and saved to the **individual_program_data** subfolder (this folder). After saving, the new data can be directly analyzed simply by modifying the data path with the new name. A detailed description of data entry/script usage for this task can be found in the ReadMe file in the **code** folder. 
