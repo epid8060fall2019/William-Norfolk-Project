@@ -188,13 +188,13 @@ Tree-based models were used to measure the efficacy of citizen science data coll
 Citizen science efficacy analysis of island side (oceanside or bayside) showed that the major predictor of island side was the salinity. A salinity measure of less than 34ppt represented the major division of the data. Sampling sites with a salinity less than 34ppt were typically associated with the bayside, where as greater than 34ppt sites were typically oceanside. This finding was consistent with previous analyses which showed substantial grouping of ocean and bayside site locations along saline lines. While informative, this characterization does not full assess the efficacy of citizen science data since it was based off of a single variable. The results of this analysis can be viewed in Figure 16 below.
 
 ```{r Figure 16, echo=FALSE}
-knitr::include_graphics("../../code/analysis_code/cs_not_best_tree.png")
+knitr::include_graphics("../../results/cs_not_best_tree.png")
 ```
 
 Secondary efficacy analysis measured the characterization of three site types of interest: Coral Reefs, Seagrass/Mangrove, and Patch Reef/Hardbottom. The results of this showed that site types were classified along three major lines. First, sites were split along salinity lines similar to the island side analysis. A salinity of 33ppt or lower was commonly associated with the Seagrass/Mangrove site type and represented a terminal node. Greater salinity was typically associated with Coral Reef sites, when secondarly split by water temperature. Water temperature above 30 (C) was typically associated with Patch Reef/Hardbottom sites adn represented a terminal node. Cooler waters favored Coral Reefs, which then split again by pH levels. A pH greater than or equal to 8.2 represented Coral Reefs whereas below this value represented Seagrass/Mangrove sites which both ended as terminal nodes. The major split points of the site type tree model are consistent with the defining characteristics of water quality for each site. The results of this analysis can be viewed in figure 17 below.
 
 ```{r Figure 17, echo=FALSE}
-knitr::include_graphics("../../code/analysis_code/cs_best_tree.png")
+knitr::include_graphics("../../results/cs_best_tree.png")
 ```
 
 ## Results

@@ -24,6 +24,7 @@ library('mda')
 library('ranger')
 library('e1071')
 library('visdat')
+library('filesstrings')
 ```
 Load the data and take a look.
 
@@ -244,7 +245,7 @@ prp(fit_no_sal_full$finalModel, extra = 106, type = 2)
 
 ```
 
-The full fit drops the second temperature branch, this si likely due to a low number of observations below 20 degrees, which is extremely cold for Key Largo however not unreasonable. 
+The full fit drops the second temperature branch, this is likely due to a low number of observations below 20 degrees, which is extremely cold for Key Largo however not unreasonable. 
 
 ## Model Testing
 
@@ -479,6 +480,7 @@ ww=17.8/2.54; wh=ww; #for saving plot
 
 dev.print(device=png,width=ww,height=wh,units="in",res=600,file="cs_not_best_tree.png") #save tree to file
 
+file.move("./cs_not_best_tree.png", "../../results", overwrite = TRUE)
 ```
 
 Well it appears that salinity prevails once again! The overwhelming success of salinity as a predictor suggests that the issue here is not with our predictors but actually with our outcome. Island side is too strongly influenced by salinity that our model cannot develop a method by which better accuracy is produced through the addition of further variables. This is very interesting information, however it does not address our overall objective to measure the efficacy of citizen science data collection. For this assessment, our alternate outcome of site type is more appropriate. 
@@ -550,6 +552,8 @@ cs_best_tree
 ww=17.8/2.54; wh=ww; #for saving plot
 
 dev.print(device=png,width=ww,height=wh,units="in",res=600,file="cs_best_tree.png") #save tree to file
+
+file.move("./cs_best_tree.png", "../../results", overwrite = TRUE)
 
 ```
 
