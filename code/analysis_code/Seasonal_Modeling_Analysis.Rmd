@@ -5,6 +5,7 @@ date: "11/18/2019"
 output: word_document
 ---
 
+This script expands on the findings of seasonal exploratory and bivariate analysis through the usage of tree based modeling to express seasonality. 
 
 Start by loading required libraries
 ```{r load libs}
@@ -13,21 +14,225 @@ library(dplyr)
 library(tidyverse)
 library(forcats)
 library(ggthemes)
-library(plotly)
 library(knitr)
 library(naniar)
 library(broom)
 library(gridExtra)
-library(zoo)
 library(ggpubr)
+library(caret)
+library(mlr)
+library(rpart)
+library(rpart.plot)
+library(ranger)
+library(visdat)
+
+#Note it will be very important to call functions using the :: library notation due to the frequency of function masking by our libraries. 
 
 ```
 
-```{r}
+Next load the data a take a look.
+
+```{r view data}
 
 WQ_clean_data <- readRDS("../../data/processed_data/processeddata.rds")
 
 glimpse(WQ_clean_data)
 ```
 
-TO DO Add seasonal model code. Must first add a new variable "season" based on month ranges.
+## Prep/Clean the Data
+
+
+For our previous analyses of season we have grouped the data by month to increase the number of monthly replicates and visualize linear changes in the data by individual months. For seasonality modeling we will bin the months into season categories through the addition of a new variable "season". Months 12-2 will represent winter, 3-5 will represent spring, 6-8 will represent summer, and 9-11 will represent fall. 
+
+Before we can begin moeling we must first create a new season variable. 
+
+```{r add season}
+add_season <- WQ_clean_data %>% dplyr::mutate(season = recode(Month,
+                                                  "12" = "Winter",
+                                                  "01" = "Winter",
+                                                  "02" = "Winter",
+                                                  "03" = "Spring",
+                                                  "04" = "Spring",
+                                                  "05" = "Spring",
+                                                  "06" = "Summer",
+                                                  "07" = "Summer",
+                                                  "08" = "Summer",
+                                                  "09" = "Fall",
+                                                  "10" = "Fall",
+                                                  "11" = "Fall"))
+```
+
+Next we lets check our data to ensure everything looks ok before we begin modeling.
+
+```{r visualize data}
+vis_dat(add_season)
+```
+
+A few NAs are present in the data but no strong areas of NAs are indicated. Tree models should be able to handle baseline amounts of NA values so for now we will leave them be. As for our variable classes all of our water quality parameters are numeric as they should be so no modification is needed there. Season is our outcome in this case so we must change this to a factor. All remaining variables are character class, however we will remove these before modeling since they are not water quality determinants of season. 
+
+```{r make season factor}
+add_season$season <- as.factor(as.character(add_season$season))
+
+```
+
+Next lets take a look at some visualizations of the new season variable before we begin modeling to see if there is any further cleaning that is needed.
+
+```{r}
+season_temp <- ggplot(add_season, aes(x = season, y = water_temp)) + geom_boxplot()
+
+season_temp
+
+season_sal <- ggplot(add_season, aes(x = season, y = salinity)) + geom_boxplot()
+
+season_sal
+
+season_do <- ggplot(add_season, aes(x = season, y = dissolved_oxygen)) + geom_boxplot()
+
+season_do
+
+season_amm <- ggplot(add_season, aes(x = season, y = ammonia)) + geom_boxplot()
+
+season_amm
+
+season_ph <- ggplot(add_season, aes(x = season, y = ph)) + geom_boxplot()
+
+season_ph
+
+
+```
+
+Humm I am concerned the tree will only build using temperature which is not terribly informative...but we press on
+
+
+Since our data looks good we are just about ready to model. First we need to remove any variables that are not of interest for seasonal prediction, and move our outcome to the front of the variable list.
+
+```{r remove vars}
+reduce_vars <- add_season %>% dplyr::select(season, water_temp, salinity, ammonia, dissolved_oxygen, ph)
+
+#This code also moves our outcome to the first slot so no additional shuffling code is needed.
+
+```
+
+Lastly we rename our data for model_ready to reduce confusion.
+
+```{r rename}
+model_ready <- reduce_vars
+```
+
+## Split the Data
+
+First we will split our data into train and test sets.
+
+```{r data split}
+
+set.seed(123)
+
+trainset <- caret::createDataPartition(y = model_ready$season, p = 0.7, list = FALSE)
+
+#Extract observations/rows for training and assign to new variable
+data_train = model_ready[trainset,] 
+
+#Same as above but for the test set
+data_test = model_ready[-trainset,] 
+```
+
+The split should allocate 367 observations into train and 155 into test.
+
+Next we compute a null model for comparison.
+
+```{r}
+library(mlr) #We will jump between mlr and caret so call with :: at all times. 
+
+mlr::measureACC("Summer", model_ready$season)
+```
+
+Next we move into single predictor tree fitting.
+
+```{r single-predictor tree acc}
+
+set.seed(1111) #To keep reproducibility
+
+outcomename = "season" #Name of outcome of interest
+
+fitControl <- trainControl(method="repeatedcv",number=5,repeats=5) #Sets K-fold cross-validation.
+
+Npred <- ncol(data_train)-1 #Sets predictors minus the outcome in column 1.
+
+resultmat <- data.frame(Variable = names(data_train)[-1], Accuracy = rep(0,Npred)) #Takes results and moves to dataframe named resultmat, measure set to accuracy.
+
+for (n in 2:ncol(data_train))
+{
+  fit1 <- caret::train( as.formula(paste(outcomename, "~",names(data_train)[n])) , data = data_train, method = "rpart", trControl = fitControl, na.action = na.pass, tuneLength = 10) 
+resultmat[n-1,2]= max(fit1$results$Accuracy)  
+} #Loop to all variables through prediction. Method rpart = tree algorithm, and skipping any NA values. 
+
+print(resultmat)
+
+```
+Not unexpected temperature is the strongest influencer of season. 
+
+
+```{r full-predictor tree acc}
+set.seed(1111)
+
+fitControl <- trainControl(method="repeatedcv",number=5,repeats=5) 
+
+fit1 = caret::train(season  ~ ., data=data_train, method="rpart",  trControl = fitControl, na.action = na.pass, tuneLength = 10) 
+
+print(fit1$results)
+
+```
+
+```{r}
+prp(fit1$finalModel, extra = 1, type = 2)
+```
+So it looks like water temperature along at 29 degrees is the best fit for determining seasonality. 
+
+
+
+##### STill Working Below Here
+
+
+
+Perhaps we are approaching our models from the wrong angle. Since our data is not specifically targeted at particular outcome (i.e. occurance of disease, algal bloom, etc.) and focuses more as a monitoring program; it may be best to use unsupervised modeling techniques to to cluster our data. We will use hierarchical clustering to cluster our data by our specific categorical variables to determine clustering characteristics. 
+
+```{r}
+remove_nas <- na.omit(model_ready)
+```
+
+
+```{r full-predictor tree acc}
+set.seed(1111)
+
+xtest <- hclust(dist(remove_nas[, 2:6]), method = "average")
+
+plot(xtest)
+```
+
+```{r}
+cuttest <- cutree(xtest, 3)
+#table(cuttest$cluster, remove_nas$season)
+
+```
+
+
+
+```{r}
+set.seed(20)
+ytest <- kmeans(remove_nas[, 2:6], 3, nstart = 20)
+ytest
+```
+
+```{r}
+table(ytest$cluster, remove_nas$site_type)
+
+```
+
+
+
+
+
+
+
+
+
