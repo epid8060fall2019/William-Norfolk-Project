@@ -208,8 +208,9 @@ location_average <- aggregate(. ~ location, cluster_trim, mean)
 
 drop_buttonwood <- location_average[!location_average$location == "Buttonwood", ]
 drop_orc <- drop_buttonwood[!drop_buttonwood$location == "Ocean Reef Club", ]
+drop_elbow <- drop_orc[!drop_orc$location == "The Elbow", ]
 
-cluster_ready <- drop_orc
+cluster_ready <- drop_elbow
 ```
 
 
@@ -224,58 +225,60 @@ cluster_site <- agnes(cluster_ready, method = "average")
 
 
 
-pltree(cluster_site, cex = 0.6, hang = -1, main = "Dendrogram of Sample Locations", labels = cluster_ready$location)
+good_tree <- pltree(cluster_site, cex = 0.6, hang = -1, main = "Dendrogram of Sample Locations", labels = cluster_ready$location)
+
+good_tree
 ```
 
 ```{r}
-sub_group_dendro_1 <- cutree(cluster_site, k = 4)
+sub_group_dendro_1 <- cutree(cluster_site, k = 2)
 
 table(sub_group_dendro_1)
 ```
+ERRORS BELOW
+```{r} 
+
+
+#plot(cluster_site, cex = 0.6)
+#rect.hclust(good_tree, k = 1)
+```
+
+
+```{r}
+fviz_nbclust(cluster_ready, FUN = hcut, method = "silhouette")
+fviz_nbclust(cluster_ready, FUN = hcut, method = "wss")
+
+
+```
+
+
 ```{r}
 add_cluster_groups <- cluster_ready %>% dplyr::mutate(cluster = sub_group_dendro_1)
 
 cluster_site <- agnes(add_cluster_groups, method = "average")
 
+cluster_data <- add_cluster_groups[, c(2:6)]
 
-fviz_cluster(list(data = cluster_site, cluster = sub_group_dendro_1))
-
-```
-
-
+#Uncomment to add names to plot (confusing in this situation)
+#rownames(cluster_data) <- add_cluster_groups$location
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-```{r}
-cuttest <- cutree(xtest, 3)
-#table(cuttest$cluster, remove_nas$season)
+fviz_cluster(list(data = cluster_data, cluster = sub_group_dendro_1))
 
 ```
 
 
 
-```{r}
-set.seed(20)
-ytest <- kmeans(remove_nas[, 2:6], 3, nstart = 20)
-ytest
-```
 
-```{r}
-table(ytest$cluster, remove_nas$site_type)
 
-```
+
+
+
+
+
+
+
 
 
 
