@@ -189,19 +189,20 @@ prp(fit1$finalModel, extra = 1, type = 2)
 So it looks like water temperature along at 29 degrees is the best fit for determining seasonality. 
 
 
+## Unsupervised Cluster Analysis
 
-##### STill Working Below Here
+Perhaps we are approaching our models from the wrong angle. Since our data is not specifically targeted at particular outcome (i.e. occurance of disease, algal bloom, etc.) and focuses more as a monitoring program; it may be best to use unsupervised modeling techniques to to cluster our data. We will use agglomerative clustering to cluster our data by our specific categorical variables to determine clustering characteristics. 
 
-
-
-Perhaps we are approaching our models from the wrong angle. Since our data is not specifically targeted at particular outcome (i.e. occurance of disease, algal bloom, etc.) and focuses more as a monitoring program; it may be best to use unsupervised modeling techniques to to cluster our data. We will use hierarchical clustering to cluster our data by our specific categorical variables to determine clustering characteristics. 
-
+First we must remove any NAs from our data as cluster functions cannot handle them. Additionally, we need to select our branch outcome (in this case location) as well as our five numeric water quality parameters of interest. 
 ```{r}
 
-cluster_cleaning <- na.omit(WQ_clean_data)
-
 cluster_trim <- cluster_cleaning %>% dplyr::select(location, water_temp, salinity, dissolved_oxygen, ammonia, ph)
+
+cluster_trim <- na.omit(cluster_trim)
 ```
+
+We will cluster by site means to produce a readable dendrogram.
+With a retrospective view, there are three locations which will greatly skew our data when producing a dendrogram. All three locations have either one or few (The Elbow) measures comprising the site. When allowed to remain in our sample set these data points force our dendrogram to subdivide further grouping themselves into indivual clusters. Though this information is interesting, considering the n of each of these locations and the large impact they play on the final dendrogram, we will remove them here to produce a generalized view of the clusters. 
 
 ```{r}
 location_average <- aggregate(. ~ location, cluster_trim, mean)
@@ -213,36 +214,60 @@ drop_elbow <- drop_orc[!drop_orc$location == "The Elbow", ]
 cluster_ready <- drop_elbow
 ```
 
+We will need to add three additional cluster analysis libraries. Then we produce the dendrograms with the code below.
 
 ```{r}
 library(factoextra)
 library(dendextend)
 library(cluster)
 
-set.seed(1111)
+set.seed(1111) #Ensure reproducible
 
-cluster_site <- agnes(cluster_ready, method = "average")
+rownames(cluster_ready) <- cluster_ready$location #Assign the location names to rownames to produce dendrograms that show site information.
+
+cluster_diss <- dist(cluster_ready, method = "euclidean") #For the hclust function we must first produce a dissimilarity matrix before runing cluster analysis
 
 
+cluster_site_hclust <- hclust(cluster_diss, method = "ward.D") #Hierarchial clustering with Ward's minimum variance
+cluster_site_agnes <- agnes(cluster_ready, method = "ward") #Agglomerative clustering with Ward's minimum variance
 
-good_tree <- pltree(cluster_site, cex = 0.6, hang = -1, main = "Dendrogram of Sample Locations", labels = cluster_ready$location)
+#Plot the trees. Note agnes can use pltree or plot but hclust must use plot
+good_tree_hclust <- plot(cluster_site_hclust, cex = 0.6, hang = -1, main = "Dendrogram of Sample Locations", labels = cluster_ready$location)
+good_tree_agnes <- pltree(cluster_site_agnes, cex = 0.6, hang = -1, main = "Dendrogram of Sample Locations", labels = cluster_ready$location)
 
-good_tree
+
+good_tree_hclust
+good_tree_agnes
 ```
 
+Both of the trees look interesting, but it looks like agglomerative is the best option.
+
+Before moving on we will check our method. We started with Ward's minimum variance method however there are others we could use (single, complete, and average). We will calculate the agglomerative coefficent for each below. A coefficent closer to 1 indicates a stronger clustering. 
+```{r warning = FALSE}
+cluster_site_agnes$ac
+
+methods <- c( "average", "single", "complete", "ward")
+names(methods) <- c( "average", "single", "complete", "ward")
+
+coeff <- function(x) {
+  agnes(cluster_ready, method = x)$ac
+}
+
+map_dbl(methods, coeff)
+```
+
+It looks like Ward's method is the best option.
+
+Just a quick code bit to count the number of values in each cluster.This is more useful if there is a very high number of branches.
 ```{r}
-sub_group_dendro_1 <- cutree(cluster_site, k = 2)
+sub_group_dendro_1 <- cutree(cluster_site_agnes, k = 2)
 
 table(sub_group_dendro_1)
-```
-ERRORS BELOW
-```{r} 
 
 
-#plot(cluster_site, cex = 0.6)
-#rect.hclust(good_tree, k = 1)
 ```
 
+Next we will check our optimal number of clusters.
 
 ```{r}
 fviz_nbclust(cluster_ready, FUN = hcut, method = "silhouette")
@@ -251,6 +276,9 @@ fviz_nbclust(cluster_ready, FUN = hcut, method = "wss")
 
 ```
 
+Looks like the optimal number is two. Ideally these will seperate strongly into groups that represent either island side or some combination of two of our site types.
+
+Next for fun we will visualize our data as a scatter cluster plot. 
 
 ```{r}
 add_cluster_groups <- cluster_ready %>% dplyr::mutate(cluster = sub_group_dendro_1)
@@ -267,6 +295,39 @@ cluster_data <- add_cluster_groups[, c(2:6)]
 fviz_cluster(list(data = cluster_data, cluster = sub_group_dendro_1))
 
 ```
+
+Looks like most of our data is relatively close but two reasonalbly distinct clusters are present. 
+
+Next lets make a nice dendrogram.
+
+```{r}
+library(factoextra)
+
+sample_site_dendro_agnes <- fviz_dend(cluster_site_agnes, k = 2, show_labels = TRUE, cex = 0.6, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Cluster Dendrogram by Sample Site")
+
+sample_site_dendro_agnes
+
+#Uncomment to preduce the full dendrogram for the hclust model.
+#sample_site_dendro_hclust <- fviz_dend(cluster_site_hclust, k = 2, show_labels = TRUE, cex = 0.6, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Cluster Dendrogram by Sample Site")
+
+#sample_site_dendro_hclust
+```
+
+
+####@# Working Still Below Here
+
+
+```{r}
+sample_site_dendro_mess <- fviz_dend(cluster_site_agnes, k = 15, show_labels = TRUE, cex = 0.6, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Cluster Dendrogram by Sample Site")
+
+sample_site_dendro_mess
+```
+
+
+
+
+
+
 
 
 
