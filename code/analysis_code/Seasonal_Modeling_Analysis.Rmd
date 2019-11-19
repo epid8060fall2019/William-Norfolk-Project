@@ -197,17 +197,66 @@ So it looks like water temperature along at 29 degrees is the best fit for deter
 Perhaps we are approaching our models from the wrong angle. Since our data is not specifically targeted at particular outcome (i.e. occurance of disease, algal bloom, etc.) and focuses more as a monitoring program; it may be best to use unsupervised modeling techniques to to cluster our data. We will use hierarchical clustering to cluster our data by our specific categorical variables to determine clustering characteristics. 
 
 ```{r}
-remove_nas <- na.omit(model_ready)
+
+cluster_cleaning <- na.omit(WQ_clean_data)
+
+cluster_trim <- cluster_cleaning %>% dplyr::select(location, water_temp, salinity, dissolved_oxygen, ammonia, ph)
+```
+
+```{r}
+location_average <- aggregate(. ~ location, cluster_trim, mean)
+
+drop_buttonwood <- location_average[!location_average$location == "Buttonwood", ]
+drop_orc <- drop_buttonwood[!drop_buttonwood$location == "Ocean Reef Club", ]
+
+cluster_ready <- drop_orc
 ```
 
 
-```{r full-predictor tree acc}
+```{r}
+library(factoextra)
+library(dendextend)
+library(cluster)
+
 set.seed(1111)
 
-xtest <- hclust(dist(remove_nas[, 2:6]), method = "average")
+cluster_site <- agnes(cluster_ready, method = "average")
 
-plot(xtest)
+
+
+pltree(cluster_site, cex = 0.6, hang = -1, main = "Dendrogram of Sample Locations", labels = cluster_ready$location)
 ```
+
+```{r}
+sub_group_dendro_1 <- cutree(cluster_site, k = 4)
+
+table(sub_group_dendro_1)
+```
+```{r}
+add_cluster_groups <- cluster_ready %>% dplyr::mutate(cluster = sub_group_dendro_1)
+
+cluster_site <- agnes(add_cluster_groups, method = "average")
+
+
+fviz_cluster(list(data = cluster_site, cluster = sub_group_dendro_1))
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ```{r}
 cuttest <- cutree(xtest, 3)
