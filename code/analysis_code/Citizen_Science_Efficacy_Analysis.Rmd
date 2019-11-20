@@ -1,0 +1,215 @@
+---
+title: "Citizen_Science_Efficacy_Analysis"
+author: "William Norfolk"
+date: "11/19/2019"
+output: word_document
+---
+
+```{r}
+
+library(readxl)
+library(dplyr)
+library(tidyverse)
+library(forcats)
+library(ggthemes)
+library(plotly)
+library(knitr)
+library(naniar)
+library(broom)
+library(gridExtra)
+library(zoo)
+library(ggpubr)
+
+```
+
+```{r}
+
+
+WQ_clean_data <- readRDS("../../data/processed_data/processeddata.rds")
+
+glimpse(WQ_clean_data)
+
+```
+
+
+
+```{r warning=FALSE}
+fknms_data_raw <- readxl::read_excel("../../data/raw_data/FKNMS_WQ_raw.xlsx")
+
+glimpse(fknms_data_raw)
+```
+
+This data set is in need to some serious cleaning, luckily to compare to our citizen science data we only need a small porition of these variables. We will remove variables then take a closer look at cleaning criteria. 
+
+```{r}
+fknms_reduce_vars <- fknms_data_raw %>% dplyr::select(SITE, `NH4-S`, `TEMP-S`, `DO-S`, `SAL-S`)
+
+#We will rename these to match our predictors in the citizen science dataset.
+fknms_rename <- fknms_reduce_vars %>% rename(location = SITE, 
+                                             water_temp = `TEMP-S`,
+                                             ammonia = `NH4-S`,
+                                             dissolved_oxygen = `DO-S`,
+                                             salinity = `SAL-S`)
+
+unique(fknms_rename$location)
+```
+
+Unfortunately it looks like the data did not collect pH regularly so to avoid 1000+ NA values we will have to exclude pH from our comparison. 
+
+Now we can clean some of these. We are only interested in samples from sites that overlab with our citizen science data so we will select for thos samples.
+
+```{r}
+fknms_1 <- fknms_rename[fknms_rename$location == "Pennikamp G27", ]
+fknms_2 <- fknms_rename[fknms_rename$location == "Rattlesnake Key", ]
+fknms_3 <- fknms_rename[fknms_rename$location == "Radabob Key", ]
+fknms_4 <- fknms_rename[fknms_rename$location == "Mosquito Bank", ]
+fknms_5 <- fknms_rename[fknms_rename$location == "Molasses Reef", ]
+fknms_6 <- fknms_rename[fknms_rename$location == "Tarpon Creek", ]
+fknms_7 <- fknms_rename[fknms_rename$location == "Bogie Channel", ]
+fknms_8 <- fknms_rename[fknms_rename$location == "Grecian Rocks", ]
+
+fknms_total <- rbind(fknms_1, fknms_2, fknms_3, fknms_4, fknms_5, fknms_6, fknms_7, fknms_8)
+
+fknms_na_drop <- na.omit(fknms_total)
+
+```
+
+Now we are looking more compareable. The next step is to recode the FKNMS sites with the correcponding site names from the citizen science data (there are many synonyms).
+
+```{r}
+fknms_fix_names <- fknms_na_drop %>% mutate(location = recode(location, 
+                                            "Pennikamp G27" = "Higdon's",
+                                            "Rattlesnake Key" = "Whitmore Bight",
+                                            "Mosquito Bank" = "Mosquito",
+                                            "Molasses Reef" = "Molasses",
+                                            "Tarpon Creek" = "Tarpon Basin",
+                                            "Bogie Channel" = "Nest Key",
+                                            "Grecian Rocks" = "Grecian Dry Rocks",
+                                            "Radabob Key" = "El Radabob"))
+
+
+```
+
+
+
+```{r}
+cs_1 <- WQ_clean_data[WQ_clean_data$location == "Grecian Dry Rocks", ]
+cs_2 <- WQ_clean_data[WQ_clean_data$location == "Higdon's", ]
+cs_3 <- WQ_clean_data[WQ_clean_data$location == "Mosquito", ]
+cs_4 <- WQ_clean_data[WQ_clean_data$location == "Molasses", ]
+cs_5 <- WQ_clean_data[WQ_clean_data$location == "Tarpon Basin", ]
+cs_6 <- WQ_clean_data[WQ_clean_data$location == "Nest Key", ]
+cs_7 <- WQ_clean_data[WQ_clean_data$location == "Whitmore Bight", ]
+cs_8 <- WQ_clean_data[WQ_clean_data$location == "El Radabob", ]
+
+cs_total <- rbind(cs_1, cs_2, cs_3, cs_4, cs_5, cs_6, cs_7, cs_8)
+
+```
+
+
+Lets take a look at some plots now.
+
+```{r}
+water_temp_fknms <- ggplot(fknms_fix_names, aes(x = location, y = water_temp)) + geom_boxplot() 
+
+water_temp_fknms
+
+water_temp_cs <-  ggplot(cs_total, aes(x = location, y = water_temp)) + geom_boxplot() 
+
+water_temp_cs
+```
+TO DO Make Better Comparison Plots
+
+
+```{r}
+set.seed(4444)
+x <- subset(cs_total, location == "Grecian Dry Rocks")
+
+x <- x[sample(nrow(x), 56), ] # Bland-Altman requires the same number of inputs to compare so we will randomly sample the larger data set (in this case citizen science) to match the max samples from the smaller data set.
+
+xx <- x$water_temp
+
+
+
+y <- subset(fknms_fix_names, location == "Grecian Dry Rocks")
+yy <- y$water_temp
+
+library(BlandAltmanLeh)
+
+bland.altman.plot(xx, yy, two = 1.96)
+```
+It looks like our citizen science and sanctuary data agree with on water temperature at Grecian Dry Rocks. 
+
+```{r}
+set.seed(4444)
+x <- x[sample(nrow(x), 56), ] 
+xx <- x$salinity
+yy <- y$salinity
+bland.altman.plot(xx, yy, two = 1.96)
+
+```
+
+```{r}
+set.seed(4444)
+x <- x[sample(nrow(x), 56), ] 
+xx <- x$dissolved_oxygen
+yy <- y$dissolved_oxygen
+bland.altman.plot(xx, yy, two = 1.96)
+```
+
+```{r}
+set.seed(4444)
+x <- x[sample(nrow(x), 56), ] 
+xx <- x$ammonia
+yy <- y$ammonia
+bland.altman.plot(xx, yy, two = 1.96)
+```
+
+Lets take a look at Tarpon Basin Also
+```{r}
+set.seed(4444)
+x <- subset(cs_total, location == "Tarpon Basin")
+
+x <- x[sample(nrow(x), 59), ] 
+
+xx <- x$water_temp
+
+
+
+y <- subset(fknms_fix_names, location == "Tarpon Basin")
+yy <- y$water_temp
+
+
+bland.altman.plot(xx, yy, two = 1.96)
+```
+
+```{r}
+set.seed(4444)
+x <- x[sample(nrow(x), 59), ] 
+
+xx <- x$salinity
+
+yy <- y$salinity
+
+
+bland.altman.plot(xx, yy, two = 1.96)
+```
+
+```{r}
+set.seed(4444)
+x <- x[sample(nrow(x), 59), ] 
+xx <- x$dissolved_oxygen
+yy <- y$dissolved_oxygen
+
+bland.altman.plot(xx, yy, two = 1.96)
+```
+
+```{r}
+set.seed(4444)
+x <- x[sample(nrow(x), 59), ] 
+xx <- x$ammonia
+yy <- y$ammonia
+
+bland.altman.plot(xx, yy, two = 1.96)
+```
+

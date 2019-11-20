@@ -1,0 +1,681 @@
+---
+title: "Unsupervised Learning Analysis"
+author: "William Norfolk"
+date: "11/18/2019"
+output: word_document
+---
+
+This script expands on the findings of seasonal exploratory and bivariate analysis through the usage of tree based modeling to express seasonality. 
+
+Start by loading required libraries
+```{r load libs}
+library(readxl)
+library(dplyr)
+library(tidyverse)
+library(forcats)
+library(ggthemes)
+library(knitr)
+library(naniar)
+library(broom)
+library(gridExtra)
+library(ggpubr)
+library(caret)
+library(mlr)
+library(rpart)
+library(rpart.plot)
+library(ranger)
+library(visdat)
+
+#Note it will be very important to call functions using the :: library notation due to the frequency of function masking by our libraries. 
+
+```
+
+Next load the data a take a look.
+
+```{r view data}
+
+WQ_clean_data <- readRDS("../../data/processed_data/processeddata.rds")
+
+glimpse(WQ_clean_data)
+```
+
+## Prep/Clean the Data
+
+
+For our previous analyses of season we have grouped the data by month to increase the number of monthly replicates and visualize linear changes in the data by individual months. For seasonality modeling we will bin the months into season categories through the addition of a new variable "season". Months 12-2 will represent winter, 3-5 will represent spring, 6-8 will represent summer, and 9-11 will represent fall. 
+
+Before we can begin moeling we must first create a new season variable. 
+
+```{r add season}
+add_season <- WQ_clean_data %>% dplyr::mutate(season = recode(Month,
+                                                  "12" = "Winter",
+                                                  "01" = "Winter",
+                                                  "02" = "Winter",
+                                                  "03" = "Spring",
+                                                  "04" = "Spring",
+                                                  "05" = "Spring",
+                                                  "06" = "Summer",
+                                                  "07" = "Summer",
+                                                  "08" = "Summer",
+                                                  "09" = "Fall",
+                                                  "10" = "Fall",
+                                                  "11" = "Fall"))
+```
+
+Next we lets check our data to ensure everything looks ok before we begin modeling.
+
+```{r visualize data}
+vis_dat(add_season)
+```
+
+A few NAs are present in the data but no strong areas of NAs are indicated. Tree models should be able to handle baseline amounts of NA values so for now we will leave them be. As for our variable classes all of our water quality parameters are numeric as they should be so no modification is needed there. Season is our outcome in this case so we must change this to a factor. All remaining variables are character class, however we will remove these before modeling since they are not water quality determinants of season. 
+
+```{r make season factor}
+add_season$season <- as.factor(as.character(add_season$season))
+
+```
+
+Next lets take a look at some visualizations of the new season variable before we begin modeling to see if there is any further cleaning that is needed.
+
+```{r}
+season_temp <- ggplot(add_season, aes(x = season, y = water_temp)) + geom_boxplot()
+
+season_temp
+
+season_sal <- ggplot(add_season, aes(x = season, y = salinity)) + geom_boxplot()
+
+season_sal
+
+season_do <- ggplot(add_season, aes(x = season, y = dissolved_oxygen)) + geom_boxplot()
+
+season_do
+
+season_amm <- ggplot(add_season, aes(x = season, y = ammonia)) + geom_boxplot()
+
+season_amm
+
+season_ph <- ggplot(add_season, aes(x = season, y = ph)) + geom_boxplot()
+
+season_ph
+
+
+```
+
+Humm I am concerned the tree will only build using temperature which is not terribly informative...but we press on
+
+
+Since our data looks good we are just about ready to model. First we need to remove any variables that are not of interest for seasonal prediction, and move our outcome to the front of the variable list.
+
+```{r remove vars}
+reduce_vars <- add_season %>% dplyr::select(season, water_temp, salinity, ammonia, dissolved_oxygen, ph)
+
+#This code also moves our outcome to the first slot so no additional shuffling code is needed.
+
+```
+
+Lastly we rename our data for model_ready to reduce confusion.
+
+```{r rename}
+model_ready <- reduce_vars
+```
+
+## Split the Data
+
+First we will split our data into train and test sets.
+
+```{r data split}
+
+set.seed(123)
+
+trainset <- caret::createDataPartition(y = model_ready$season, p = 0.7, list = FALSE)
+
+#Extract observations/rows for training and assign to new variable
+data_train = model_ready[trainset,] 
+
+#Same as above but for the test set
+data_test = model_ready[-trainset,] 
+```
+
+The split should allocate 367 observations into train and 155 into test.
+
+Next we compute a null model for comparison.
+
+```{r}
+library(mlr) #We will jump between mlr and caret so call with :: at all times. 
+
+mlr::measureACC("Summer", model_ready$season)
+```
+
+Next we move into single predictor tree fitting.
+
+```{r single-predictor tree acc}
+
+set.seed(1111) #To keep reproducibility
+
+outcomename = "season" #Name of outcome of interest
+
+fitControl <- trainControl(method="repeatedcv",number=5,repeats=5) #Sets K-fold cross-validation.
+
+Npred <- ncol(data_train)-1 #Sets predictors minus the outcome in column 1.
+
+resultmat <- data.frame(Variable = names(data_train)[-1], Accuracy = rep(0,Npred)) #Takes results and moves to dataframe named resultmat, measure set to accuracy.
+
+for (n in 2:ncol(data_train))
+{
+  fit1 <- caret::train( as.formula(paste(outcomename, "~",names(data_train)[n])) , data = data_train, method = "rpart", trControl = fitControl, na.action = na.pass, tuneLength = 10) 
+resultmat[n-1,2]= max(fit1$results$Accuracy)  
+} #Loop to all variables through prediction. Method rpart = tree algorithm, and skipping any NA values. 
+
+print(resultmat)
+
+```
+Not unexpected temperature is the strongest influencer of season. 
+
+
+```{r full-predictor tree acc}
+set.seed(1111)
+
+fitControl <- trainControl(method="repeatedcv",number=5,repeats=5) 
+
+fit1 = caret::train(season  ~ ., data=data_train, method="rpart",  trControl = fitControl, na.action = na.pass, tuneLength = 10) 
+
+print(fit1$results)
+
+```
+
+```{r}
+prp(fit1$finalModel, extra = 1, type = 2)
+```
+So it looks like water temperature along at 29 degrees is the best fit for determining seasonality. 
+
+
+## Unsupervised Cluster Analysis
+
+Perhaps we are approaching our models from the wrong angle. Since our data is not specifically targeted at particular outcome (i.e. occurance of disease, algal bloom, etc.) and focuses more as a monitoring program; it may be best to use unsupervised modeling techniques to to cluster our data. We will use agglomerative clustering to cluster our data by our specific categorical variables to determine clustering characteristics. 
+
+First we must remove any NAs from our data as cluster functions cannot handle them. Additionally, we need to select our branch outcome (in this case location) as well as our five numeric water quality parameters of interest. 
+```{r}
+
+cluster_trim <- WQ_clean_data %>% dplyr::select(location, water_temp, salinity, dissolved_oxygen, ammonia, ph)
+
+cluster_trim <- na.omit(cluster_trim)
+```
+
+We will cluster by site means to produce a readable dendrogram.
+With a retrospective view, there are three locations which will greatly skew our data when producing a dendrogram. All three locations have either one or few (The Elbow) measures comprising the site. When allowed to remain in our sample set these data points force our dendrogram to subdivide further grouping themselves into indivual clusters. Though this information is interesting, considering the n of each of these locations and the large impact they play on the final dendrogram, we will remove them here to produce a generalized view of the clusters. 
+
+```{r}
+location_average <- aggregate(. ~ location, cluster_trim, mean)
+
+drop_buttonwood <- location_average[!location_average$location == "Buttonwood", ]
+drop_orc <- drop_buttonwood[!drop_buttonwood$location == "Ocean Reef Club", ]
+drop_elbow <- drop_orc[!drop_orc$location == "The Elbow", ]
+drop_NA_site <- drop_elbow[!drop_elbow$location == "NA", ]
+
+cluster_ready <- drop_NA_site
+```
+
+We will need to add three additional cluster analysis libraries. Then we produce the dendrograms with the code below.
+
+```{r}
+library(factoextra)
+library(dendextend)
+library(cluster)
+
+set.seed(1111) #Ensure reproducible
+
+rownames(cluster_ready) <- cluster_ready$location #Assign the location names to rownames to produce dendrograms that show site information.
+
+cluster_diss <- dist(cluster_ready, method = "euclidean") #For the hclust function we must first produce a dissimilarity matrix before runing cluster analysis
+
+
+cluster_site_hclust <- hclust(cluster_diss, method = "ward.D") #Hierarchial clustering with Ward's minimum variance
+cluster_site_agnes <- agnes(cluster_ready, method = "ward") #Agglomerative clustering with Ward's minimum variance
+
+#Plot the trees. Note agnes can use pltree or plot but hclust must use plot
+good_tree_hclust <- plot(cluster_site_hclust, cex = 0.6, hang = -1, main = "Dendrogram of Sample Locations", labels = cluster_ready$location)
+good_tree_agnes <- pltree(cluster_site_agnes, cex = 0.6, hang = -1, main = "Dendrogram of Sample Locations", labels = cluster_ready$location)
+
+
+good_tree_hclust
+good_tree_agnes
+```
+
+Both of the trees look interesting, but it looks like agglomerative is the best option.
+
+Before moving on we will check our method. We started with Ward's minimum variance method however there are others we could use (single, complete, and average). We will calculate the agglomerative coefficent for each below. A coefficent closer to 1 indicates a stronger clustering. 
+```{r warning = FALSE}
+cluster_site_agnes$ac
+
+methods <- c( "average", "single", "complete", "ward")
+names(methods) <- c( "average", "single", "complete", "ward")
+
+coeff <- function(x) {
+  agnes(cluster_ready, method = x)$ac
+}
+
+map_dbl(methods, coeff)
+```
+
+It looks like Ward's method is the best option.
+
+Just a quick code bit to count the number of values in each cluster.This is more useful if there is a very high number of branches.
+```{r}
+sub_group_dendro_1 <- cutree(cluster_site_agnes, k = 2)
+
+table(sub_group_dendro_1)
+
+
+```
+
+Next we will check our optimal number of clusters.
+
+```{r}
+fviz_nbclust(cluster_ready, FUN = hcut, method = "silhouette")
+fviz_nbclust(cluster_ready, FUN = hcut, method = "wss")
+
+
+```
+
+Looks like the optimal number is two. Ideally these will seperate strongly into groups that represent either island side or some combination of two of our site types.
+
+Next for fun we will visualize our data as a scatter cluster plot. 
+
+```{r}
+add_cluster_groups <- cluster_ready %>% dplyr::mutate(cluster = sub_group_dendro_1)
+
+cluster_site <- agnes(add_cluster_groups, method = "average")
+
+cluster_data <- add_cluster_groups[, c(2:6)]
+
+#Uncomment to add names to plot (confusing in this situation)
+#rownames(cluster_data) <- add_cluster_groups$location
+
+
+
+fviz_cluster(list(data = cluster_data, cluster = sub_group_dendro_1))
+
+```
+
+Looks like most of our data is relatively close but two reasonalbly distinct clusters are present. 
+
+Next lets make a nice dendrogram.
+
+```{r}
+library(factoextra)
+
+sample_site_dendro_agnes <- fviz_dend(cluster_site_agnes, k = 2, show_labels = TRUE, cex = 0.6, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Agglomerated Dendrogram by Sample Site")
+
+sample_site_dendro_agnes
+
+#Uncomment to preduce the full dendrogram for the hclust model.
+#sample_site_dendro_hclust <- fviz_dend(cluster_site_hclust, k = 2, show_labels = TRUE, cex = 0.6, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Cluster Dendrogram by Sample Site")
+
+#sample_site_dendro_hclust
+```
+
+
+Now that we have the overall dendrogram for each site lets compare our three site types individuall and see how different each of them are from one another. For this analysis we will use average values for each parameter as we did above and compare clustering for Seagrass/Mangrove, Patch Reef/Hardbottom, and Coral Reef sites respectively.
+
+First we need to subset data from the clean data, select our predictors, remove any NAs in the predictors, and finally aggregate the means of each site.
+```{r}
+
+
+location_average <- aggregate(. ~ location, cluster_trim, mean)
+
+
+sg_mg_subset <- subset(WQ_clean_data, site_type == "Seagrass/Mangrove")
+pr_h_subset <- subset(WQ_clean_data, site_type == "Patch Reef/Hardbottom")
+cr_subset <- subset(WQ_clean_data, site_type == "Coral Reef")
+
+sg_mg_reduce <- sg_mg_subset %>% dplyr::select(location, water_temp, salinity, dissolved_oxygen, ammonia, ph)
+pr_h_reduce <- pr_h_subset %>% dplyr::select(location, water_temp, salinity, dissolved_oxygen, ammonia, ph)
+cr_reduce <- cr_subset %>% dplyr::select(location, water_temp, salinity, dissolved_oxygen, ammonia, ph)
+
+sg_mg_ready <- na.omit(sg_mg_reduce)
+pr_h_ready <- na.omit(pr_h_reduce)
+cr_ready <- na.omit(cr_reduce)
+
+sg_mg_ready <- aggregate(. ~ location, sg_mg_ready, mean)
+pr_h_ready <- aggregate(. ~ location, pr_h_ready, mean)
+cr_ready <- aggregate(. ~ location, cr_ready, mean)
+
+rownames(sg_mg_ready) <- sg_mg_ready$location
+rownames(pr_h_ready) <- pr_h_ready$location
+rownames(cr_ready) <- cr_ready$location
+
+
+```
+
+
+We will drop the Buttonwood observation again as the temperture value is very likely an error.
+```{r}
+sg_mg_ready <- sg_mg_ready[!sg_mg_ready$location == "Buttonwood", ]
+
+```
+
+
+Now we can make our dendrograms, we will start with Seagrass/Mangrove. 
+
+```{r}
+fviz_nbclust(sg_mg_ready, FUN = hcut, method = "silhouette")
+
+```
+Two clusters it is!
+
+
+```{r}
+set.seed(1111)
+
+sg_mg_clust <- agnes(sg_mg_ready, method = "ward")
+
+sg_mg_dend <- pltree(sg_mg_clust, cex = 0.6, hang = -1, main = "Test Dendro for all Data", labels = sg_mg_ready$location)
+
+sg_mg_good_dend <- fviz_dend(sg_mg_clust, k = 2, show_labels = TRUE, cex = 0.6, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Seagrass/Mangrove Cluster Analysis")
+
+sg_mg_good_dend
+
+```
+Interesting! It appears that our clustering is reasonably consistent with geographic location. The red cluster successfully grouped all of the sites that are components of Largo Sound (an individual body of water). The blue cluster is a bit more dynamic but has the vast majority of the bayside sites (excluding Tarpon Island and Sexton Cove). A vast majority of the nearest neigbors in the dendrogram additionally are sites that are adjacent or very close to one another.
+
+Lets take a look at patch reefs and hardbottom sites.
+
+```{r}
+set.seed(1111)
+
+pr_h_clust <- agnes(pr_h_ready, method = "ward")
+
+pr_h_dend <- pltree(pr_h_clust, cex = 0.6, hang = -1, main = "Test Dendro for all Data", labels = pr_h_ready$location)
+
+pr_h_good_dend <- fviz_dend(pr_h_clust, k = 4, show_labels = TRUE, cex = 0.6, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Patch Reef/Hardbottom Cluster Analysis")
+
+pr_h_good_dend
+```
+
+Looks like our Patch Reef/Hardbottom sites are quite different, this is not terribly suprising due to the fact these locations are quite variable depending on site and they are visited less frequently. Of note Cannon Patch and Mosquito are sister reefs (very similar structure/biodiversity and close in proximity) so it is interesting thst they are clustered closely. Whitemore Bight, Marker 37, and The Barge are very different sites from all other locations so it is unsuprising they are clustered independently.
+
+Lastly lets investigate Coral Reefs.
+
+```{r}
+fviz_nbclust(cr_ready, FUN = hcut, method = "silhouette")
+
+```
+Two clusters again.
+
+```{r}
+set.seed(1111)
+
+cr_clust <- agnes(cr_ready, method = "ward")
+
+cr_dend <- pltree(cr_clust, cex = 0.6, hang = -1, main = "Test Dendro for all Data", labels = cr_ready$location)
+
+cr_good_dend <- fviz_dend(cr_clust, k = 2, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Coral Reef Cluster Analysis")
+
+cr_good_dend
+```
+Coral reef clustering shows a very interesting pattern. The blue cluster contains the two northernmost reef sites visited by MarineLab. The red cluster contains the mid-southern reefs predominantly. While there are many breaks in the dendrogram, individual pairs are consistent geographically for North North Dry Rocks & Minow Caves, Key Largo Dry Rocks & Grecian Dry Rock. Both of these pairs represent adjacent reef systems. 
+
+
+Last lets make a comparison across years using a tanglegram to see how clustering of invividual site locations compares across the ~4 years of study. 
+
+First we must subset our data into years and normalize our locations so we only have repedative locations for each dendrogram.
+
+
+
+```{r}
+year_16 <- subset(WQ_clean_data, Year == "16")
+year_17 <- subset(WQ_clean_data, Year == "17")
+year_18 <- subset(WQ_clean_data, Year == "18")
+year_19 <- subset(WQ_clean_data, Year == "19")
+
+year_16 <- na.omit(year_16)
+year_17 <- na.omit(year_17)
+year_18 <- na.omit(year_18)
+year_19 <- na.omit(year_19)
+
+year_16 <- year_16 %>% dplyr::select(location, water_temp, salinity, dissolved_oxygen, ammonia, ph)
+year_17 <- year_17 %>% dplyr::select(location, water_temp, salinity, dissolved_oxygen, ammonia, ph)
+year_18 <- year_18 %>% dplyr::select(location, water_temp, salinity, dissolved_oxygen, ammonia, ph)
+year_19 <- year_19 %>% dplyr::select(location, water_temp, salinity, dissolved_oxygen, ammonia, ph)
+
+year_16 <- aggregate(. ~ location, year_16, mean)
+year_17 <- aggregate(. ~ location, year_17, mean)
+year_18 <- aggregate(. ~ location, year_18, mean)
+year_19 <- aggregate(. ~ location, year_19, mean)
+
+
+rownames(year_16) <- year_16$location
+rownames(year_17) <- year_17$location
+rownames(year_18) <- year_18$location
+rownames(year_19) <- year_19$location
+```
+
+```{r}
+
+year_16 <- year_16[!year_16$location == "Scott's Channel", ]
+year_16 <- year_16[!year_16$location == "Sexton Cove", ]
+year_16 <- year_16[!year_16$location == "Ocean Reef Club", ]
+year_16 <- year_16[!year_16$location == "North North Dry Rocks", ]
+year_16 <- year_16[!year_16$location == "NA", ]
+year_16 <- year_16[!year_16$location == "Higdon's", ]
+year_16 <- year_16[!year_16$location == "The Elbow", ]
+year_16 <- year_16[!year_16$location == "The Barge", ]
+year_16 <- year_16[!year_16$location == "Bayside", ]
+year_16 <- year_16[!year_16$location == "Blackwater Sound", ]
+year_16 <- year_16[!year_16$location == "Benny Poo", ]
+year_16 <- year_16[!year_16$location == "French Reef", ]
+year_16 <- year_16[!year_16$location == "Deep Blue", ]
+year_16 <- year_16[!year_16$location == "Marker 37", ]
+year_16 <- year_16[!year_16$location == "Lagoon", ]
+year_16 <- year_16[!year_16$location == "Tarpon Deep", ]
+year_16 <- year_16[!year_16$location == "Mosquito", ]
+
+unique(year_16$location)
+
+```
+
+
+```{r}
+
+year_17 <- year_17[!year_17$location == "Scott's Channel", ]
+year_17 <- year_17[!year_17$location == "Sexton Cove", ]
+year_17 <- year_17[!year_17$location == "Ocean Reef Club", ]
+year_17 <- year_17[!year_17$location == "North North Dry Rocks", ]
+year_17 <- year_17[!year_17$location == "NA", ]
+year_17 <- year_17[!year_17$location == "Higdon's", ]
+year_17 <- year_17[!year_17$location == "The Elbow", ]
+year_17 <- year_17[!year_17$location == "The Barge", ]
+year_17 <- year_17[!year_17$location == "Bayside", ]
+year_17 <- year_17[!year_17$location == "Blackwater Sound", ]
+year_17 <- year_17[!year_17$location == "Benny Poo", ]
+year_17 <- year_17[!year_17$location == "French Reef", ]
+year_17 <- year_17[!year_17$location == "Deep Blue", ]
+year_17 <- year_17[!year_17$location == "Marker 37", ]
+year_17 <- year_17[!year_17$location == "Lagoon", ]
+year_17 <- year_17[!year_17$location == "Tarpon Deep", ]
+year_17 <- year_17[!year_17$location == "Mosquito", ]
+year_17 <- year_17[!year_17$location == "Swash Keys", ]
+year_17 <- year_17[!year_17$location == "Captain's Point", ]
+
+
+unique(year_17$location)
+```
+
+```{r}
+
+year_18 <- year_18[!year_18$location == "Scott's Channel", ]
+year_18 <- year_18[!year_18$location == "Sexton Cove", ]
+year_18 <- year_18[!year_18$location == "Ocean Reef Club", ]
+year_18 <- year_18[!year_18$location == "North North Dry Rocks", ]
+year_18 <- year_18[!year_18$location == "NA", ]
+year_18 <- year_18[!year_18$location == "Higdon's", ]
+year_18 <- year_18[!year_18$location == "The Elbow", ]
+year_18 <- year_18[!year_18$location == "The Barge", ]
+year_18 <- year_18[!year_18$location == "Bayside", ]
+year_18 <- year_18[!year_18$location == "Blackwater Sound", ]
+year_18 <- year_18[!year_18$location == "Benny Poo", ]
+year_18 <- year_18[!year_18$location == "French Reef", ]
+year_18 <- year_18[!year_18$location == "Deep Blue", ]
+year_18 <- year_18[!year_18$location == "Marker 37", ]
+year_18 <- year_18[!year_18$location == "Lagoon", ]
+year_18 <- year_18[!year_18$location == "Tarpon Deep", ]
+year_18 <- year_18[!year_18$location == "Mosquito", ]
+year_18 <- year_18[!year_18$location == "Swash Keys", ]
+year_18 <- year_18[!year_18$location == "Buttonwood", ]
+year_18 <- year_18[!year_18$location == "Captain's Point", ]
+
+
+unique(year_18$location)
+```
+
+```{r}
+
+year_19 <- year_19[!year_19$location == "Scott's Channel", ]
+year_19 <- year_19[!year_19$location == "Sexton Cove", ]
+year_19 <- year_19[!year_19$location == "Ocean Reef Club", ]
+year_19 <- year_19[!year_19$location == "North North Dry Rocks", ]
+year_19 <- year_19[!year_19$location == "NA", ]
+year_19 <- year_19[!year_19$location == "Higdon's", ]
+year_19 <- year_19[!year_19$location == "The Elbow", ]
+year_19 <- year_19[!year_19$location == "The Barge", ]
+year_19 <- year_19[!year_19$location == "Bayside", ]
+year_19 <- year_19[!year_19$location == "Blackwater Sound", ]
+year_19 <- year_19[!year_19$location == "Benny Poo", ]
+year_19 <- year_19[!year_19$location == "French Reef", ]
+year_19 <- year_19[!year_19$location == "Deep Blue", ]
+year_19 <- year_19[!year_19$location == "Marker 37", ]
+year_19 <- year_19[!year_19$location == "Lagoon", ]
+year_19 <- year_19[!year_19$location == "Tarpon Deep", ]
+year_19 <- year_19[!year_19$location == "Mosquito", ]
+year_19 <- year_19[!year_19$location == "Swash Keys", ]
+year_19 <- year_19[!year_19$location == "Buttonwood", ]
+year_19 <- year_19[!year_19$location == "Tarpon Island", ]
+year_19 <- year_19[!year_19$location == "South Sound Creek", ]
+year_19 <- year_19[!year_19$location == "Hidden Lake", ]
+year_19 <- year_19[!year_19$location == "Captain's Point", ]
+
+unique(year_19$location)
+
+```
+
+Phew lots of sorting, now we can start on our dendros.
+
+We will make 2016 first.
+
+```{r}
+fviz_nbclust(year_16, FUN = hcut, method = "silhouette")
+
+set.seed(1111)
+clust_16 <- agnes(year_16, method = "ward")
+
+dend_16 <- pltree(clust_16, cex = 0.6, hang = -1, main = "Test Dendro for all Data", labels = year_16$location)
+
+good_dend_16 <- fviz_dend(clust_16, k = 3, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "2016 Cluster Analysis")
+
+good_dend_16
+
+dist_16 <- dist(year_16, method = "euclidean")
+hclust_16 <- hclust(dist_16, method = "ward.D2")
+dend_ready_16 <- as.dendrogram(hclust_16)
+
+```
+
+Now for 2017!
+
+```{r}
+fviz_nbclust(year_17, FUN = hcut, method = "silhouette")
+
+set.seed(1111)
+clust_17 <- agnes(year_17, method = "ward")
+
+dend_17 <- pltree(clust_17, cex = 0.6, hang = -1, main = "Test Dendro for all Data", labels = year_17$location)
+
+good_dend_17 <- fviz_dend(clust_16, k = 2, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "2017 Cluster Analysis")
+
+good_dend_17
+
+dist_17 <- dist(year_17, method = "euclidean")
+hclust_17 <- hclust(dist_17, method = "ward.D2")
+dend_ready_17 <- as.dendrogram(hclust_17)
+```
+
+2018
+
+```{r}
+fviz_nbclust(year_18, FUN = hcut, method = "silhouette")
+
+set.seed(1111)
+clust_18 <- agnes(year_18, method = "ward")
+
+dend_18 <- pltree(clust_18, cex = 0.6, hang = -1, main = "Test Dendro for all Data", labels = year_18$location)
+
+good_dend_18 <- fviz_dend(clust_18, k = 3, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "2018 Cluster Analysis")
+
+good_dend_18
+
+dist_18 <- dist(year_18, method = "euclidean")
+hclust_18 <- hclust(dist_18, method = "ward.D2")
+dend_ready_18 <- as.dendrogram(hclust_18)
+
+```
+ And 2019 
+ 
+```{r}
+fviz_nbclust(year_19, FUN = hcut, method = "silhouette")
+
+set.seed(1111)
+clust_19 <- agnes(year_19, method = "ward")
+
+dend_19 <- pltree(clust_19, cex = 0.6, hang = -1, main = "Test Dendro for all Data", labels = year_19$location)
+
+good_dend_19 <- fviz_dend(clust_19, k = 3, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "2019 Cluster Analysis")
+
+good_dend_19
+
+dist_19 <- dist(year_19, method = "euclidean")
+hclust_19 <- hclust(dist_19, method = "ward.D2")
+dend_ready_19 <- as.dendrogram(hclust_19)
+```
+
+
+Now we can build our tanglegrams. Tanglegrams compare the alignment of two dendrograms. The entanglement coefficent represents the degree by which the two samples are entangled (or improperly aligned). A low entanglemnt shows a good alignment whereas a high entanglement shows disalignment. 
+```{r}
+
+entang_16_17 <- dendlist(dend_ready_16, dend_ready_17)
+
+tangle_16_17 <- tanglegram(dend_ready_16, dend_ready_17, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("entanglement =", round(entanglement(entang_16_17), 2)))
+```
+
+
+
+```{r}
+entang_16_18 <- dendlist(dend_ready_16, dend_ready_18)
+
+tangle_16_18 <- tanglegram(dend_ready_16, dend_ready_18, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("entanglement =", round(entanglement(entang_16_18), 2)))
+```
+
+```{r}
+entang_16_18 <- dendlist(dend_ready_16, dend_ready_18)
+
+tangle_16_18 <- tanglegram(dend_ready_16, dend_ready_18, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("entanglement =", round(entanglement(entang_16_18), 2)))
+```
+
+```{r}
+entang_17_18 <- dendlist(dend_ready_17, dend_ready_18)
+
+tangle_17_18 <- tanglegram(dend_ready_17, dend_ready_18, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("entanglement =", round(entanglement(entang_17_18), 2)))
+```
+
+```{r}
+entang_17_19 <- dendlist(dend_ready_17, dend_ready_19)
+
+tangle_17_19 <- tanglegram(dend_ready_17, dend_ready_19, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("entanglement =", round(entanglement(entang_17_19), 2)))
+```
+
+```{r}
+entang_18_19 <- dendlist(dend_ready_18, dend_ready_19)
+
+tangle_18_19 <- tanglegram(dend_ready_18, dend_ready_19, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("entanglement =", round(entanglement(entang_18_19), 2)))
+```
+
+So it looks like our closest aligning pairs are 2016 to 2017, 2017 to 2019 and 2018 to 2019. The closer alignment of consecutive years my reflect changes in overseeing staff over time or perhaps modification or sampling protocols. Regarding the best entanglement 2017 to 2018, the measure of 0.52 is not terribly robust. Therefore ther emay be some room for improvement to establish a more percise measuring protocol in future years. That being said citizen science data is typically highly variable thus a strong alignment was not expected, however it would be interesting to see if the staff could optimize methods from 2019 to 2020.  
