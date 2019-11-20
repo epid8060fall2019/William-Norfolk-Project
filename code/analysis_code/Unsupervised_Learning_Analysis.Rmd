@@ -628,7 +628,7 @@ clust_19 <- agnes(year_19, method = "ward")
 
 dend_19 <- pltree(clust_19, cex = 0.6, hang = -1, main = "Test Dendro for all Data", labels = year_19$location)
 
-good_dend_19 <- fviz_dend(clust_19, k = 3, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "2019 Cluster Analysis")
+good_dend_19 <- fviz_dend(clust_19, k = 5, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "2019 Cluster Analysis")
 
 good_dend_19
 
@@ -651,31 +651,31 @@ tangle_16_17 <- tanglegram(dend_ready_16, dend_ready_17, highlight_distinct_edge
 ```{r}
 entang_16_18 <- dendlist(dend_ready_16, dend_ready_18)
 
-tangle_16_18 <- tanglegram(dend_ready_16, dend_ready_18, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("entanglement =", round(entanglement(entang_16_18), 2)))
+tangle_16_18 <- tanglegram(dend_ready_16, dend_ready_18, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("Entanglement =", round(entanglement(entang_16_18), 2)))
 ```
 
 ```{r}
 entang_16_18 <- dendlist(dend_ready_16, dend_ready_18)
 
-tangle_16_18 <- tanglegram(dend_ready_16, dend_ready_18, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("entanglement =", round(entanglement(entang_16_18), 2)))
+tangle_16_18 <- tanglegram(dend_ready_16, dend_ready_18, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("Entanglement =", round(entanglement(entang_16_18), 2)))
 ```
 
 ```{r}
 entang_17_18 <- dendlist(dend_ready_17, dend_ready_18)
 
-tangle_17_18 <- tanglegram(dend_ready_17, dend_ready_18, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("entanglement =", round(entanglement(entang_17_18), 2)))
+tangle_17_18 <- tanglegram(dend_ready_17, dend_ready_18, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("Entanglement =", round(entanglement(entang_17_18), 2)))
 ```
 
 ```{r}
 entang_17_19 <- dendlist(dend_ready_17, dend_ready_19)
 
-tangle_17_19 <- tanglegram(dend_ready_17, dend_ready_19, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("entanglement =", round(entanglement(entang_17_19), 2)))
+tangle_17_19 <- tanglegram(dend_ready_17, dend_ready_19, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("Entanglement =", round(entanglement(entang_17_19), 2)))
 ```
 
 ```{r}
 entang_18_19 <- dendlist(dend_ready_18, dend_ready_19)
 
-tangle_18_19 <- tanglegram(dend_ready_18, dend_ready_19, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("entanglement =", round(entanglement(entang_18_19), 2)))
+tangle_18_19 <- tanglegram(dend_ready_18, dend_ready_19, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("Entanglement =", round(entanglement(entang_18_19), 2)))
 ```
 
 So it looks like our closest aligning pairs are 2016 to 2017, 2017 to 2019 and 2018 to 2019. The closer alignment of consecutive years my reflect changes in overseeing staff over time or perhaps modification or sampling protocols. Regarding the best entanglement 2017 to 2018, the measure of 0.52 is not terribly robust. Therefore ther emay be some room for improvement to establish a more percise measuring protocol in future years. That being said citizen science data is typically highly variable thus a strong alignment was not expected, however it would be interesting to see if the staff could optimize methods from 2019 to 2020.  
