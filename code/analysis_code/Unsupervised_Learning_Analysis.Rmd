@@ -23,7 +23,7 @@ library(visdat)
 library(factoextra)
 library(dendextend)
 library(cluster)
-library(fpc)
+library(NbClust)
 
 #Note it will be very important to call functions using the :: library notation due to the frequency of function masking by our libraries. 
 
@@ -219,7 +219,17 @@ xx <- tanglegram(cluster_site_hclust, cluster_site_agnes, highlight_distinct_edg
 
 all_site_dend %>% untangle("step1side") %>% tanglegram()
 ```
-From the tanglegram it looks like most of our sites are in agreement between the two methods. Most of the disagreement appears to be within the 5 major clusters (i.e. disagreement about where in the cluster exaclty the site belongs) which are relatively minor. The only large difference is the Elbow site which jumps clustering with the different alogrithms, it will be important to keep an eye on this location. 
+From the tanglegram it looks like most of our sites are in agreement between the two methods. Most of the disagreement appears to be within the 5 major clusters (i.e. disagreement about where in the cluster exaclty the site belongs) which are relatively minor. The only large difference is the Elbow site which jumps clustering with the different alogrithms, it will be important to keep an eye on this location.
+
+### Unsupervised Modeling Discussion
+
+The unsupervised method of modeling allows us to see data clusters that occur as a result of the input variables. This type of analysis is very useful for datasets like ours where no defined outcome is a componet. From this type of analysis we can determine which sites (or other assigned criteria) are most similar across the dataset due to changes in the input variables. 
+
+However, this analysis is not without limiation. While the clustering provides important information, clustering does not explain why the data is grouped in a particular pattern. Water quality measuares feed into the model which in turn influence the decisions of the clustering however, this type of model cannot account for any external factors (unless previously controlled) which influence the variables (such as seasonality and annual variance). In the absence of a visible pattern of clustering attributable to some known characteristic of the sites (i.e. type, depth, season, distance from shore, etc) the cluster groups are relatively uninfomative beyond showing which are the most similar. This is an issue we have seen with our analysis above. Small patterns of site data can be seen within individual branches however, no overall pattern of clustering can be seen which applies to all sites.
+
+This result is not entirely uninformative, this suggests that site clustering may be strongly affected by additional factors (which we will explore below) and/or water quality parameters are simply not powerful enough to distinguish these sites either entirely or through the usage of the tools employed by MarineLab. 
+
+To explore some more depths of our dataset we will subset the cleaned data to target specific aspects of the analyis in effort to visualize additional patterns which cannot be seen using the total data. These results are shown in the sections below.
 
 ## Site Type Clustering
 
@@ -309,7 +319,15 @@ It looks like our Seagrass/Mangrove sites are reasonably distinct! It is unspris
 
 Lets take a look at patch reefs and hardbottom sites.
 
-Cluster evaluation with the silhouette and wss method (as we have done for all samples) is not possible for the Patch Reef/Hardbottom data due to the fact that the number of observations is too low to use the function. We will determine our k using the number of major splits in the dendrogram.
+Cluster evaluation with the silhouette and wss method (as we have done for all samples) is not possible for the Patch Reef/Hardbottom data due to the fact that the number of observations is too low to use the function. We will use the NbClust function to compute the silhouette index and determine the best number of clusters. Note this method will not produce a silhouette curve but will still provide the ideal cluster number in the output.
+```{r}
+#A min and max number of clusters must be supplied in this function. We will use a 2 min to ensure we get some informaiton and a max of 6 as the highest max must be n-1
+pr_h_diss <- NbClust(pr_h_ready, distance = "euclidean", min.nc = 2, max.nc = 6, method = "ward.D2", index = "silhouette")
+
+#The code below provides the best number of columns, silhouette index, and partition of observations into clusters
+pr_h_diss$Best.nc
+pr_h_diss$Best.partition
+```
 
 ```{r}
 set.seed(1111)
@@ -318,7 +336,7 @@ pr_h_clust <- agnes(pr_h_ready, method = "ward")
 
 pr_h_dend <- pltree(pr_h_clust, cex = 0.6, hang = -1, main = "Test Dendro for all Data", labels = pr_h_ready$location)
 
-pr_h_good_dend <- fviz_dend(pr_h_clust, k = 5, show_labels = TRUE, cex = 0.6, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Patch Reef/Hardbottom Cluster Analysis")
+pr_h_good_dend <- fviz_dend(pr_h_clust, k = 6, show_labels = TRUE, cex = 0.6, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Patch Reef/Hardbottom Cluster Analysis")
 
 pr_h_good_dend
 ```
@@ -660,9 +678,162 @@ Based on the tanglegrams and entanglement measures it seems like MarineLab is no
 
 While consistency may be a goal of sampling, it is important to note that this analysis does not account for any seasonal variation between sites and could show skewed values if a particualr site was only visited during a certian part of the year for one or more of the data subsets. Additionally, inconsistancy may also be a result of improving methods, training, or equipment over time. 
 
-#######More below here
+## Seasonal Clustering
 
-The seasonal variation between sites may be worth an investigation by clustering data by month rather than by site for a subset of a single site.
+### Questions for this section
 
+_Do measurements cluster into groups containing similar months of the year?_
+_Is there a distinct seasonal pattern in the clusters from the most visited sites?_
+
+Based on the poor entanglement measures of year-to-year comparison it may be more prudent to cluster data based on month collected rather than simply measuring specific sites across years due to annual and seasonal fluctuation. 
+
+For this analysis we will use our most frequently visted sites for comparison of each of the three site types. Seagrass/Mangrove will be represented by Tarpon Basin, Patch Reef, Hardbottom will be represented by Rodriguez Key and Coral Reefs will be represented by Grecian Dry Rocks.
+
+First we need to make our subsets.
+```{r}
+tarpon_only <- subset(WQ_clean_data, location == "Tarpon Basin")
+grecian_only <- subset(WQ_clean_data, location == "Grecian Dry Rocks")
+roddy_only <- subset(WQ_clean_data, location == "Rodriguez Key")
+
+```
+
+Next as above, we must clean our data, aggregate by means of Month, assin rownames, scale, and prep the dataframe.
+```{r}
+tarpon_reduce <- tarpon_only %>% dplyr::select(Month, water_temp, salinity, dissolved_oxygen, ammonia, ph)
+
+tarpon_mean <- aggregate(. ~ Month, tarpon_reduce, mean)
+
+rownames(tarpon_mean) <- tarpon_mean$Month
+
+tarpon_drop_month <- tarpon_mean %>% dplyr::select(-Month)
+
+tarpon_scale <- scale(tarpon_drop_month)
+
+tarpon_ready <- as.data.frame(tarpon_scale)
+```
+
+Since these dendrograms will have less than 10 total bins we will need to modify our silhouete code as above using the NbClust. The fviz_nbclust function cannot handle datasets with less than 10 observations in the format as above, additionall we cannot produce the silhouette curves however, we can calculate the values.
+```{r}
+library(NbClust)
+#In this function we must specify a min and mx number of clusters, we will use a min of two to get some information and a max of four to see if we can get seasonal clustering
+tarpon_diss <-NbClust(tarpon_ready, distance = "euclidean", min.nc = 2, max.nc = 4, 
+            method = "ward.D2", index = "silhouette")
+
+#The best number of clusters calcuated by the value index
+tarpon_diss$Best.nc
+#the partition of observations into their respective clusters
+tarpon_diss$Best.partition
+```
+
+Next we make the dendgrograms as above.
+```{r}
+set.seed(1111)
+
+
+clust_tarpon_agnes <- agnes(tarpon_ready, method = "ward")
+
+good_adend_tarpon <- fviz_dend(clust_tarpon_agnes, k = 2, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Tarpon Basin Seasonal Cluster Analysis (agnes)")
+
+good_adend_tarpon
+
+dist_tarpon <- dist(tarpon_ready, method = "euclidean")
+hclust_tarpon <- hclust(dist_tarpon, method = "ward.D2")
+dend_ready_tarpon <- as.dendrogram(hclust_tarpon)
+
+good_hdend_tarpon <- fviz_dend(hclust_tarpon, k = 2, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Tarpon Basin Seasonal Cluster Analysis (hclust)")
+
+good_hdend_tarpon
+```
+It looks like our data groups relatively close to a seasonal timeline. The closest clusters are often adjacent or near months. It appears October is a very different month from the rest of the samples, this may be due to the fact that September and November observations are absent so it is our only representitive of fall.
+
+Next we will look at Rodriguez Key
+
+```{r}
+roddy_reduce <- roddy_only %>% dplyr::select(Month, water_temp, salinity, dissolved_oxygen, ammonia, ph)
+
+roddy_mean <- aggregate(. ~ Month, roddy_reduce, mean)
+
+rownames(roddy_mean) <- roddy_mean$Month
+
+roddy_drop_month <- roddy_mean %>% dplyr::select(-Month)
+
+roddy_scale <- scale(roddy_drop_month)
+
+roddy_ready <- as.data.frame(roddy_scale)
+```
+
+```{r}
+roddy_diss <- NbClust(roddy_ready, distance = "euclidean", min.nc = 2, max.nc = 4, 
+            method = "ward.D2", index = "silhouette")
+
+roddy_diss$Best.nc
+roddy_diss$Best.partition
+```
+Lookd likr four clusters is best here!
+
+```{r}
+set.seed(1111)
+
+
+clust_roddy_agnes <- agnes(roddy_ready, method = "ward")
+
+good_adend_roddy <- fviz_dend(clust_roddy_agnes, k = 4, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Rodriguez Key Seasonal Cluster Analysis (agnes)")
+
+good_adend_roddy
+
+dist_roddy <- dist(roddy_ready, method = "euclidean")
+hclust_roddy <- hclust(dist_roddy, method = "ward.D2")
+dend_ready_roddy <- as.dendrogram(hclust_roddy)
+
+good_hdend_roddy <- fviz_dend(hclust_roddy, k = 4, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Rodriguez Key Seasonal Cluster Analysis (hclust)")
+
+good_hdend_roddy
+```
+So it looks like our summer clustering is fairly strong, however the remainder of the months are not grouped in any notable pattern.
+
+Last we will look at Grecian Dry Rocks
+
+```{r}
+grecian_reduce <- grecian_only %>% dplyr::select(Month, water_temp, salinity, dissolved_oxygen, ammonia, ph)
+
+grecian_mean <- aggregate(. ~ Month, grecian_reduce, mean)
+
+rownames(grecian_mean) <- grecian_mean$Month
+
+grecian_drop_month <- grecian_mean %>% dplyr::select(-Month)
+
+grecian_scale <- scale(grecian_drop_month)
+
+grecian_ready <- as.data.frame(grecian_scale)
+```
+
+
+```{r}
+grecian_diss <- NbClust(grecian_ready, distance = "euclidean", min.nc = 2, max.nc = 4, method = "ward.D2", index = "silhouette")
+
+grecian_diss$Best.nc
+grecian_diss$Best.partition
+```
+Three cluster for this subset.
+
+```{r}
+set.seed(1111)
+
+clust_grecian_agnes <- agnes(grecian_ready, method = "ward")
+
+good_adend_grecian <- fviz_dend(clust_grecian_agnes, k = 3, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Grecian Dry Rocks Seasonal Cluster Analysis (agnes)")
+
+good_adend_grecian
+
+dist_grecian <- dist(grecian_ready, method = "euclidean")
+hclust_grecian <- hclust(dist_grecian, method = "ward.D2")
+dend_ready_grecian <- as.dendrogram(hclust_grecian)
+
+good_hdend_grecian <- fviz_dend(hclust_grecian, k = 3, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Grecian Rocks Seasonal Cluster Analysis (hclust)")
+
+good_hdend_grecian
+```
+
+The clustering in this instance does not appear to show seasonal grouping. It should be noted that the two individual clusters July and December are the two most extreme seasonal months so it is possible their seperation may be due to seasonal extremes. However, the majority of months do not show a distinct pattern.
 
 
