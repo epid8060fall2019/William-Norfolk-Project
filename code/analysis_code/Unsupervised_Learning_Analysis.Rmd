@@ -217,6 +217,7 @@ all_site_dend <- dendlist(q, p)
 
 xx <- tanglegram(cluster_site_hclust, cluster_site_agnes, highlight_distinct_edges = FALSE, common_subtrees_color_branches = FALSE, lwd = 2, k_branches = 5, lab.cex = 0.7, main = paste("All Sites (hclust vs agnes) Entanglement =", round(entanglement(all_site_dend), 2)))
 
+all_site_dend %>% untangle("step1side") %>% tanglegram()
 ```
 From the tanglegram it looks like most of our sites are in agreement between the two methods. Most of the disagreement appears to be within the 5 major clusters (i.e. disagreement about where in the cluster exaclty the site belongs) which are relatively minor. The only large difference is the Elbow site which jumps clustering with the different alogrithms, it will be important to keep an eye on this location. 
 
@@ -361,45 +362,49 @@ For Coral Reefs the most similar site pairs are Horseshoe & Grecian Rocks as wel
 ## Year-to-Year Comparison
 
 ### Questions for this section
-_
+_How does our cluster analysis compare across sampling years?_
 
 
-Last lets make a comparison across years using a tanglegram to see how clustering of invividual site locations compares across the ~4 years of study. 
+We will make a comparison across years using a tanglegram to see how clustering of invividual site locations compares across the ~4 years of study. 
 
 First we must subset our data into years and normalize our locations so we only have repedative locations for each dendrogram.
 
-
-
-```{r}
+```{r prep year data and predictors}
+#Subset into individual years
 year_16 <- subset(WQ_clean_data, Year == "16")
 year_17 <- subset(WQ_clean_data, Year == "17")
 year_18 <- subset(WQ_clean_data, Year == "18")
 year_19 <- subset(WQ_clean_data, Year == "19")
 
+#Remove NAs
 year_16 <- na.omit(year_16)
 year_17 <- na.omit(year_17)
 year_18 <- na.omit(year_18)
 year_19 <- na.omit(year_19)
 
+#Select predictors
 year_16 <- year_16 %>% dplyr::select(location, water_temp, salinity, dissolved_oxygen, ammonia, ph)
 year_17 <- year_17 %>% dplyr::select(location, water_temp, salinity, dissolved_oxygen, ammonia, ph)
 year_18 <- year_18 %>% dplyr::select(location, water_temp, salinity, dissolved_oxygen, ammonia, ph)
 year_19 <- year_19 %>% dplyr::select(location, water_temp, salinity, dissolved_oxygen, ammonia, ph)
 
+#Aggregate the sample sites by mean of each water quality variable
 year_16 <- aggregate(. ~ location, year_16, mean)
 year_17 <- aggregate(. ~ location, year_17, mean)
 year_18 <- aggregate(. ~ location, year_18, mean)
 year_19 <- aggregate(. ~ location, year_19, mean)
 
-
+#Assign the location to the rowname
 rownames(year_16) <- year_16$location
 rownames(year_17) <- year_17$location
 rownames(year_18) <- year_18$location
 rownames(year_19) <- year_19$location
+
 ```
 
-```{r}
+```{r 2016}
 
+#Remove all rows that are not present in all four years of study
 year_16 <- year_16[!year_16$location == "Scott's Channel", ]
 year_16 <- year_16[!year_16$location == "Sexton Cove", ]
 year_16 <- year_16[!year_16$location == "Ocean Reef Club", ]
@@ -418,12 +423,15 @@ year_16 <- year_16[!year_16$location == "Lagoon", ]
 year_16 <- year_16[!year_16$location == "Tarpon Deep", ]
 year_16 <- year_16[!year_16$location == "Mosquito", ]
 
-unique(year_16$location)
+#Remove the location variable, scale the data to normalize, and return back to a data frame
+year_16 <- year_16 %>% dplyr::select(-location)
+year_16 <- scale(year_16)
+year_16 <- as.data.frame(year_16)
+
 
 ```
 
-
-```{r}
+```{r 2017}
 
 year_17 <- year_17[!year_17$location == "Scott's Channel", ]
 year_17 <- year_17[!year_17$location == "Sexton Cove", ]
@@ -445,11 +453,13 @@ year_17 <- year_17[!year_17$location == "Mosquito", ]
 year_17 <- year_17[!year_17$location == "Swash Keys", ]
 year_17 <- year_17[!year_17$location == "Captain's Point", ]
 
+year_17 <- year_17 %>% dplyr::select(-location)
+year_17 <- scale(year_17)
+year_17 <- as.data.frame(year_17)
 
-unique(year_17$location)
 ```
 
-```{r}
+```{r 2018}
 
 year_18 <- year_18[!year_18$location == "Scott's Channel", ]
 year_18 <- year_18[!year_18$location == "Sexton Cove", ]
@@ -472,11 +482,14 @@ year_18 <- year_18[!year_18$location == "Swash Keys", ]
 year_18 <- year_18[!year_18$location == "Buttonwood", ]
 year_18 <- year_18[!year_18$location == "Captain's Point", ]
 
+year_18 <- year_18 %>% dplyr::select(-location)
+year_18 <- scale(year_18)
+year_18 <- as.data.frame(year_18)
 
-unique(year_18$location)
+
 ```
 
-```{r}
+```{r 2019}
 
 year_19 <- year_19[!year_19$location == "Scott's Channel", ]
 year_19 <- year_19[!year_19$location == "Sexton Cove", ]
@@ -502,97 +515,113 @@ year_19 <- year_19[!year_19$location == "South Sound Creek", ]
 year_19 <- year_19[!year_19$location == "Hidden Lake", ]
 year_19 <- year_19[!year_19$location == "Captain's Point", ]
 
-unique(year_19$location)
-
+year_19 <- year_19 %>% dplyr::select(-location)
+year_19 <- scale(year_19)
+year_19 <- as.data.frame(year_19)
 ```
 
 Phew lots of sorting, now we can start on our dendros.
 
 We will make 2016 first.
 
-```{r}
+```{r 2016 dend}
+set.seed(1111)
+
 fviz_nbclust(year_16, FUN = hcut, method = "silhouette")
 
-set.seed(1111)
 clust_16 <- agnes(year_16, method = "ward")
 
-dend_16 <- pltree(clust_16, cex = 0.6, hang = -1, main = "Test Dendro for all Data", labels = year_16$location)
+good_adend_16 <- fviz_dend(clust_16, k = 2, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "2016 Cluster Analysis agnes")
 
-good_dend_16 <- fviz_dend(clust_16, k = 3, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "2016 Cluster Analysis")
-
-good_dend_16
+good_adend_16
 
 dist_16 <- dist(year_16, method = "euclidean")
 hclust_16 <- hclust(dist_16, method = "ward.D2")
 dend_ready_16 <- as.dendrogram(hclust_16)
 
-```
+good_hdend_16 <- fviz_dend(hclust_16, k = 2, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "2016 Cluster Analysis hclust")
+good_hdend_16
 
+```
+Looks like the Grotto is very different from all other measures this year. Similarly, the boat ramp and Nest Key are quite distinct also.
 
 Now for 2017!
 
 ```{r}
+set.seed(1111)
+
 fviz_nbclust(year_17, FUN = hcut, method = "silhouette")
 
-set.seed(1111)
 clust_17 <- agnes(year_17, method = "ward")
 
-dend_17 <- pltree(clust_17, cex = 0.6, hang = -1, main = "Test Dendro for all Data", labels = year_17$location)
+good_adend_17 <- fviz_dend(clust_16, k = 4, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "2017 Cluster Analysis agnes")
 
-good_dend_17 <- fviz_dend(clust_16, k = 2, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "2017 Cluster Analysis")
-
-good_dend_17
+good_adend_17
 
 dist_17 <- dist(year_17, method = "euclidean")
 hclust_17 <- hclust(dist_17, method = "ward.D2")
 dend_ready_17 <- as.dendrogram(hclust_17)
-```
 
-2018
+good_hdend_17 <- fviz_dend(hclust_16, k = 4, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "2017 Cluster Analysis hclust")
+
+good_hdend_17
+```
+2017 looks very similar to 2016, structurally with The Grotto, Boat Ramp, and Nest Key showing as the most distant from all other locations.
+
+Next 2018
 
 ```{r}
+set.seed(1111)
+
 fviz_nbclust(year_18, FUN = hcut, method = "silhouette")
 
-set.seed(1111)
 clust_18 <- agnes(year_18, method = "ward")
 
-dend_18 <- pltree(clust_18, cex = 0.6, hang = -1, main = "Test Dendro for all Data", labels = year_18$location)
+good_adend_18 <- fviz_dend(clust_18, k = 8, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "2018 Cluster Analysis agnes")
 
-good_dend_18 <- fviz_dend(clust_18, k = 3, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "2018 Cluster Analysis")
-
-good_dend_18
+good_adend_18
 
 dist_18 <- dist(year_18, method = "euclidean")
 hclust_18 <- hclust(dist_18, method = "ward.D2")
 dend_ready_18 <- as.dendrogram(hclust_18)
 
+good_hdend_18 <- fviz_dend(hclust_18, k = 8, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "2018 Cluster Analysis hclust")
+
+good_hdend_18
 ```
- And 2019 
+
+2018 is the most unique so far however, no distinct patterns are notable.
+
+And finally 2019 
  
 ```{r}
+set.seed(1111)
+
 fviz_nbclust(year_19, FUN = hcut, method = "silhouette")
 
-set.seed(1111)
 clust_19 <- agnes(year_19, method = "ward")
 
-dend_19 <- pltree(clust_19, cex = 0.6, hang = -1, main = "Test Dendro for all Data", labels = year_19$location)
+good_adend_19 <- fviz_dend(clust_19, k = 4, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "2019 Cluster Analysis")
 
-good_dend_19 <- fviz_dend(clust_19, k = 5, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "2019 Cluster Analysis")
-
-good_dend_19
+good_adend_19
 
 dist_19 <- dist(year_19, method = "euclidean")
 hclust_19 <- hclust(dist_19, method = "ward.D2")
 dend_ready_19 <- as.dendrogram(hclust_19)
+
+good_hdend_19 <- fviz_dend(hclust_19, k = 4, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "2019 Cluster Analysis")
+
+good_hdend_19
 ```
 
+2019 looks the most consistent with geographical location as the previous years however, this pattern is not seen in all sites.
 
 Now we can build our tanglegrams. Tanglegrams compare the alignment of two dendrograms. The entanglement coefficent represents the degree by which the two samples are entangled (or improperly aligned). A low entanglemnt shows a good alignment whereas a high entanglement shows disalignment. 
 ```{r}
 
 entang_16_17 <- dendlist(dend_ready_16, dend_ready_17)
 
-tangle_16_17 <- tanglegram(dend_ready_16, dend_ready_17, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("entanglement =", round(entanglement(entang_16_17), 2)))
+tangle_16_17 <- tanglegram(dend_ready_16, dend_ready_17, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, lwd = 2, lab.cex = 1, main = paste("2016 vs. 2017 Entanglement =", round(entanglement(entang_16_17), 2)))
 ```
 
 
@@ -600,37 +629,40 @@ tangle_16_17 <- tanglegram(dend_ready_16, dend_ready_17, highlight_distinct_edge
 ```{r}
 entang_16_18 <- dendlist(dend_ready_16, dend_ready_18)
 
-tangle_16_18 <- tanglegram(dend_ready_16, dend_ready_18, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, lwd = 2, lab.cex = 1, hang = TRUE, main = paste("Entanglement =", round(entanglement(entang_16_18), 2)))
+tangle_16_18 <- tanglegram(dend_ready_16, dend_ready_18, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, lwd = 2, lab.cex = 1, main = paste("2016 vs. 2018 Entanglement =", round(entanglement(entang_16_18), 2)))
 ```
 
 ```{r}
-entang_16_18 <- dendlist(dend_ready_16, dend_ready_18)
+entang_16_19 <- dendlist(dend_ready_16, dend_ready_19)
 
-tangle_16_18 <- tanglegram(dend_ready_16, dend_ready_18, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, lwd = 2, main = paste("Entanglement =", round(entanglement(entang_16_18), 2)))
+tangle_16_19 <- tanglegram(dend_ready_16, dend_ready_19, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, lwd = 2, lab.cex = 1, main = paste("2016 vs. 2019 Entanglement =", round(entanglement(entang_16_19), 2)))
 ```
 
 ```{r}
 entang_17_18 <- dendlist(dend_ready_17, dend_ready_18)
 
-tangle_17_18 <- tanglegram(dend_ready_17, dend_ready_18, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, lwd = 2, main = paste("Entanglement =", round(entanglement(entang_17_18), 2)))
+tangle_17_18 <- tanglegram(dend_ready_17, dend_ready_18, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, lwd = 2, lab.cex = 1, main = paste("2017 vs. 2018 Entanglement =", round(entanglement(entang_17_18), 2)))
 ```
 
 ```{r}
 entang_17_19 <- dendlist(dend_ready_17, dend_ready_19)
 
-tangle_17_19 <- tanglegram(dend_ready_17, dend_ready_19, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, lwd = 2, main = paste("Entanglement =", round(entanglement(entang_17_19), 2)))
+tangle_17_19 <- tanglegram(dend_ready_17, dend_ready_19, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, lwd = 2, lab.cex = 1, main = paste("2017 vs. 2019 Entanglement =", round(entanglement(entang_17_19), 2)))
 ```
 
 ```{r}
 entang_18_19 <- dendlist(dend_ready_18, dend_ready_19)
 
-tangle_18_19 <- tanglegram(dend_ready_18, dend_ready_19, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, lwd = 2, main = paste("Entanglement =", round(entanglement(entang_18_19), 2)))
+tangle_18_19 <- tanglegram(dend_ready_18, dend_ready_19, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, lwd = 2, lab.cex = 1, main = paste("2018 vs. 2019 Entanglement =", round(entanglement(entang_18_19), 2)))
 ```
 
+Based on the tanglegrams and entanglement measures it seems like MarineLab is not very consistent with measurement across multiple years. Only one of the tanglegrams (2016 vs. 2019) shows any alignment of nodes. Notably some of the greatest entanglement is seen in tanglegrams containing 2019, this my be the result of the fact that this data set ended before the fall of this year. 
 
+While consistency may be a goal of sampling, it is important to note that this analysis does not account for any seasonal variation between sites and could show skewed values if a particualr site was only visited during a certian part of the year for one or more of the data subsets. Additionally, inconsistancy may also be a result of improving methods, training, or equipment over time. 
 
+#######More below here
 
+The seasonal variation between sites may be worth an investigation by clustering data by month rather than by site for a subset of a single site.
 
-So it looks like our closest aligning pairs are 2016 to 2017, 2017 to 2019 and 2018 to 2019. The closer alignment of consecutive years my reflect changes in overseeing staff over time or perhaps modification or sampling protocols. Regarding the best entanglement 2017 to 2018, the measure of 0.52 is not terribly robust. Therefore ther emay be some room for improvement to establish a more percise measuring protocol in future years. That being said citizen science data is typically highly variable thus a strong alignment was not expected, however it would be interesting to see if the staff could optimize methods from 2019 to 2020.  
 
 
