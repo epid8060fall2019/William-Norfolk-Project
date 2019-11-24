@@ -5,7 +5,7 @@ date: "11/18/2019"
 output: word_document
 ---
 
-This script expands on the findings of seasonal exploratory and bivariate analysis through the usage of tree based modeling to express seasonality. 
+This script uses unsupervised modeling to determine similaraity characteristics between individual sampling sites, as well as uses cluster analysis to measure similarity of year to year measures. 
 
 Start by loading required libraries
 ```{r load libs}
@@ -19,12 +19,11 @@ library(naniar)
 library(broom)
 library(gridExtra)
 library(ggpubr)
-library(caret)
-library(mlr)
-library(rpart)
-library(rpart.plot)
-library(ranger)
 library(visdat)
+library(factoextra)
+library(dendextend)
+library(cluster)
+library(fpc)
 
 #Note it will be very important to call functions using the :: library notation due to the frequency of function masking by our libraries. 
 
@@ -39,217 +38,97 @@ WQ_clean_data <- readRDS("../../data/processed_data/processeddata.rds")
 glimpse(WQ_clean_data)
 ```
 
-## Prep/Clean the Data
-
-
-For our previous analyses of season we have grouped the data by month to increase the number of monthly replicates and visualize linear changes in the data by individual months. For seasonality modeling we will bin the months into season categories through the addition of a new variable "season". Months 12-2 will represent winter, 3-5 will represent spring, 6-8 will represent summer, and 9-11 will represent fall. 
-
-Before we can begin moeling we must first create a new season variable. 
-
-```{r add season}
-add_season <- WQ_clean_data %>% dplyr::mutate(season = recode(Month,
-                                                  "12" = "Winter",
-                                                  "01" = "Winter",
-                                                  "02" = "Winter",
-                                                  "03" = "Spring",
-                                                  "04" = "Spring",
-                                                  "05" = "Spring",
-                                                  "06" = "Summer",
-                                                  "07" = "Summer",
-                                                  "08" = "Summer",
-                                                  "09" = "Fall",
-                                                  "10" = "Fall",
-                                                  "11" = "Fall"))
-```
-
-Next we lets check our data to ensure everything looks ok before we begin modeling.
-
-```{r visualize data}
-vis_dat(add_season)
-```
-
-A few NAs are present in the data but no strong areas of NAs are indicated. Tree models should be able to handle baseline amounts of NA values so for now we will leave them be. As for our variable classes all of our water quality parameters are numeric as they should be so no modification is needed there. Season is our outcome in this case so we must change this to a factor. All remaining variables are character class, however we will remove these before modeling since they are not water quality determinants of season. 
-
-```{r make season factor}
-add_season$season <- as.factor(as.character(add_season$season))
-
-```
-
-Next lets take a look at some visualizations of the new season variable before we begin modeling to see if there is any further cleaning that is needed.
-
-```{r}
-season_temp <- ggplot(add_season, aes(x = season, y = water_temp)) + geom_boxplot()
-
-season_temp
-
-season_sal <- ggplot(add_season, aes(x = season, y = salinity)) + geom_boxplot()
-
-season_sal
-
-season_do <- ggplot(add_season, aes(x = season, y = dissolved_oxygen)) + geom_boxplot()
-
-season_do
-
-season_amm <- ggplot(add_season, aes(x = season, y = ammonia)) + geom_boxplot()
-
-season_amm
-
-season_ph <- ggplot(add_season, aes(x = season, y = ph)) + geom_boxplot()
-
-season_ph
-
-
-```
-
-Humm I am concerned the tree will only build using temperature which is not terribly informative...but we press on
-
-
-Since our data looks good we are just about ready to model. First we need to remove any variables that are not of interest for seasonal prediction, and move our outcome to the front of the variable list.
-
-```{r remove vars}
-reduce_vars <- add_season %>% dplyr::select(season, water_temp, salinity, ammonia, dissolved_oxygen, ph)
-
-#This code also moves our outcome to the first slot so no additional shuffling code is needed.
-
-```
-
-Lastly we rename our data for model_ready to reduce confusion.
-
-```{r rename}
-model_ready <- reduce_vars
-```
-
-## Split the Data
-
-First we will split our data into train and test sets.
-
-```{r data split}
-
-set.seed(123)
-
-trainset <- caret::createDataPartition(y = model_ready$season, p = 0.7, list = FALSE)
-
-#Extract observations/rows for training and assign to new variable
-data_train = model_ready[trainset,] 
-
-#Same as above but for the test set
-data_test = model_ready[-trainset,] 
-```
-
-The split should allocate 367 observations into train and 155 into test.
-
-Next we compute a null model for comparison.
-
-```{r}
-library(mlr) #We will jump between mlr and caret so call with :: at all times. 
-
-mlr::measureACC("Summer", model_ready$season)
-```
-
-Next we move into single predictor tree fitting.
-
-```{r single-predictor tree acc}
-
-set.seed(1111) #To keep reproducibility
-
-outcomename = "season" #Name of outcome of interest
-
-fitControl <- trainControl(method="repeatedcv",number=5,repeats=5) #Sets K-fold cross-validation.
-
-Npred <- ncol(data_train)-1 #Sets predictors minus the outcome in column 1.
-
-resultmat <- data.frame(Variable = names(data_train)[-1], Accuracy = rep(0,Npred)) #Takes results and moves to dataframe named resultmat, measure set to accuracy.
-
-for (n in 2:ncol(data_train))
-{
-  fit1 <- caret::train( as.formula(paste(outcomename, "~",names(data_train)[n])) , data = data_train, method = "rpart", trControl = fitControl, na.action = na.pass, tuneLength = 10) 
-resultmat[n-1,2]= max(fit1$results$Accuracy)  
-} #Loop to all variables through prediction. Method rpart = tree algorithm, and skipping any NA values. 
-
-print(resultmat)
-
-```
-Not unexpected temperature is the strongest influencer of season. 
-
-
-```{r full-predictor tree acc}
-set.seed(1111)
-
-fitControl <- trainControl(method="repeatedcv",number=5,repeats=5) 
-
-fit1 = caret::train(season  ~ ., data=data_train, method="rpart",  trControl = fitControl, na.action = na.pass, tuneLength = 10) 
-
-print(fit1$results)
-
-```
-
-```{r}
-prp(fit1$finalModel, extra = 1, type = 2)
-```
-So it looks like water temperature along at 29 degrees is the best fit for determining seasonality. 
-
 
 ## Unsupervised Cluster Analysis
 
-Perhaps we are approaching our models from the wrong angle. Since our data is not specifically targeted at particular outcome (i.e. occurance of disease, algal bloom, etc.) and focuses more as a monitoring program; it may be best to use unsupervised modeling techniques to to cluster our data. We will use agglomerative clustering to cluster our data by our specific categorical variables to determine clustering characteristics. 
+Since our data is not specifically targeted at particular outcome (i.e. occurance of disease, algal bloom, etc.) and focuses more as a monitoring program; it may be best to use unsupervised modeling techniques to to cluster our data. We will use agglomerative clustering to explore the data for various cluster patterns. Agglomerative clustering works in a bottom-up fashion, each individual object within a data set is considered a distinct cluster (leaves) initially and is grouped to the nearest cluster (via the input variables) at each step of the algorithm until all data is in a single big cluster (root) thus producing a dendrogram. The inverse of agglomerative clustering is called divisive cluster analysis and works opposite from a root to leaf manner. Divisive clustering is acomplished through the function diana() and is used substantially less in analyses than agnes(). We will compare a diana() cluster to agnes() and hclut() below. 
+
+### Questions for this Analysis
+
+_Which sampling locations are the most similar?_ 
+_How similar is the sampling data from different years of study?_ 
 
 First we must remove any NAs from our data as cluster functions cannot handle them. Additionally, we need to select our branch outcome (in this case location) as well as our five numeric water quality parameters of interest. 
-```{r}
+```{r select vars and remove nas}
 
 cluster_trim <- WQ_clean_data %>% dplyr::select(location, water_temp, salinity, dissolved_oxygen, ammonia, ph)
 
 cluster_trim <- na.omit(cluster_trim)
+
+
 ```
 
-We will cluster by site means to produce a readable dendrogram.
-With a retrospective view, there are three locations which will greatly skew our data when producing a dendrogram. All three locations have either one or few (The Elbow) measures comprising the site. When allowed to remain in our sample set these data points force our dendrogram to subdivide further grouping themselves into indivual clusters. Though this information is interesting, considering the n of each of these locations and the large impact they play on the final dendrogram, we will remove them here to produce a generalized view of the clusters. 
-
 ```{r}
+#cluster_trim <- scale(cluster_trim)
+#cluster_trim <- as.data.frame(cluster_trim)
+```
+
+
+We will cluster by site means to produce a readable dendrogram.
+
+With a retrospective view, there are four locations which will greatly skew our data when producing a dendrogram. All four locations have a single measure comprising the data for site. When allowed to remain in our sample set these data points force our dendrogram to subdivide further grouping themselves into indivual clusters. Though this information is interesting, considering the n of each of these locations and the large impact they play on the final dendrogram, we will remove them here to produce a generalized view of the clusters. 
+
+In addition to pruning, all data must be scaled so it can be accurately compared across multiple variables. Each of our water quality parameters have a different scale of measure (i.e. temperature is relatively variable from approximately 10 degrees to 40 degrees, where as ammonia is very narrow from 0 to 1 mg/L). The variability among the scales of the variables would skew the results to to very strongly express those with greater differences (likely temperature and salinity). To ensure all variables are accounted for correctly we will use the scale function which subtracts the mean from each observation then divides by the standard deviation. This allows variables which are measured on different scales to be compareable for clustering. 
+
+```{r aggregate and remove outliers}
+
 location_average <- aggregate(. ~ location, cluster_trim, mean)
 
 drop_buttonwood <- location_average[!location_average$location == "Buttonwood", ]
 drop_orc <- drop_buttonwood[!drop_buttonwood$location == "Ocean Reef Club", ]
-drop_elbow <- drop_orc[!drop_orc$location == "The Elbow", ]
-drop_NA_site <- drop_elbow[!drop_elbow$location == "NA", ]
+drop_lagoon <- drop_orc[!drop_orc$location == "Lagoon", ]
+drop_hidden <- drop_lagoon[!drop_lagoon$location == "Hidden Lake", ]
+drop_NA_site <- drop_hidden[!drop_hidden$location == "NA", ]#There is also a site listed as NA we must remove
 
-cluster_ready <- drop_NA_site
+#set rownames to the locations names, then the location variable must be dropped to eliminate any non-numeric variables in the dataframe. 
+rownames(drop_NA_site) <- drop_NA_site$location
+
+drop_location <- drop_NA_site %>% dplyr::select(-location)
+
+#Scale the data so all variables are compareable, after using the scale function you must convert the resulting object back to a data fram for further analysis
+cluster_ready <- scale(drop_location, center = TRUE, scale = TRUE)
+
+cluster_ready <- as.data.frame(cluster_ready)
 ```
 
-We will need to add three additional cluster analysis libraries. Then we produce the dendrograms with the code below.
+Next we produce the dendrograms with the code below. We will use three different cluster methods hclust, agnes, and diana to compare the results initially. hclust and agnes will preform agglomerative cluster analysis and diana will preform divisive cluster analysis. 
 
-```{r}
-library(factoextra)
-library(dendextend)
-library(cluster)
+Note prior preforming agglomerative clustering we must first compute a dissimilarity martix to determine how different individual observations are from one another, this is acomplished with the dist() function for the hclust function and is built into the functions agnes and diana. 
+
+
+```{r mean all site dendrogram}
 
 set.seed(1111) #Ensure reproducible
 
-rownames(cluster_ready) <- cluster_ready$location #Assign the location names to rownames to produce dendrograms that show site information.
+#rownames(cluster_ready) <- cluster_ready$location #Assign the location names to rownames to produce dendrograms that show site information.
 
 cluster_diss <- dist(cluster_ready, method = "euclidean") #For the hclust function we must first produce a dissimilarity matrix before runing cluster analysis
 
 
 cluster_site_hclust <- hclust(cluster_diss, method = "ward.D") #Hierarchial clustering with Ward's minimum variance
 cluster_site_agnes <- agnes(cluster_ready, method = "ward") #Agglomerative clustering with Ward's minimum variance
+cluster_site_diana <- diana(cluster_ready) #Divisive clustering is similar to the agnes function, however no method is needed to provide to this function
 
 #Plot the trees. Note agnes can use pltree or plot but hclust must use plot
-good_tree_hclust <- plot(cluster_site_hclust, cex = 0.6, hang = -1, main = "Dendrogram of Sample Locations", labels = cluster_ready$location)
-good_tree_agnes <- pltree(cluster_site_agnes, cex = 0.6, hang = -1, main = "Dendrogram of Sample Locations", labels = cluster_ready$location)
+good_tree_hclust <- plot(cluster_site_hclust, cex = 0.6, hang = -1, main = "Agglomerative (hclust) Dendrogram of Sample Locations")
+good_tree_agnes <- pltree(cluster_site_agnes, cex = 0.6, hang = -1, main = "Agglomerative (agnes) Dendrogram of Sample Locations")
+good_tree_diana <- pltree(cluster_site_diana, cex = 0.6, hang = -1, main = "Divisive Dendrogram of Sample Locations")
 
 
-good_tree_hclust
-good_tree_agnes
 ```
 
-Both of the trees look interesting, but it looks like agglomerative is the best option.
+So it looks like all three dendrograms look fairly different. There are no very distinct patterns that jump out immediately but we will need to do a bit more analysis to learn our optimal cluster number (k) before we can really start to interpret the results. 
 
-Before moving on we will check our method. We started with Ward's minimum variance method however there are others we could use (single, complete, and average). We will calculate the agglomerative coefficent for each below. A coefficent closer to 1 indicates a stronger clustering. 
+Our primary question is targeted at determining how different individual sampling site locations are from one another. While our sites represent an array of different habitat types, we are interested in clustering locations by the specific abiotic conditions of the locale. Since our question is looking at these small specific differences we will use agglomerative clustering for the duration of the analysis as this method is better suited for identifying small clusters. Agglomerative clustering uses a more exhaustive algorithm (pairs at each iteration and upon completion) to make comparisons so it is generally better with small differences in data however, this is a trade-off for computational ability. Since our dataset is fairly small and computationally easy this will not be an issue. For larger datasets divisive clustering would be the more efficent choice. 
+
+Before moving on we will check our agglomerative method. We started with Ward's minimum variance method however there are others we could use (single, complete, and average). We will calculate the agglomerative coefficent for each below. A coefficent closer to 1 indicates a stronger clustering. 
 ```{r warning = FALSE}
 cluster_site_agnes$ac
 
 methods <- c( "average", "single", "complete", "ward")
 names(methods) <- c( "average", "single", "complete", "ward")
 
+#Note we must use agnes to get the agglomerative coefficent as hclust objects do not permit this function
 coeff <- function(x) {
   agnes(cluster_ready, method = x)$ac
 }
@@ -257,39 +136,49 @@ coeff <- function(x) {
 map_dbl(methods, coeff)
 ```
 
-It looks like Ward's method is the best option.
+It looks like Ward's method is the best option so we will keep that for all future clusters to be consistent.
 
+Next we will check our optimal number of clusters. There are two available methods to check for optimal clusters wss and silhouette. These functions work with cluster algorithms to determine the ideal k value for samples. The wss (within-cluster sum of squares) or "Elbow Method" measures the compactness of clustering with the within cluster sum of squares, a smaller wss equals the optimal cluster numbers. The wss plot produced by the function shows a curve where the Elbow in the the curve is the optimal clusters. The silhouette method uses the average silhouette to determine how well an object lies in a cluster. There greater avaerage silhouette the more optimal the cluster level is. 
+
+
+```{r}
+set.seed(1111)
+
+fviz_nbclust(cluster_ready, FUN = hcut, method = "silhouette", print.summary = TRUE)
+fviz_nbclust(cluster_ready, FUN = hcut, method = "wss", print.summary = TRUE)
+
+```
+It looks like five clusters is the optimal number for both the wss and silhouette methods so we will use this k value to produce our good dendrograms for the manuscript. 
+
+
+Before moving to the next code set.
 Just a quick code bit to count the number of values in each cluster.This is more useful if there is a very high number of branches.
 ```{r}
-sub_group_dendro_1 <- cutree(cluster_site_agnes, k = 2)
+sub_group_dendro_1 <- cutree(cluster_site_agnes, k = 5)
 
 table(sub_group_dendro_1)
 
 
 ```
 
-Next we will check our optimal number of clusters.
+Looks like one of our clusters is substantially larger than the rest of the of the clusters. Ideally we can find a common factor between these location points which we cna interpret. 
 
-```{r}
-fviz_nbclust(cluster_ready, FUN = hcut, method = "silhouette")
-fviz_nbclust(cluster_ready, FUN = hcut, method = "wss")
-
-
-```
-
-Looks like the optimal number is two. Ideally these will seperate strongly into groups that represent either island side or some combination of two of our site types.
 
 Next for fun we will visualize our data as a scatter cluster plot. 
 
 ```{r}
+
+
 add_cluster_groups <- cluster_ready %>% dplyr::mutate(cluster = sub_group_dendro_1)
+
+
 
 cluster_site <- agnes(add_cluster_groups, method = "average")
 
 cluster_data <- add_cluster_groups[, c(2:6)]
 
-#Uncomment to add names to plot (confusing in this situation)
-#rownames(cluster_data) <- add_cluster_groups$location
+#Uncomment to add names to plot (the look is confusing in this situation)
+rownames(add_cluster_groups) <- cluster_ready$location
 
 
 
@@ -297,88 +186,129 @@ fviz_cluster(list(data = cluster_data, cluster = sub_group_dendro_1))
 
 ```
 
-Looks like most of our data is relatively close but two reasonalbly distinct clusters are present. 
+Looks like our clusters are relatively distinct with a little overlap between 1 and 2. Five may be a cluster to keep an eye on as it is very small, but it is possible that cluster contains two sites which are very different from others in the data set. 
 
 Next lets make a nice dendrogram.
 
 ```{r}
-library(factoextra)
 
-sample_site_dendro_agnes <- fviz_dend(cluster_site_agnes, k = 2, show_labels = TRUE, cex = 0.6, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Agglomerated Dendrogram by Sample Site")
+
+sample_site_dendro_agnes <- fviz_dend(cluster_site_agnes, k = 5, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Agglomerated Dendrogram (agnes) by Sample Site")
 
 sample_site_dendro_agnes
 
-#Uncomment to preduce the full dendrogram for the hclust model.
-#sample_site_dendro_hclust <- fviz_dend(cluster_site_hclust, k = 2, show_labels = TRUE, cex = 0.6, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Cluster Dendrogram by Sample Site")
+sample_site_dendro_hclust <- fviz_dend(cluster_site_hclust, k = 5, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Agglomerated Dendrogram (hclust) by Sample Site")
 
-#sample_site_dendro_hclust
+sample_site_dendro_hclust
 ```
 
+Now that we can better visualize differences it looks like our two agglomerative dendrograms are very similar (which is good news!) the hclust function and agnes functions are slightly different in practice so it is not out of the question to see small differences in the results. 
+
+Based on this dendrogram it looks like the most similar sites visited by MarineLab in terms of water quality data are: Key Largo Dry Rocks & Grecian Dry Rocks and Scott's Channel & Banana. The former pair are two sites which are adjacent to one another on the reef line so this is expected. The latter pair are highly different sites both geograpically and biologically so this is an interesting match. Looking at differences there are no individual sites which stand out a distinctly different from others within the data set. The two major divisions of the dendrogram (blue/purple and red/yellow/green) show a little favoritism between Seagrass/Mangrove and not. The majority of Seagrass/Mangrove sites are found in the red/yellow/green branch whereas the majority of Coral reefs are in the blue/purple division however, this situation is not consistent for all sites within each type. Patch Reef/Hardbottom sites appear sporadically in the clusters. 
+
+We can check the similarity of these two dendrograms by using a tanglegram. A tanglegram compares the alignment of two dendrograms (the must have the same information and number of samples) to show how entangled they are. The greater the entanglemnt (closer to 1) the less similar the two dendrograms are. Matching nodes in each dendrogram are connected by a colored line which corresponds to the cluster location, unmatched nodes are black, these represent disagreement between the two dendrograms. 
+
+```{r}
+p <- as.dendrogram(cluster_site_agnes)
+q <- as.dendrogram(cluster_site_hclust)
+
+all_site_dend <- dendlist(q, p)
+
+
+xx <- tanglegram(cluster_site_hclust, cluster_site_agnes, highlight_distinct_edges = FALSE, common_subtrees_color_branches = FALSE, lwd = 2, k_branches = 5, lab.cex = 0.7, main = paste("All Sites (hclust vs agnes) Entanglement =", round(entanglement(all_site_dend), 2)))
+
+```
+From the tanglegram it looks like most of our sites are in agreement between the two methods. Most of the disagreement appears to be within the 5 major clusters (i.e. disagreement about where in the cluster exaclty the site belongs) which are relatively minor. The only large difference is the Elbow site which jumps clustering with the different alogrithms, it will be important to keep an eye on this location. 
+
+## Site Type Clustering
 
 Now that we have the overall dendrogram for each site lets compare our three site types individuall and see how different each of them are from one another. For this analysis we will use average values for each parameter as we did above and compare clustering for Seagrass/Mangrove, Patch Reef/Hardbottom, and Coral Reef sites respectively.
 
+### Questions for this section
+
+_Within the three distinct site types (Seagrass/Mangrove, Path Reef/Hardbottom, and Coral Reef) which sites are the most different and which are the most similar?_
+
 First we need to subset data from the clean data, select our predictors, remove any NAs in the predictors, and finally aggregate the means of each site.
-```{r}
+```{r clean data for site type clustering}
 
-
-location_average <- aggregate(. ~ location, cluster_trim, mean)
-
-
+#Subset the sites
 sg_mg_subset <- subset(WQ_clean_data, site_type == "Seagrass/Mangrove")
+#We will drop the same observations again as we did in the above cluster analysis
+sg_mg_redrop1 <- sg_mg_subset[!sg_mg_subset$location == "Buttonwood", ]
+sg_mg_redrop2 <- sg_mg_redrop1[!sg_mg_redrop1$location == "Lagoon", ]
+sg_mg_redrop3 <- sg_mg_redrop2[!sg_mg_redrop2$location == "Hidden Lake", ]
+
 pr_h_subset <- subset(WQ_clean_data, site_type == "Patch Reef/Hardbottom")
 cr_subset <- subset(WQ_clean_data, site_type == "Coral Reef")
 
-sg_mg_reduce <- sg_mg_subset %>% dplyr::select(location, water_temp, salinity, dissolved_oxygen, ammonia, ph)
+#Reduce the data to the predictors of interest
+sg_mg_reduce <- sg_mg_redrop3 %>% dplyr::select(location, water_temp, salinity, dissolved_oxygen, ammonia, ph)
 pr_h_reduce <- pr_h_subset %>% dplyr::select(location, water_temp, salinity, dissolved_oxygen, ammonia, ph)
 cr_reduce <- cr_subset %>% dplyr::select(location, water_temp, salinity, dissolved_oxygen, ammonia, ph)
 
+
+#Drop any NAs
 sg_mg_ready <- na.omit(sg_mg_reduce)
 pr_h_ready <- na.omit(pr_h_reduce)
 cr_ready <- na.omit(cr_reduce)
 
+#Aggregate to get the mean value for each variable at each location
 sg_mg_ready <- aggregate(. ~ location, sg_mg_ready, mean)
 pr_h_ready <- aggregate(. ~ location, pr_h_ready, mean)
 cr_ready <- aggregate(. ~ location, cr_ready, mean)
 
+#Assign rownames as the site names
 rownames(sg_mg_ready) <- sg_mg_ready$location
 rownames(pr_h_ready) <- pr_h_ready$location
 rownames(cr_ready) <- cr_ready$location
 
+#Drop the location variable then scale the data to normalize and finally convert back to a data frame
+sg_drop_location <- sg_mg_ready %>% dplyr::select(-location)
+sg_scale <- scale(sg_drop_location)
+sg_mg_ready <- as.data.frame(sg_scale)
+
+pr_h_drop_location <- pr_h_ready %>% dplyr::select(-location)
+pr_h_scale <- scale(pr_h_drop_location)
+pr_h_ready <- as.data.frame(pr_h_scale)
+
+cr_drop_location <- cr_ready %>% dplyr::select(-location)
+cr_scale <- scale(cr_drop_location)
+cr_ready <- as.data.frame(cr_scale)
 
 ```
 
 
-We will drop the Buttonwood observation again as the temperture value is very likely an error.
-```{r}
-sg_mg_ready <- sg_mg_ready[!sg_mg_ready$location == "Buttonwood", ]
+Now we can make our dendrograms, we will start with Seagrass/Mangrove. First we will determine our optimal number of clusters for analysis.
 
-```
+```{r check clusters SG/MG}
 
-
-Now we can make our dendrograms, we will start with Seagrass/Mangrove. 
-
-```{r}
 fviz_nbclust(sg_mg_ready, FUN = hcut, method = "silhouette")
+fviz_nbclust(sg_mg_ready, FUN = hcut, method = "wss")
 
 ```
-Two clusters it is!
+
+Five clusters it is! Now we can make our good dendrogram!
 
 
-```{r}
+```{r good dendro SG/MG}
 set.seed(1111)
 
 sg_mg_clust <- agnes(sg_mg_ready, method = "ward")
 
-sg_mg_dend <- pltree(sg_mg_clust, cex = 0.6, hang = -1, main = "Test Dendro for all Data", labels = sg_mg_ready$location)
+#Note this code produces a raw dendrogram where as the fviz_dend function allows for tuning and modification for publication/manuscript usage
+sg_mg_dend <- pltree(sg_mg_clust, cex = 0.6, hang = -1, main = "Test Dendro for SG/MG Clustering")
 
-sg_mg_good_dend <- fviz_dend(sg_mg_clust, k = 2, show_labels = TRUE, cex = 0.6, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Seagrass/Mangrove Cluster Analysis")
+sg_mg_good_dend <- fviz_dend(sg_mg_clust, k = 5, show_labels = TRUE, cex = 0.6, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Seagrass/Mangrove Agglomerative Cluster Analysis")
 
 sg_mg_good_dend
 
+
 ```
-Interesting! It appears that our clustering is reasonably consistent with geographic location. The red cluster successfully grouped all of the sites that are components of Largo Sound (an individual body of water). The blue cluster is a bit more dynamic but has the vast majority of the bayside sites (excluding Tarpon Island and Sexton Cove). A vast majority of the nearest neigbors in the dendrogram additionally are sites that are adjacent or very close to one another.
+It looks like our Seagrass/Mangrove sites are reasonably distinct! It is unsprising that Nest Key is given a distinct cluster due to the fact that this site is very geographically different from all other sampling locations in the data set. Beyond this seperation, there are not noticable distinct patterns in the data. The lack of notable correlation may be due to the fact that Seagrass/Mangrove sites tend to be the most variable in terms of conditions and seasonality may be a stronger influencer of water quality parameters. 
 
 Lets take a look at patch reefs and hardbottom sites.
+
+Cluster evaluation with the silhouette and wss method (as we have done for all samples) is not possible for the Patch Reef/Hardbottom data due to the fact that the number of observations is too low to use the function. We will determine our k using the number of major splits in the dendrogram.
 
 ```{r}
 set.seed(1111)
@@ -387,20 +317,22 @@ pr_h_clust <- agnes(pr_h_ready, method = "ward")
 
 pr_h_dend <- pltree(pr_h_clust, cex = 0.6, hang = -1, main = "Test Dendro for all Data", labels = pr_h_ready$location)
 
-pr_h_good_dend <- fviz_dend(pr_h_clust, k = 4, show_labels = TRUE, cex = 0.6, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Patch Reef/Hardbottom Cluster Analysis")
+pr_h_good_dend <- fviz_dend(pr_h_clust, k = 5, show_labels = TRUE, cex = 0.6, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Patch Reef/Hardbottom Cluster Analysis")
 
 pr_h_good_dend
 ```
 
-Looks like our Patch Reef/Hardbottom sites are quite different, this is not terribly suprising due to the fact these locations are quite variable depending on site and they are visited less frequently. Of note Cannon Patch and Mosquito are sister reefs (very similar structure/biodiversity and close in proximity) so it is interesting thst they are clustered closely. Whitemore Bight, Marker 37, and The Barge are very different sites from all other locations so it is unsuprising they are clustered independently.
+It looks like our Patch Reef/Hardbottom sites are very distinct across the majority of samples. This is likely due to the fact that all of these sites are distant from each other, this also my be sue to sampling bias as these sites are visited the lest frequently of all the three site types due to weather inaccessibility.
 
 Lastly lets investigate Coral Reefs.
 
 ```{r}
 fviz_nbclust(cr_ready, FUN = hcut, method = "silhouette")
+fviz_nbclust(cr_ready, FUN = hcut, method = "wss")
 
 ```
-Two clusters again.
+
+Looks like ideal clustering is a bit less obvious this time around. We will use two for our analysis.
 
 ```{r}
 set.seed(1111)
@@ -413,7 +345,23 @@ cr_good_dend <- fviz_dend(cr_clust, k = 2, show_labels = TRUE, cex = 0.5, rect =
 
 cr_good_dend
 ```
-Coral reef clustering shows a very interesting pattern. The blue cluster contains the two northernmost reef sites visited by MarineLab. The red cluster contains the mid-southern reefs predominantly. While there are many breaks in the dendrogram, individual pairs are consistent geographically for North North Dry Rocks & Minow Caves, Key Largo Dry Rocks & Grecian Dry Rock. Both of these pairs represent adjacent reef systems. 
+
+Coral Reef clustering shows two distinct clusters, the The Elbow and Ocean Reef Club represent the two northernmost sites in our data set so it is interesting to see them seperated from the remained of the reef. All other sites are fairly variable. There is so clustering that appears to be geographically inclied (Key Kargo Dry Rocks & North North Dry Rocks as well as French Reef & Banana). Additionally, the clustering of Horseshoe and Grecian rocks may be due to depth similarity. 
+
+
+Overall, our site clustering did not show a consistent pattern of grouping across all samples of site types. Notably, the most similar/dissimilar sites in the early clusters often can be linked by a similar characteristic such as: geographical location, similar biota, water depth, etc.
+
+For Seagrass/Mangrove our most similar site pair was Pelican Key and Bush Point. These two sites are quite dissimilar from each other interms of location and biota, however they are the most favorable sites for winter wind direction. It is possible this clustering is due to a bias for winter sampling. The most distinct site was Nest Key which is geographically the furthest Seagras/Mangrove site from any of the other sites in the data set.
+
+For Patch Reef/Hardbottom there was a wide range of dissimilarirty. The most similar sites were Higdon's and Mosquito. These two sites are almost exactly the same distance from shore and as a result have very similar coral biota as the primary reef structure. In terms of distance, Marker 37 is the most distinct site. Marker 37 is geographically distant from many of the other sites (and is probably closer to a Coral Reef location than other Patch Reefs). It should be noted that many sites were fairly distinct in this sampling set which shows that these locations are the most variable. This may be in part due to substantially lower sampling values for these sites due to inaccessibility. 
+
+For Coral Reefs the most similar site pairs are Horseshoe & Grecian Rocks as well as North North Dry Rocks (NNDR) and Key Largo Dry Rocks (KLDR). NNDR and KLDR are two reef sites which are adjacent to each other on the reef line so this result is unsuprising. Horseshoe and Grecian are not as close (Grecian is actually closest to KLDR) however these two sites are highly similar in depth (shallower) which may explain this clustering. The most distinct sites in this subset are Ocean Reef Club and The Elbow both of which are the northernmost sites for all Coral Reef locations. 
+
+
+## Year-to-Year Comparison
+
+### Questions for this section
+_
 
 
 Last lets make a comparison across years using a tanglegram to see how clustering of invividual site locations compares across the ~4 years of study. 
@@ -580,6 +528,7 @@ dend_ready_16 <- as.dendrogram(hclust_16)
 
 ```
 
+
 Now for 2017!
 
 ```{r}
@@ -651,31 +600,37 @@ tangle_16_17 <- tanglegram(dend_ready_16, dend_ready_17, highlight_distinct_edge
 ```{r}
 entang_16_18 <- dendlist(dend_ready_16, dend_ready_18)
 
-tangle_16_18 <- tanglegram(dend_ready_16, dend_ready_18, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("Entanglement =", round(entanglement(entang_16_18), 2)))
+tangle_16_18 <- tanglegram(dend_ready_16, dend_ready_18, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, lwd = 2, lab.cex = 1, hang = TRUE, main = paste("Entanglement =", round(entanglement(entang_16_18), 2)))
 ```
 
 ```{r}
 entang_16_18 <- dendlist(dend_ready_16, dend_ready_18)
 
-tangle_16_18 <- tanglegram(dend_ready_16, dend_ready_18, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("Entanglement =", round(entanglement(entang_16_18), 2)))
+tangle_16_18 <- tanglegram(dend_ready_16, dend_ready_18, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, lwd = 2, main = paste("Entanglement =", round(entanglement(entang_16_18), 2)))
 ```
 
 ```{r}
 entang_17_18 <- dendlist(dend_ready_17, dend_ready_18)
 
-tangle_17_18 <- tanglegram(dend_ready_17, dend_ready_18, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("Entanglement =", round(entanglement(entang_17_18), 2)))
+tangle_17_18 <- tanglegram(dend_ready_17, dend_ready_18, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, lwd = 2, main = paste("Entanglement =", round(entanglement(entang_17_18), 2)))
 ```
 
 ```{r}
 entang_17_19 <- dendlist(dend_ready_17, dend_ready_19)
 
-tangle_17_19 <- tanglegram(dend_ready_17, dend_ready_19, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("Entanglement =", round(entanglement(entang_17_19), 2)))
+tangle_17_19 <- tanglegram(dend_ready_17, dend_ready_19, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, lwd = 2, main = paste("Entanglement =", round(entanglement(entang_17_19), 2)))
 ```
 
 ```{r}
 entang_18_19 <- dendlist(dend_ready_18, dend_ready_19)
 
-tangle_18_19 <- tanglegram(dend_ready_18, dend_ready_19, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, main = paste("Entanglement =", round(entanglement(entang_18_19), 2)))
+tangle_18_19 <- tanglegram(dend_ready_18, dend_ready_19, highlight_distinct_edges = FALSE, common_subtrees_color_branches = TRUE, lwd = 2, main = paste("Entanglement =", round(entanglement(entang_18_19), 2)))
 ```
 
+
+
+
+
 So it looks like our closest aligning pairs are 2016 to 2017, 2017 to 2019 and 2018 to 2019. The closer alignment of consecutive years my reflect changes in overseeing staff over time or perhaps modification or sampling protocols. Regarding the best entanglement 2017 to 2018, the measure of 0.52 is not terribly robust. Therefore ther emay be some room for improvement to establish a more percise measuring protocol in future years. That being said citizen science data is typically highly variable thus a strong alignment was not expected, however it would be interesting to see if the staff could optimize methods from 2019 to 2020.  
+
+
