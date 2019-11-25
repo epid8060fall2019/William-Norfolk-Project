@@ -73,23 +73,22 @@ fknms_rename <- fknms_reduce_vars %>% rename(location = SITE,
 unique(fknms_rename$location)
 ```
 
-Now we can clean some of these. We are only interested in samples from sites that overlab with our citizen science data so we will select for thos samples. Note the the FKNMS data is collected throughout the enterity of the Florida Keys so much of the sample sites in this dataset are from the middle to lower keys.
+Now we can clean some of these. We are only interested in samples from sites that overlap with our citizen science data so we will select for those samples. Note the the FKNMS data is collected throughout the enterity of the Florida Keys so much of the sample sites in this dataset are from the middle to lower keys. The overlapping site in this data set are Dixie Shoal, Molasses Reef, Tarpon Creek, Grecian Rocks, and Molasses Reef Channel. Note there are a few additional overlapping sites however, they have a low number of observations (n<20) thus we will keep them out of our comparitive analysis. 
 
 ```{r}
 fknms_1 <- fknms_rename[fknms_rename$location == "Dixie Shoal", ]
-fknms_3 <- fknms_rename[fknms_rename$location == "Radabob Key", ]
 fknms_5 <- fknms_rename[fknms_rename$location == "Molasses Reef", ]
 fknms_6 <- fknms_rename[fknms_rename$location == "Tarpon Creek", ]
 fknms_8 <- fknms_rename[fknms_rename$location == "Grecian Rocks", ]
 fknms_9 <- fknms_rename[fknms_rename$location == "Molasses Reef Channel", ]
 
-fknms_total <- rbind(fknms_1, fknms_3, fknms_5, fknms_6, fknms_8, fknms_9)
+fknms_total <- rbind(fknms_1, fknms_5, fknms_6, fknms_8, fknms_9)
 
 fknms_na_drop <- na.omit(fknms_total)
 
 ```
 
-Now we are looking more compareable. The next step is to recode the FKNMS sites with the correcponding site names from the citizen science data (there are many synonyms for specific locations).
+Now the data is looking more compareable. The next step is to recode the FKNMS sites with the correcponding site names from the citizen science data (there are many synonyms for specific locations).
 
 ```{r}
 fknms_fix_names <- fknms_na_drop %>% mutate(location = recode(location, 
@@ -97,7 +96,6 @@ fknms_fix_names <- fknms_na_drop %>% mutate(location = recode(location,
                                             "Molasses Reef" = "Molasses",
                                             "Tarpon Creek" = "Tarpon Basin",
                                             "Grecian Rocks" = "Grecian Dry Rocks",
-                                            "Radabob Key" = "El Radabob",
                                          "Molasses Reef Channel" = "Rodriguez Key"))
 
 
@@ -111,27 +109,61 @@ cs_1 <- WQ_clean_data[WQ_clean_data$location == "Grecian Dry Rocks", ]
 cs_2 <- WQ_clean_data[WQ_clean_data$location == "Key Largo Dry Rocks", ]
 cs_4 <- WQ_clean_data[WQ_clean_data$location == "Molasses", ]
 cs_5 <- WQ_clean_data[WQ_clean_data$location == "Tarpon Basin", ]
-cs_8 <- WQ_clean_data[WQ_clean_data$location == "El Radabob", ]
 cs_9 <- WQ_clean_data[WQ_clean_data$location == "Rodriguez Key", ]
 
-cs_total <- rbind(cs_1, cs_2, cs_4, cs_5, cs_8, cs_9)
+cs_total <- rbind(cs_1, cs_2, cs_4, cs_5, cs_9)
 
 ```
 
+Next we need to drop the unused variables from the citizen science data and add a ned variable which we will call source to indicate where the data is coming from (Citizen Science or FKNMS). Then we can combine the two dataframes into one and create factor bins for the specific locations and sources. 
+
+```{r}
+cs_reduce_vars <- cs_total %>% dplyr::select(location, water_temp, salinity, dissolved_oxygen, ammonia)
+
+cs_add_source <- cs_reduce_vars %>% mutate(Source = "Citizen Science")
+fknms_add_source <- fknms_fix_names %>% mutate(Source = "FKNMS")
+
+cs_fknms_combined <- rbind(cs_add_source, fknms_add_source)
+
+cs_fknms_combined$location <- as.factor(as.character(cs_fknms_combined$location))
+cs_fknms_combined$Source <- as.factor(as.character(cs_fknms_combined$Source))
+
+```
 
 Now we can start to look at some plots for comparison.
 
 ```{r}
-water_temp_fknms <- ggplot(fknms_fix_names, aes(x = location, y = water_temp)) + geom_boxplot() + scale_y_continuous(limits=c(5, 40))
+compare_water_temp <- ggplot(cs_fknms_combined, aes(x = location, y = water_temp, fill = Source)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-water_temp_fknms
+compare_water_temp
 
-water_temp_cs <-  ggplot(cs_total, aes(x = location, y = water_temp)) + geom_boxplot() + scale_y_continuous(limits=c(5, 40))
-
-
-water_temp_cs
 ```
-TO DO Make Better Comparison Plots
+
+```{r}
+compare_sal <- ggplot(cs_fknms_combined, aes(x = location, y = salinity, fill = Source)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+compare_sal
+
+```
+
+
+```{r}
+compare_do <- ggplot(cs_fknms_combined, aes(x = location, y = dissolved_oxygen, fill = Source)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+compare_do
+```
+
+
+
+```{r}
+compare_amm <- ggplot(cs_fknms_combined, aes(x = location, y = ammonia, fill = Source)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+compare_amm
+```
+
+
+
+
 
 
 ```{r}
