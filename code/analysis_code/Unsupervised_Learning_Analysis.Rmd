@@ -24,6 +24,7 @@ library(factoextra)
 library(dendextend)
 library(cluster)
 library(NbClust)
+library(mclust)
 
 #Note it will be very important to call functions using the :: library notation due to the frequency of function masking by our libraries. 
 
@@ -45,8 +46,8 @@ Since our data is not specifically targeted at particular outcome (i.e. occuranc
 
 ### Questions for this Analysis
 
-_Which sampling locations are the most similar?_ 
-_How similar is the sampling data from different years of study?_ 
+_How do sampling sites cluster based on individual water quality measurements_ 
+_Are there any site-wise, annual, and/or seasonal patterns that cna be identified based on cluster analysis?_ 
 
 First we must remove any NAs from our data as cluster functions cannot handle them. Additionally, we need to select our branch outcome (in this case location) as well as our five numeric water quality parameters of interest. 
 ```{r select vars and remove nas}
@@ -58,10 +59,6 @@ cluster_trim <- na.omit(cluster_trim)
 
 ```
 
-```{r}
-#cluster_trim <- scale(cluster_trim)
-#cluster_trim <- as.data.frame(cluster_trim)
-```
 
 
 We will cluster by site means to produce a readable dendrogram.
@@ -237,7 +234,9 @@ Now that we have the overall dendrogram for each site lets compare our three sit
 
 ### Questions for this section
 
-_Within the three distinct site types (Seagrass/Mangrove, Path Reef/Hardbottom, and Coral Reef) which sites are the most different and which are the most similar?_
+_Which of the three site types (Seagrass/Mangrove, Patch Reef/Hardbottom, or Coral Reef) are the most homogeneous and heterogeneous?_
+
+_Are there any notable site patterns which might explain why the clusters are distributed in this manner?_
 
 First we need to subset data from the clean data, select our predictors, remove any NAs in the predictors, and finally aggregate the means of each site.
 ```{r clean data for site type clustering}
@@ -307,7 +306,7 @@ set.seed(1111)
 sg_mg_clust <- agnes(sg_mg_ready, method = "ward")
 
 #Note this code produces a raw dendrogram where as the fviz_dend function allows for tuning and modification for publication/manuscript usage
-sg_mg_dend <- pltree(sg_mg_clust, cex = 0.6, hang = -1, main = "Test Dendro for SG/MG Clustering")
+sg_mg_dend <- pltree(sg_mg_clust, cex = 0.6, hang = -1, main = "SG/MG Test")
 
 sg_mg_good_dend <- fviz_dend(sg_mg_clust, k = 5, show_labels = TRUE, cex = 0.6, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Seagrass/Mangrove Agglomerative Cluster Analysis")
 
@@ -334,7 +333,7 @@ set.seed(1111)
 
 pr_h_clust <- agnes(pr_h_ready, method = "ward")
 
-pr_h_dend <- pltree(pr_h_clust, cex = 0.6, hang = -1, main = "Test Dendro for all Data", labels = pr_h_ready$location)
+pr_h_dend <- pltree(pr_h_clust, cex = 0.6, hang = -1, main = "Patch Reef/Hardobttom Test", labels = pr_h_ready$location)
 
 pr_h_good_dend <- fviz_dend(pr_h_clust, k = 6, show_labels = TRUE, cex = 0.6, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Patch Reef/Hardbottom Cluster Analysis")
 
@@ -358,7 +357,7 @@ set.seed(1111)
 
 cr_clust <- agnes(cr_ready, method = "ward")
 
-cr_dend <- pltree(cr_clust, cex = 0.6, hang = -1, main = "Test Dendro for all Data", labels = cr_ready$location)
+cr_dend <- pltree(cr_clust, cex = 0.6, hang = -1, main = "Coral Reef Cluster Test", labels = cr_ready$location)
 
 cr_good_dend <- fviz_dend(cr_clust, k = 2, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Coral Reef Cluster Analysis")
 
@@ -682,8 +681,7 @@ While consistency may be a goal of sampling, it is important to note that this a
 
 ### Questions for this section
 
-_Do measurements cluster into groups containing similar months of the year?_
-_Is there a distinct seasonal pattern in the clusters from the most visited sites?_
+_Which of the three representitive sites is more strongly influenced by seasonal changes_
 
 Based on the poor entanglement measures of year-to-year comparison it may be more prudent to cluster data based on month collected rather than simply measuring specific sites across years due to annual and seasonal fluctuation. 
 
@@ -814,7 +812,7 @@ grecian_diss <- NbClust(grecian_ready, distance = "euclidean", min.nc = 2, max.n
 grecian_diss$Best.nc
 grecian_diss$Best.partition
 ```
-Three cluster for this subset.
+Three clusters for this subset.
 
 ```{r}
 set.seed(1111)
@@ -836,4 +834,43 @@ good_hdend_grecian
 
 The clustering in this instance does not appear to show seasonal grouping. It should be noted that the two individual clusters July and December are the two most extreme seasonal months so it is possible their seperation may be due to seasonal extremes. However, the majority of months do not show a distinct pattern.
 
+### Further Cluster Analysis Discussion
+
+Through the use of hiearacical clustering and data subsets were were able to identify how closely related observations are to one another. Using site type cluster analysis we explored the distrubution of sampling sites under each of the three site types in the study. For Seagrass/Mangrove sites our data is fairly heterogeneous. These locaitons divided into 6 distinct clusters. No specific common attribute of the sites can explain the division pattern seen however, some notable differences and similarities appear to be correlated with geographic location (i.e. very different clusters contain sites which are far from all others whereas similar clusters are close in proximity). This pattern was not observed across all site locations. Path Reef/Hardbottom locations showed a very distinct spread across all of the sites with 6 clusters as ideal for a total of 7 sites. This suggests that these sites are the most distinct from one another. The two similar sites in the group Higdon's and Mosquito have very similar coral biota and depth ranges compared to all others. Coral reef analysis shows the least clustering of all of the site types, primairly divinding into the northernmost reefs (The Elbow and Ocean Reef Club) and all of the remaining southern reefs. This suggests that coral reefs are the least heterogenous of the three site types which is consistant previous analysis which show the narrowest range of abiotic conditions. 
+
+_Which of the three site types (Seagrass/Mangrove, Patch Reef/Hardbottom, or Coral Reef) are the most homogeneous and heterogeneous?_
+In terms of water quality parameters the most heterogeneous site types were Seagrass/Mangrove and Patch Reef/Hardbottom. The most homogeneous are Coral Reefs. This observation is  consistent with previous analyses which show a wider range of abiotic conditions in Seagrass/Mangrove sites and a narrower range in Coral Reefs.
+_Are there any notable site patterns which might explain why the clusters are distributed in this manner?_
+There is no discernable pattern that applies to all clustering situations that would explain the distribution. Large differences and samll differences may likely be attributable to site characteristics (geographic proximity, depth similarity, etc.) however, no one pattern explains all of the clustering. 
+
+Annual clustering was used to determine the similarity between subsequent years of sampling. Dendrograms of sampling sites which were measured all four years were subsetted and compared using a tanglegram to calculate the level of entanglement. Greater entanglement shows a greater level of dissimilarity between years of sampling. This analysis suggests that year-to-year measures of water quality are not very consistentusing the MarineLab sampling techniques. Though the analysis suggests this, it is important to understand the limiations of this technique. Entanglement is dependant entirely on the structure of the respective dendrograms which are in turn dependant on the water quality parameters which feed into the model. This method is limited in its ability to assess this type of question because it cannot account for differences in seasonal flucutation, annual fluctuation, equipment optimization, training optimization, or other confounding factors. As a result we will determine the quesitons of this subsection to be inconclusive due to model limitations. The usage of a tanglegram/entanglment would be an applicable method to compare different samling teams who visited the same sites at the same time of year (inter-rater relatibility).
+
+_How does our cluster analysis compare across sampling years?_
+The results of cluster comparison across multiple years are inconclusive due to model restrictions. Upon deeper investigation of the entanglemnt calculations and model abilities, data is not comparable across multiple years due to the presence of confounding factors which cannot be eliminated using this modeling technique. The methodology would work as a comparison of inter-rater relatability for observers using the same methods.
+
+Lastly, seasonal clustering investigated the grouping of Month groups when observed at the most frequently visited sampling sites of each of the three site types: Tarpon Basin, Grecian Dry Rocks, and Rodriguez Key. The results showed a seasonally organized clustering for Tarpon Basin which suggests that Seagrass/Mangrove sites are more strongly influenced by seasonal factors, this observation is consistent with previous analyses. Rodriguez Key showed a summer month cluster however the remaining clusters were not consistent with a seasonal pattern. Grecian Dry Rocks showed the least seasonally grouped clustering pattern of all three sites which suggests that coral reefs are least influenced by seasonal fluctuation.  
+
+_Which of the three representitive sites is more strongly influenced by seasonal changes_
+Based on month-wise clustering, Tarpon Basin is the site which is most strongly influenced by seasonal flucutation in water quality. This result suggests that Seagrass/MAngrove sites are strongly influenced by seasonal change. Patch Reefs/Hardbottom sites appear to be moderately influenced and Coral Reefs are influenced the least. 
+
+### Revisiting Analysis Questions
+
+_How do sampling sites cluster based on individual water quality measurements?_ 
+Overall sampling sites do not cluster with any discernable pattern that is applicable for the entire data set. Individual subsets of the data can show specific clustering patterns that may be attributable to season, year, geographical distance, or local biota however; these atrributes are inferences based on individual dendrograms and do not apply to the entire data set.
+
+_Are there any site-wise, annual, and/or seasonal patterns that can be identified based on cluster analysis?_ 
+Based on cluster analysis, it was observed that Seagrass/Mangrove sites are the most heterogeneous sites in terms of water quality. Patch Reefs/Hardbottom were moderate and Coral Reefs were the most homogenous. Additionally, Seagrass/Mangrove sites are the most influenced by seasonal fluctuation, Patch Reefs/Hardbottom are moderately influenced, and Coral Reefs are the least influenced. 
+
+
+### Pros and Cons of Hierarchical Clustering
+_Pros_
+1. Hierarchical cluster analysis is applicable to datasets without a predetermined outcome. This is ideal for exploratory data, monitoring, or taxanomic grouping research. 
+2. There are multiple options for analysis algorithms and methods which can be optimized for individual data sets. For this data set we experimented with a number of methods but found our optimal model approach used agglomerative clustering with Ward's minimum variance. Optimal cluster number was determined using the silhouette method (though the Elbow method was equivlant in all cases as well). 
+3. Hierarchical clustering allows for a dynamic analysis approach to modeling. A large dendrogram can be made to visualize gross patterns in the data which can then be subsestted to investigate individual categories/parameters/timeframes of interest. 
+_Cons_ 
+1. Hierarchical clustering will only show the resulting clusters that observations have been assigned to, it does not provide any evidence as to why these clusters were desginated. 
+2. Dendrograms are not comparable between one another unless they conatin data which are replicates of the data in another dendrogram (i.e. they cannot control for confounding factors when comparing).
+3. Cluster analysis (in general) is relatively slow compared to other modeling methods especially when larger datasets are in use. 
+4. Since there is no specific outcome for hierarchical clustering, if the resulting analysis does not show any informative information (through clustering patterns) it is likely the results of the analysis will not be useful to the research.
+5. Hierarchical clustering cannot handle any predictor variables which are categorical. The cluster results can be categorical (as done here) but must be assigned to the rownames and removed from the data frame. 
 
