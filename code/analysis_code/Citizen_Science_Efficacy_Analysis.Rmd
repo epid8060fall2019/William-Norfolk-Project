@@ -5,6 +5,12 @@ date: "11/19/2019"
 output: word_document
 ---
 
+
+This script compares the MarineLab citizen science water quality database to the Florida Keys National Marine Scanctuary (FKNMS) water quality monitoring database to determine how similar/dissimilar each of these data sets are. 
+
+It should be noted that the sampling sites for FKNMS and MarineLab are not the same due to differences in the needs of the programs. Comparisions will only be made with sites which are geographic (or very close) replicates of each other.
+
+First begin by loading all of the libraries needed for data cleaning and visualization.
 ```{r}
 
 library(readxl)
@@ -12,7 +18,6 @@ library(dplyr)
 library(tidyverse)
 library(forcats)
 library(ggthemes)
-library(plotly)
 library(knitr)
 library(naniar)
 library(broom)
@@ -22,6 +27,7 @@ library(ggpubr)
 
 ```
 
+Next load the MarineLab citizen science data.
 ```{r}
 
 
@@ -31,7 +37,18 @@ glimpse(WQ_clean_data)
 
 ```
 
+Before we begin to work with the new dataset we need to make a reference for the citizen science data so select comparable sites. There may be some site overlap however, this overlap is not very meaningful if the n for that site is very small for the citizen science data. FKNMS data is on a standardized sampling schedule so it is unlikely this will be an issue with that data set. We will make a simple bar chart of the site counts for reference.
 
+```{r}
+
+site_view <- ggplot(WQ_clean_data, aes(x = location)) + geom_bar(stat = "count") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+site_view
+
+```
+Ideally, we can select all of the sites where n > 20 however, some of these locations will likely not be present in the FKNMS data or may be too specific for there sampling needs. For certian we will use our three representitive sites Grecian Dry Rocks, Rodriguez Key, and Tarpon Basin; other contenders for comparison are Boat Ramp, Captian's Point, Dana's Cove, Horseshoe, Key Largo Dry Rocks, and Pelican Key. We will explore this data in the subsequent steps.
+
+Next we will load the raw FKNMS water quality data. This data sheet can be found in the raw_data folder within the code folder of this project repository. 
 
 ```{r warning=FALSE}
 fknms_data_raw <- readxl::read_excel("../../data/raw_data/FKNMS_WQ_raw.xlsx")
@@ -40,6 +57,8 @@ glimpse(fknms_data_raw)
 ```
 
 This data set is in need to some serious cleaning, luckily to compare to our citizen science data we only need a small porition of these variables. We will remove variables then take a closer look at cleaning criteria. 
+
+Unfortunately it looks like the FKNMS data did not collect pH regularly so to avoid 1000+ NA values we will have to exclude pH from our comparison. 
 
 ```{r}
 fknms_reduce_vars <- fknms_data_raw %>% dplyr::select(SITE, `NH4-S`, `TEMP-S`, `DO-S`, `SAL-S`)
@@ -54,67 +73,61 @@ fknms_rename <- fknms_reduce_vars %>% rename(location = SITE,
 unique(fknms_rename$location)
 ```
 
-Unfortunately it looks like the data did not collect pH regularly so to avoid 1000+ NA values we will have to exclude pH from our comparison. 
-
-Now we can clean some of these. We are only interested in samples from sites that overlab with our citizen science data so we will select for thos samples.
+Now we can clean some of these. We are only interested in samples from sites that overlab with our citizen science data so we will select for thos samples. Note the the FKNMS data is collected throughout the enterity of the Florida Keys so much of the sample sites in this dataset are from the middle to lower keys.
 
 ```{r}
-fknms_1 <- fknms_rename[fknms_rename$location == "Pennikamp G27", ]
-fknms_2 <- fknms_rename[fknms_rename$location == "Rattlesnake Key", ]
+fknms_1 <- fknms_rename[fknms_rename$location == "Dixie Shoal", ]
 fknms_3 <- fknms_rename[fknms_rename$location == "Radabob Key", ]
-fknms_4 <- fknms_rename[fknms_rename$location == "Mosquito Bank", ]
 fknms_5 <- fknms_rename[fknms_rename$location == "Molasses Reef", ]
 fknms_6 <- fknms_rename[fknms_rename$location == "Tarpon Creek", ]
-fknms_7 <- fknms_rename[fknms_rename$location == "Bogie Channel", ]
 fknms_8 <- fknms_rename[fknms_rename$location == "Grecian Rocks", ]
+fknms_9 <- fknms_rename[fknms_rename$location == "Molasses Reef Channel", ]
 
-fknms_total <- rbind(fknms_1, fknms_2, fknms_3, fknms_4, fknms_5, fknms_6, fknms_7, fknms_8)
+fknms_total <- rbind(fknms_1, fknms_3, fknms_5, fknms_6, fknms_8, fknms_9)
 
 fknms_na_drop <- na.omit(fknms_total)
 
 ```
 
-Now we are looking more compareable. The next step is to recode the FKNMS sites with the correcponding site names from the citizen science data (there are many synonyms).
+Now we are looking more compareable. The next step is to recode the FKNMS sites with the correcponding site names from the citizen science data (there are many synonyms for specific locations).
 
 ```{r}
 fknms_fix_names <- fknms_na_drop %>% mutate(location = recode(location, 
-                                            "Pennikamp G27" = "Higdon's",
-                                            "Rattlesnake Key" = "Whitmore Bight",
-                                            "Mosquito Bank" = "Mosquito",
+                                            "Dixie Shoal" = "Key Largo Dry Rocks",
                                             "Molasses Reef" = "Molasses",
                                             "Tarpon Creek" = "Tarpon Basin",
-                                            "Bogie Channel" = "Nest Key",
                                             "Grecian Rocks" = "Grecian Dry Rocks",
-                                            "Radabob Key" = "El Radabob"))
+                                            "Radabob Key" = "El Radabob",
+                                         "Molasses Reef Channel" = "Rodriguez Key"))
 
 
 ```
 
 
+Next we need to select the corresponding citizen science data from these locaitons and bind them into a new dataframe.
 
 ```{r}
 cs_1 <- WQ_clean_data[WQ_clean_data$location == "Grecian Dry Rocks", ]
-cs_2 <- WQ_clean_data[WQ_clean_data$location == "Higdon's", ]
-cs_3 <- WQ_clean_data[WQ_clean_data$location == "Mosquito", ]
+cs_2 <- WQ_clean_data[WQ_clean_data$location == "Key Largo Dry Rocks", ]
 cs_4 <- WQ_clean_data[WQ_clean_data$location == "Molasses", ]
 cs_5 <- WQ_clean_data[WQ_clean_data$location == "Tarpon Basin", ]
-cs_6 <- WQ_clean_data[WQ_clean_data$location == "Nest Key", ]
-cs_7 <- WQ_clean_data[WQ_clean_data$location == "Whitmore Bight", ]
 cs_8 <- WQ_clean_data[WQ_clean_data$location == "El Radabob", ]
+cs_9 <- WQ_clean_data[WQ_clean_data$location == "Rodriguez Key", ]
 
-cs_total <- rbind(cs_1, cs_2, cs_3, cs_4, cs_5, cs_6, cs_7, cs_8)
+cs_total <- rbind(cs_1, cs_2, cs_4, cs_5, cs_8, cs_9)
 
 ```
 
 
-Lets take a look at some plots now.
+Now we can start to look at some plots for comparison.
 
 ```{r}
-water_temp_fknms <- ggplot(fknms_fix_names, aes(x = location, y = water_temp)) + geom_boxplot() 
+water_temp_fknms <- ggplot(fknms_fix_names, aes(x = location, y = water_temp)) + geom_boxplot() + scale_y_continuous(limits=c(5, 40))
 
 water_temp_fknms
 
-water_temp_cs <-  ggplot(cs_total, aes(x = location, y = water_temp)) + geom_boxplot() 
+water_temp_cs <-  ggplot(cs_total, aes(x = location, y = water_temp)) + geom_boxplot() + scale_y_continuous(limits=c(5, 40))
+
 
 water_temp_cs
 ```

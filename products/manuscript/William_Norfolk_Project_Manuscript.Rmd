@@ -46,13 +46,18 @@ Have the water quality conditions of highly visited sites changed over the three
 
 _Question 3: Seasonal Change_
 
-Are there visible seasonal changes in the abiotic conditions of the water?
+Are there notable seasonal changes in the abiotic conditions of the water?
 
 _Question 4: Citizen Science Data Efficacy_
 
 Is citizen science data accurate enough to capture large-scale environmental trends and is the data specific enough to characterize different aquatic habitat types.
 
-_Objective 5: Promoting Future Citizen Science_
+_Question 5: Data Clustering_
+
+How are sampling sites grouped in terms of water quality measures? 
+Are there any site-wise, annual, and/or seasonal patterns that can be identified from these grouping patterns?
+
+_Objective 6: Promoting Future Citizen Science_
 
 Develop a script for the immediate processing of data collected by groups actively in the Marinelab program. The goal of this objective is to write a ready-to-use script that will produce scatter plots of the five water quality parameters to compare and contrast oceanside and bayside locations. These figures will then be used to show students the results of their data collection over the course of their time at Marinelab. The script will be tailored to accept a specifically formatted .xlsx file to ensure the data can be run with minimal to no cleaning required. Detailed instructions for data entry into the .xlsx file, and instructions for loading and running the script will be included in a README.md file in the folder.
 

@@ -46,8 +46,8 @@ Since our data is not specifically targeted at particular outcome (i.e. occuranc
 
 ### Questions for this Analysis
 
-_How do sampling sites cluster based on individual water quality measurements_ 
-_Are there any site-wise, annual, and/or seasonal patterns that cna be identified based on cluster analysis?_ 
+_How do sampling sites cluster based on individual water quality measurements?_ 
+_Are there any site-wise, annual, and/or seasonal patterns that can be identified based on cluster analysis?_ 
 
 First we must remove any NAs from our data as cluster functions cannot handle them. Additionally, we need to select our branch outcome (in this case location) as well as our five numeric water quality parameters of interest. 
 ```{r select vars and remove nas}
