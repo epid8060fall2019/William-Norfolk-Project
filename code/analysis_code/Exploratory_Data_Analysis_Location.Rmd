@@ -193,3 +193,15 @@ ggsave(filename = "../../results/Exploratory_Location_Figures/site_type_ammonia.
 
 ```
 
+```{r}
+site_type_filter %>% ggplot() + 
+  geom_jitter(aes(x = site_type, y = ph))
+
+site_type_ph <- ggplot(island_side_filter, aes(x = site_type, y = ph, color = site_type)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("pH by Site Type") + xlab("") + ylab("pH") + theme(legend.position = "none", axis.text.x = element_text(face = "bold"))
+
+site_type_ph
+
+ggsave(filename = "../../results/Exploratory_Location_Figures/site_type_ph.png",plot = site_type_ph) 
+```
+
+
