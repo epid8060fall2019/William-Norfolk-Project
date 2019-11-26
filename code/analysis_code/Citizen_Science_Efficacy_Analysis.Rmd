@@ -130,131 +130,56 @@ cs_fknms_combined$Source <- as.factor(as.character(cs_fknms_combined$Source))
 
 ```
 
-Now we can start to look at some plots for comparison.
+Now we can start to look at some plots for comparison.We will use side by side boxplots to view each parameter for all of the sites to visualize data source patterns.
 
 ```{r}
-compare_water_temp <- ggplot(cs_fknms_combined, aes(x = location, y = water_temp, fill = Source)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+effic_water_temp <- ggplot(cs_fknms_combined, aes(x = location, y = water_temp, fill = Source)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Sampling Location") + ylab("Water Temperature (C)") + ggtitle("Citizen Science vs. FKNMS Water Temperature") + labs(fill = "Data Source")
 
-compare_water_temp
+effic_water_temp
+
+ggsave(filename = "../../results/effic_water_temp.png", plot = effic_water_temp) 
 
 ```
 
-```{r}
-compare_sal <- ggplot(cs_fknms_combined, aes(x = location, y = salinity, fill = Source)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+Looking at themperature it looks like there is relatively decent agreement across the boxplots for both mean temperature and interquartile range. There is some small disagreement with the median for FKNMS Rodriguez Key. 
 
-compare_sal
+```{r}
+effic_sal <- ggplot(cs_fknms_combined, aes(x = location, y = salinity, fill = Source)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Sampling Location") + ylab("Salinity") + ggtitle("Citizen Science vs. FKNMS Salinity (ppt)") + labs(fill = "Data Source")
+
+effic_sal
+
+ggsave(filename = "../../results/effic_sal.png", plot = effic_sal) 
 
 ```
 
+Looking at salinity there are some very interesting patterns in the data. First and formost, it is obvious that the interquartile range for the FKNMS data is much smaller than the citizen science data. This is very likely due to the percision differences of the techniques used to measure water quality between data sources. Additionally, it appears that the citizen science data tends to underestimate the salinity in general as most of the upper limits of the interquartile ranges for citizen science data are similar to the median value of FKNMS data.
 
 ```{r}
-compare_do <- ggplot(cs_fknms_combined, aes(x = location, y = dissolved_oxygen, fill = Source)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+effic_do <- ggplot(cs_fknms_combined, aes(x = location, y = dissolved_oxygen, fill = Source)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Sampling Location") + ylab("Dissolved Oxygen (mg/L)") + ggtitle("Citizen Science vs. FKNMS Dissolved Oxygen") + labs(fill = "Data Source")
 
-compare_do
-```
+effic_do
 
-
-
-```{r}
-compare_amm <- ggplot(cs_fknms_combined, aes(x = location, y = ammonia, fill = Source)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-compare_amm
-```
-
-
-
-
-
-
-```{r}
-set.seed(4444)
-x <- subset(cs_total, location == "Grecian Dry Rocks")
-
-x <- x[sample(nrow(x), 56), ] # Bland-Altman requires the same number of inputs to compare so we will randomly sample the larger data set (in this case citizen science) to match the max samples from the smaller data set.
-
-xx <- x$water_temp
-
-
-
-y <- subset(fknms_fix_names, location == "Grecian Dry Rocks")
-yy <- y$water_temp
-
-library(BlandAltmanLeh)
-
-bland.altman.plot(xx, yy, two = 1.96)
-```
-It looks like our citizen science and sanctuary data agree with on water temperature at Grecian Dry Rocks. 
-
-```{r}
-set.seed(4444)
-x <- x[sample(nrow(x), 56), ] 
-xx <- x$salinity
-yy <- y$salinity
-bland.altman.plot(xx, yy, two = 1.96)
+ggsave(filename = "../../results/effic_do.png", plot = effic_do) 
 
 ```
 
-```{r}
-set.seed(4444)
-x <- x[sample(nrow(x), 56), ] 
-xx <- x$dissolved_oxygen
-yy <- y$dissolved_oxygen
-bland.altman.plot(xx, yy, two = 1.96)
-```
+The dissolved oxygen data captures a similar trend across both data sets. Coral reef site locations (Grecian, Key Largo Dry Rocks, and Molasses) appear to be reasonably consistent however, it does appear that citizen science overestimates the DO level a small amount. The Seagrass/Mangrove site (Tarpon Basin) shows an unserestimation of the DO level in citizen science data and the Patch Reef/Hardbottom site (Rodriguez Key) appears relatively consistent. Notably the outliers in the data appear to be substantially higher or lower in citizen science data compared to FKNMS data, this may be due to citizen science experiece-based error.
 
 ```{r}
-set.seed(4444)
-x <- x[sample(nrow(x), 56), ] 
-xx <- x$ammonia
-yy <- y$ammonia
-bland.altman.plot(xx, yy, two = 1.96)
+effic_amm <- ggplot(cs_fknms_combined, aes(x = location, y = ammonia, fill = Source)) + geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab("Sampling Location") + ylab("Ammonia") + ggtitle("Citizen Science vs. FKNMS Ammonia (ppt)") + labs(fill = "Data Source")
+
+effic_amm
+
+ggsave(filename = "../../results/effic_amm.png", plot = effic_amm) 
+
 ```
 
-Lets take a look at Tarpon Basin Also
-```{r}
-set.seed(4444)
-x <- subset(cs_total, location == "Tarpon Basin")
+Ammonia shows an interesting pattern as well. It appeas that the citizen science data may underestimate the total ammonia in the water when compared to FKNMS. Similar to salinity, this is likely due to the measurement specificty of the data collection tools. Additionally, FKNMS outlier data appears to be substantially higher than any citizen science outlier data.
 
-x <- x[sample(nrow(x), 59), ] 
 
-xx <- x$water_temp
+Based on the overall comparison of both datasets, the efficacy of citizen science data is situationally dependant. Viewing the water quality comparison boxplots, the citizen science data captured the major trends in water quality of all of the comparable sites. However, it is evident by the visualizations that the methods employed by the FKNMS team are more accurate and percise than those used by the citizen scientists. This result is not suprising due to the fact that citizen science data collection in itself is intended largely for the purpose of monitoring and therefore tools are typically less sensetive and cheaper. Regarding the efficacy of the data, we conclude that the utlity of citizen science data is dependant on the overall goal of the research. If a research study aims to capture large-scale trends and/or general patterns of water quality, citizen science data collection is a viable option. However, if a study is interested in specific details and/or very accurate measures of water quality parameters this methods is not ideal for data collection. 
 
 
 
-y <- subset(fknms_fix_names, location == "Tarpon Basin")
-yy <- y$water_temp
 
-
-bland.altman.plot(xx, yy, two = 1.96)
-```
-
-```{r}
-set.seed(4444)
-x <- x[sample(nrow(x), 59), ] 
-
-xx <- x$salinity
-
-yy <- y$salinity
-
-
-bland.altman.plot(xx, yy, two = 1.96)
-```
-
-```{r}
-set.seed(4444)
-x <- x[sample(nrow(x), 59), ] 
-xx <- x$dissolved_oxygen
-yy <- y$dissolved_oxygen
-
-bland.altman.plot(xx, yy, two = 1.96)
-```
-
-```{r}
-set.seed(4444)
-x <- x[sample(nrow(x), 59), ] 
-xx <- x$ammonia
-yy <- y$ammonia
-
-bland.altman.plot(xx, yy, two = 1.96)
-```
 
