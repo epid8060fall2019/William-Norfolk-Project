@@ -19,6 +19,7 @@ library(naniar)
 library(broom)
 library(gridExtra)
 library(zoo)
+library(ggpubr)
 ```
 
 Load the processed data from the RDS. Then take a look!
@@ -49,7 +50,9 @@ island_side_filter %>% ggplot() +
 island_side_filter %>% ggplot() + 
   geom_jitter(aes(x = island_side, y = ph))
 
-bay_v_ocean_ph <- ggplot(island_side_filter, aes(x = island_side, y = ph, color = island_side)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Bay vs. Ocean pH") + xlab("Island Side") + ylab("pH") + theme(legend.position = "none", axis.text.x = element_text(face = "bold"))
+island__side_labs <- c("Bay", "Ocean")
+
+bay_v_ocean_ph <- ggplot(island_side_filter, aes(x = island_side, y = ph, color = island_side)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Bay vs. Ocean pH") + xlab("Island Side") + ylab("pH") + theme(legend.position = "none", axis.text.x = element_text(face = "bold")) + scale_x_discrete(labels = island__side_labs)
 
 bay_v_ocean_ph
 
@@ -72,7 +75,7 @@ island_side_filter %>% ggplot() +
 island_side_filter %>% ggplot() + 
   geom_jitter(aes(x = island_side, y = salinity))
 
-bay_v_ocean_salinity <- ggplot(island_side_filter, aes(x = island_side, y = salinity, color = island_side)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Bay vs. Ocean Salinity") + xlab("Island Side") + ylab("Salinity (ppt)") + theme(legend.position = "none", axis.text.x = element_text(face = "bold"))
+bay_v_ocean_salinity <- ggplot(island_side_filter, aes(x = island_side, y = salinity, color = island_side)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Bay vs. Ocean Salinity") + xlab("Island Side") + ylab("Salinity (ppt)") + theme(legend.position = "none", axis.text.x = element_text(face = "bold")) + scale_x_discrete(labels = island__side_labs)
 
 bay_v_ocean_salinity
 
@@ -90,7 +93,7 @@ island_side_filter %>% ggplot() +
 island_side_filter %>% ggplot() + 
   geom_jitter(aes(x = island_side, y = water_temp))
 
-bay_v_ocean_water_temp <- ggplot(island_side_filter, aes(x = island_side, y = water_temp, color = island_side)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Bay vs. Ocean Water Temperature") + xlab("Island Side") + ylab("Water Temperature (C)") + theme(legend.position = "none", axis.text.x = element_text(face = "bold"))
+bay_v_ocean_water_temp <- ggplot(island_side_filter, aes(x = island_side, y = water_temp, color = island_side)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Bay vs. Ocean Water Temperature") + xlab("Island Side") + ylab("Water Temperature (C)") + theme(legend.position = "none", axis.text.x = element_text(face = "bold")) + scale_x_discrete(labels = island__side_labs)
 
 bay_v_ocean_water_temp 
 
@@ -108,7 +111,7 @@ island_side_filter %>% ggplot() +
 island_side_filter %>% ggplot() + 
   geom_jitter(aes(x = island_side, y = dissolved_oxygen))
 
-bay_v_ocean_dissolved_oxygen <- ggplot(island_side_filter, aes(x = island_side, y = dissolved_oxygen, color = island_side)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Bay vs. Ocean Dissolved Oxygen") + xlab("Island Side") + ylab("Dissolved Oxygen (mg/L)") + theme(legend.position = "none", axis.text.x = element_text(face = "bold"))
+bay_v_ocean_dissolved_oxygen <- ggplot(island_side_filter, aes(x = island_side, y = dissolved_oxygen, color = island_side)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Bay vs. Ocean Dissolved Oxygen") + xlab("Island Side") + ylab("Dissolved Oxygen (mg/L)") + theme(legend.position = "none", axis.text.x = element_text(face = "bold")) + scale_x_discrete(labels = island__side_labs)
 
 bay_v_ocean_dissolved_oxygen
 
@@ -126,13 +129,19 @@ filter(WQ_clean_data, !is.na(island_side)) %>% ggplot() +
 filter(WQ_clean_data, !is.na(island_side)) %>% ggplot() + 
   geom_jitter(aes(x = island_side, y = ammonia))
 
-bay_v_ocean_ammonia <- ggplot(island_side_filter, aes(x = island_side, y = ammonia, color = island_side)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Bay vs. Ocean Ammonia") + xlab("Island Side") + ylab("Ammonia (mg/L)") + theme(legend.position = "none", axis.text.x = element_text(face = "bold"))
+bay_v_ocean_ammonia <- ggplot(island_side_filter, aes(x = island_side, y = ammonia, color = island_side)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Bay vs. Ocean Ammonia") + xlab("Island Side") + ylab("Ammonia (mg/L)") + theme(legend.position = "none", axis.text.x = element_text(face = "bold")) + scale_x_discrete(labels = island__side_labs)
 
 bay_v_ocean_ammonia
 
 ggsave(filename = "../../results/Exploratory_Location_Figures/bay_v_ocean_ammonia.png",plot = bay_v_ocean_ammonia) 
 
 ```
+
+```{r combine all}
+#A bit too difficult to read
+ggarrange(bay_v_ocean_water_temp, bay_v_ocean_salinity, bay_v_ocean_dissolved_oxygen, bay_v_ocean_ammonia, bay_v_ocean_ph, nrow = 2, ncol = 3)
+```
+
 
 Now we will consider site type. There are a number of sites that are located on the ocean side of the island that are actually mangrove/seagrass sites. Additionally, there is a biological difference between patch reefs/hardbottom sites and the formal reef line. We will compare individual variables as above.
 
@@ -142,7 +151,9 @@ Seperating the salinity data we can see that there is a much wider range for sea
 site_type_filter %>% ggplot() + 
   geom_jitter(aes(x = site_type, y = salinity))
 
-site_type_salinity <- ggplot(island_side_filter, aes(x = site_type, y = salinity, color = site_type)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Salinity by Site Type") + xlab("") + ylab("Salinity (ppt)") + theme(legend.position = "none", axis.text.x = element_text(face = "bold"))
+site_labs <- c("Coral Reef", "Patch/Hard", "SG/MG")
+
+site_type_salinity <- ggplot(island_side_filter, aes(x = site_type, y = salinity, color = site_type)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Salinity by Site Type") + xlab("") + ylab("") + theme(legend.position = "none", axis.text.x = element_text(face = "bold")) + scale_x_discrete(labels = site_labs)
 
 site_type_salinity
 
@@ -150,13 +161,22 @@ ggsave(filename = "../../results/Exploratory_Location_Figures/site_type_salinity
 
 ```
 
+```{r}
+sal_wrap_manuscript <- ggarrange(bay_v_ocean_salinity, site_type_salinity, nrow = 1, ncol = 2)
+
+sal_wrap_manuscript
+
+ggsave(filename = "../../results/Exploratory_Location_Figures/sal_wrap_manuscript.png",plot = sal_wrap_manuscript) 
+```
+
+
 Similar to salinity, we see a wide range of water temperature in seagrasss/mangrove site locations. Interestingly, it appears patch reefs/hardbottom has a higher average temperature compared to coral reefs. This may be due to the fact that patch reefs tend to be shallower in depth, however this parameter was not measured in this study.
 
 ```{r}
 site_type_filter %>% ggplot() + 
   geom_jitter(aes(x = site_type, y = water_temp))
 
-site_type_water_temp <- ggplot(island_side_filter, aes(x = site_type, y = water_temp, color = site_type)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Water Temperature by Site Type") + xlab("") + ylab("Water Temperature (C)") + theme(legend.position = "none", axis.text.x = element_text(face = "bold"))
+site_type_water_temp <- ggplot(island_side_filter, aes(x = site_type, y = water_temp, color = site_type)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Water Temperature by Site Type") + xlab("") + ylab("Water Temperature (C)") + theme(legend.position = "none", axis.text.x = element_text(face = "bold")) + scale_x_discrete(labels = site_labs)
 
 site_type_water_temp
 
@@ -165,18 +185,35 @@ ggsave(filename = "../../results/Exploratory_Location_Figures/site_type_water_te
 
 ```
 
+```{r}
+water_temp_wrap_manuscript <- ggarrange(bay_v_ocean_water_temp, site_type_water_temp, nrow = 1, ncol = 2)
+
+water_temp_wrap_manuscript
+
+ggsave(filename = "../../results/Exploratory_Location_Figures/water_temp_wrap_manuscript.png",plot = water_temp_wrap_manuscript) 
+```
+
+
 Similar to the island side results, dissolved oxygen looks reasonably consistent across all three site types.
 
 ```{r}
 site_type_filter %>% ggplot() + 
   geom_jitter(aes(x = site_type, y = dissolved_oxygen))
 
-site_type_dissolved_oxygen <- ggplot(island_side_filter, aes(x = site_type, y = dissolved_oxygen, color = site_type)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Dissolved Oxygen by Site Type") + xlab("") + ylab("Dissolved Oxygen (mg/L)") + theme(legend.position = "none", axis.text.x = element_text(face = "bold"))
+site_type_dissolved_oxygen <- ggplot(island_side_filter, aes(x = site_type, y = dissolved_oxygen, color = site_type)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Dissolved Oxygen by Site Type") + xlab("") + ylab("Dissolved Oxygen (mg/L)") + theme(legend.position = "none", axis.text.x = element_text(face = "bold")) + scale_x_discrete(labels = site_labs)
 
 site_type_dissolved_oxygen
 
 ggsave(filename = "../../results/Exploratory_Location_Figures/site_type_dissolved_oxygen.png",plot = site_type_dissolved_oxygen) 
 
+```
+
+```{r}
+do_wrap_manuscript <- ggarrange(bay_v_ocean_dissolved_oxygen, site_type_dissolved_oxygen, nrow = 1, ncol = 2)
+
+do_wrap_manuscript
+
+ggsave(filename = "../../results/Exploratory_Location_Figures/do_wrap_manuscript.png",plot = do_wrap_manuscript) 
 ```
 
 Lastly, ammonia looks reasonably similar across all site types. There may be a slightly greater ammoina level in seagrass/mangrove sites judging by the distributions, however full analysis is needed to confirm.
@@ -185,7 +222,7 @@ Lastly, ammonia looks reasonably similar across all site types. There may be a s
 site_type_filter %>% ggplot() + 
   geom_jitter(aes(x = site_type, y = ammonia))
 
-site_type_ammonia <- ggplot(island_side_filter, aes(x = site_type, y = ammonia, color = site_type)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Ammonia by Site Type") + xlab("") + ylab("Ammonia (mg/L)") + theme(legend.position = "none", axis.text.x = element_text(face = "bold"))
+site_type_ammonia <- ggplot(island_side_filter, aes(x = site_type, y = ammonia, color = site_type)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Ammonia by Site Type") + xlab("") + ylab("Ammonia (mg/L)") + theme(legend.position = "none", axis.text.x = element_text(face = "bold")) + scale_x_discrete(labels = site_labs)
 
 site_type_ammonia
 
@@ -194,14 +231,31 @@ ggsave(filename = "../../results/Exploratory_Location_Figures/site_type_ammonia.
 ```
 
 ```{r}
+amm_wrap_manuscript <- ggarrange(bay_v_ocean_ammonia, site_type_ammonia, nrow = 1, ncol = 2)
+
+amm_wrap_manuscript
+
+ggsave(filename = "../../results/Exploratory_Location_Figures/amm_wrap_manuscript.png",plot = amm_wrap_manuscript) 
+```
+
+
+```{r}
 site_type_filter %>% ggplot() + 
   geom_jitter(aes(x = site_type, y = ph))
 
-site_type_ph <- ggplot(island_side_filter, aes(x = site_type, y = ph, color = site_type)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("pH by Site Type") + xlab("") + ylab("pH") + theme(legend.position = "none", axis.text.x = element_text(face = "bold"))
+site_type_ph <- ggplot(island_side_filter, aes(x = site_type, y = ph, color = site_type)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("pH by Site Type") + xlab("") + ylab("pH") + theme(legend.position = "none", axis.text.x = element_text(face = "bold")) + scale_x_discrete(labels = site_labs)
 
 site_type_ph
 
 ggsave(filename = "../../results/Exploratory_Location_Figures/site_type_ph.png",plot = site_type_ph) 
+```
+
+```{r}
+ph_wrap_manuscript <- ggarrange(bay_v_ocean_ph, site_type_ph, nrow = 1, ncol = 2)
+
+ph_wrap_manuscript
+
+ggsave(filename = "../../results/Exploratory_Location_Figures/ph_wrap_manuscript.png",plot = ph_wrap_manuscript) 
 ```
 
 

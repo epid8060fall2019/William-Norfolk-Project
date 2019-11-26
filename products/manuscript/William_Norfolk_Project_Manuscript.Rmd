@@ -80,7 +80,7 @@ All raw data was imported as xlsx files and cleaned for optimal analysis in R. R
 To facilitate the efforts of MarineLab and future citizen science interests, a ready-to-use shell processing/analysis script and a complementary raw data shell were designed. This shell and script allow for the rapid visualization of collected data which can be used to educate students who participate in citizen science water quality monitoring. Components and instructions for the usage of this script can be found in the supplemental materials.
 
 #### Exploratory/Univariate Analysis
-Exploratory analysis of the citizen science data investigated the general distribution of water quality parameters and was broken into two subgroups, location analysis and seasonal analysis. Exploratory location analysis measured the water quality conditions based on island side and site type of the sampling location. Exploratory seasonal analysis visualized the long-term patterns of water quality conditions across the four years of data collection.
+Exploratory analysis of the citizen science data investigated the general distribution of water quality parameters and was broken into two subgroups, location analysis and seasonal analysis. Exploratory location analysis measured the water quality conditions based on island side and site type of the sampling location. Island side was broken into two distinct categories: ocean side (Atlantic) and bay side (Gulf of Mexico). Site type was split into three categories: Seagrass/Mangrove, Patch Reef/Hardbottom, and Coral Reef. Island side was determined based on the geographic location of the site in relation to the island of Key Largo and site type was determined by the dominat benthic species of the location. Exploratory seasonal analysis visualized the long-term patterns of water quality conditions across the four years of data collection. It should be noted that due to accessibility contstraints/facility closures the months of August and December have a reduced total number of observations compared to the remaining months. This data was compiled in August of 2019 and thus the fall season of this year is excluded from this study. 
 
 #### Bivariate Analysis
 Bivariate analysis measured the correlations between individual water quality parameters and investigated the deeper associations of seasonal trends across multiple variations of data timescales and categories. 
@@ -97,33 +97,50 @@ Agglomerative hierarchical cluster analysis was used to determine how individual
 ## Results
 
 ### Exploratory/Univariate analysis
+Exploratory analysis showed the general trends of water quality contitions within categorical location groups and across the time series of the study. Location analysis showed distinct patterns associated with the island side charac
+
 Exploratory analysis of the cleaned water quality dataset shows general trends across all parameters measured and identifies specific aspects of the code that warrent deeper analysis. 
 
 The first variables explored will be collectively refrred to as the location variables, as they provide site specific information of the sampling locations that is understandable to inividuals that are not familar with the specific sites by name. Loaction variables explored consisted of island_side and site_type. Island_side refers to the specific side of the island the sampling site is located and consists of two categories: oceanside (Atlantic Ocean) and bayside (Gulf of Mexico). Site_type defines the specific type of ecosystem the site represents and consists of three categories: coral reef, seagrass/mangroves, and path reef/hardbottom. The thee site categories are distinguished by distance from shore, seagrass/mangrove represent near shore sites, path reef/hardbottom are mid-shore, and coral reefs are offshore locations. 
 
 Notable location patterns were observed in both salinity and temperature parameters for both island_side and site_type. Oceanside sites typically showed a reduced range of temperature and salinity measures, whereas bayside sites were distinctly dynamic. In terms of site_type, seagrass/mangrove sites generally exhibited a wider range of temperature and salinity, whereas coral reefs and patch reefs/hardbottom sites were less variable. The following trends can be seen in figures 1-4 below. 
 
-```{r 1Fig, fig.cap="Distribution of water temperature (C) for bayside and oceanside site locations.", echo=FALSE}
-knitr::include_graphics("../../results/Exploratory_Location_Figures/bay_v_ocean_water_temp.png")
+```{r 1Fig, fig.cap="Temp ADD MORE.", echo=FALSE}
+knitr::include_graphics("../../results/Exploratory_Location_Figures/water_temp_wrap_manuscript.png")
 
 ```
 
-```{r 2Fig, fig.cap="Distribution of salinity (ppt) for bayside and oceanside site locations.", echo=FALSE}
-knitr::include_graphics("../../results/Exploratory_Location_Figures/bay_v_ocean_salinity.png")
+```{r 2Fig, fig.cap="Sal ADD MORE.", echo=FALSE}
+knitr::include_graphics("../../results/Exploratory_Location_Figures/sal_wrap_manuscript.png")
 ```
 
-```{r 3Fig, fig.cap="Distribution of water temperature (C) for Coral Reef, Seagrass/Mangrove, and Patch Reef/Hardbottom site types.", echo=FALSE}
+```{r 3Fig, fig.cap="DO ADD MORE.", echo=FALSE}
+knitr::include_graphics("../../results/Exploratory_Location_Figures/do_wrap_manuscript.png")
+
+```
+
+```{r 4Fig, fig.cap="Amm ADD MORE.", echo=FALSE}
+knitr::include_graphics("../../results/Exploratory_Location_Figures/amm_wrap_manuscript.png")
+
+```
+
+```{r 5Fig, fig.cap="ph ADD MORE.", echo=FALSE}
+knitr::include_graphics("../../results/Exploratory_Location_Figures/ph_wrap_manuscript.png")
+
+```
+
+```{r 6Fig, fig.cap="Distribution of water temperature (C) for Coral Reef, Seagrass/Mangrove, and Patch Reef/Hardbottom site types.", echo=FALSE}
 knitr::include_graphics("../../results/Exploratory_Location_Figures/site_type_water_temp.png")
 ```
 
-```{r 4Fig, fig.cap="Distribution of salinity (ppt) for Coral Reef, Seagrass/Mangrove, and Patch Reef/Hardbottom site types.", echo=FALSE}
+```{r 7Fig, fig.cap="Distribution of salinity (ppt) for Coral Reef, Seagrass/Mangrove, and Patch Reef/Hardbottom site types.", echo=FALSE}
 knitr::include_graphics("../../results/Exploratory_Location_Figures/site_type_salinity.png")
 ```
 
 The scond half of the exploratory data analysis was focused on the seasonal data associated with the measured observations. Each water quality parameter was averaged and plotted against the total time of the study to determine seasonal fluctuations and look for abiotic impacts of Hurrican Irma which occurred in September 2017. Ammonia showed a steady average spread with minor seasonal variation and a large spike in the fall of 2017 consistent with Hurricane Irma landfall. pH showed a range of values with no discernable seasonal trends. A drop was indicated in pH following Hirrican Irma, however the decline is consistent with previous fluctuations. Salinity showed a moderate seasonal trend with a sharp decrease following Hurricane Irma. Dissolved oxygen showed steady seasonal fluctuations with a slightly lower dip following Hurricane Irma landfall. Water temperature showed a consistent pattern of seasonal fluctuation across the four years of study. It should be noted that despite the apparent alignment of abiotic changes in relation to Hurricane Irma landfall, substantially fewer data was gathered in the months following the storm compared to other years due to the unsafe conditions of water travel.
 
 
-```{r 5Fig, fig.cap="Annual fluctuation of water quality parameters in Key Largo, Florida from January 2016 to August 2019.", echo=FALSE}
+```{r 8Fig, fig.cap="Annual fluctuation of water quality parameters in Key Largo, Florida from January 2016 to August 2019.", echo=FALSE}
 knitr::include_graphics("../../results/Exploratory_Seasonal_Figures/combined_seasonal_trends.png")
 ```
 
@@ -136,31 +153,31 @@ Analysis of the associations between each of the five water quality parameters s
 
 Bivariate analysis permitted the in depth visualization of all five water quality parameters across the annual time scale allowing for a detailed view of seasonal water conditions. 
 
-```{r 6Fig, fig.cap="Seasonal water temperature (C) of ocean and bayside site locations in Key Largo, Florida.", echo=FALSE}
+```{r 9Fig, fig.cap="Seasonal water temperature (C) of ocean and bayside site locations in Key Largo, Florida.", echo=FALSE}
 knitr::include_graphics("../../results/Bivariate_Figures/temp_by_year.png")
 ```
 
 Analysis of water temperature showed distinct seasonal patterns of temperature rise an fall consistent with cooler and warmer months of the year. For all four years of study, bayside site locations showed a greater temperature range when compared to oceanside sites, this finding is consistent with univariate visualizations. 
 
-```{r 7Fig, fig.cap="Seasonal salinity levels (ppt) of ocean and bayside site locations in Key Largo, Florida.", echo=FALSE}
+```{r 10Fig, fig.cap="Seasonal salinity levels (ppt) of ocean and bayside site locations in Key Largo, Florida.", echo=FALSE}
 knitr::include_graphics("../../results/Bivariate_Figures/sal_by_year.png")
 ```
 
 Analysis of salinity showed a distinct seperation of bayside and oceanside waters with salinity typically greater in the ocean and reduced in the bay. Bayside site locations showed a much wider range of salinity conditions whereas the ocean was relatively stenohaline. There is a distinct jump in the salinity of bayside site locations in 2016 and 2019 associated with the months of March and April. 2017 showed a distinctive drop in the salinity of the bay associated with the month of September. 
 
-```{r 8Fig, fig.cap="Seasonal dissolved oxygen levels (mg/L) of ocean and bayside site locations in Key Largo, Florida.", echo=FALSE}
+```{r 11Fig, fig.cap="Seasonal dissolved oxygen levels (mg/L) of ocean and bayside site locations in Key Largo, Florida.", echo=FALSE}
 knitr::include_graphics("../../results/Bivariate_Figures/do_by_year.png")
 ```
 
 Analysis of dissolved oxygen did not reveal any distinct seasonal patterns in the oxygen levels of Key Largo waters. Bayside sites typically showed a lower minimum dissolved oxygen level, whereas the max was variable between the two island sides. 
 
-```{r 9Fig, fig.cap="Seasonal ammonia levels (mg/L) of ocean and bayside site locations in Key Largo, Florida.", echo=FALSE}
+```{r 12Fig, fig.cap="Seasonal ammonia levels (mg/L) of ocean and bayside site locations in Key Largo, Florida.", echo=FALSE}
 knitr::include_graphics("../../results/Bivariate_Figures/amm_by_year.png")
 ```
 
 Ammonia analysis did not show any consistent seasonal fluctuation patterns across all years of measure. Levels on both the bayside and oceanside remain relatively low through the course of study, however there is a large spike in 2017 near the month of September. 
 
-```{r 10Fig, fig.cap="Seasonal pH levels of ocean and bayside site locations in Key Largo, Florida.", echo=FALSE}
+```{r 13Fig, fig.cap="Seasonal pH levels of ocean and bayside site locations in Key Largo, Florida.", echo=FALSE}
 knitr::include_graphics("../../results/Bivariate_Figures/ph_by_year.png")
 ```
 
@@ -170,32 +187,32 @@ Analysis of pH levels showed no discernable seasonal fluctuations. pH remained r
 
 Hurricane Irma analysis investigated the specific impacts of hurricane Irma landfall on the five water quality parameters measured in this study. Hurricane Irma made landfall on September 10, 2017. Figures in this analysis represent continious time data from the start of 2017 to the end of 2018 to allow visualization of the acute and subacute effects of hurricane landfall.
 
-```{r 11Fig, fig.cap="Influence of Hurricane Irma landfall on the mean water temperatures (C) of ocean and bayside waters of Key Largo, Florida. Hurricane Irma landfall occured on September 10, 2017 (indicated by dashed line).", echo=FALSE}
+```{r 14Fig, fig.cap="Influence of Hurricane Irma landfall on the mean water temperatures (C) of ocean and bayside waters of Key Largo, Florida. Hurricane Irma landfall occured on September 10, 2017 (indicated by dashed line).", echo=FALSE}
 knitr::include_graphics("../../results/Hurricane_Irma_Figures/imra_mean_temp_plot.png")
 ```
 
 Water temperature associated with Irma landfall showed a notable drop in the months following the storm. This drop was largest for bayside site locations. IT should be noted this decrease is consistent with the timing of standard seasonal fluctuation of water temperature in the Florida Keys.
 
-```{r 12Fig, fig.cap="Influence of Hurricane Irma landfall on the mean salinity levels (ppt) of ocean and bayside waters in Key Largo, Florida. Hurricane Irma landfall occured on September 10, 2017 (indicated by dashed line).", echo=FALSE}
+```{r 15Fig, fig.cap="Influence of Hurricane Irma landfall on the mean salinity levels (ppt) of ocean and bayside waters in Key Largo, Florida. Hurricane Irma landfall occured on September 10, 2017 (indicated by dashed line).", echo=FALSE}
 knitr::include_graphics("../../results/Hurricane_Irma_Figures/imra_mean_sal_plot.png")
 ```
 
 Salinity levels associated with hurricane landfall showed a distinctive decrease for bayside site locations. The mean salinity of the ocean however remained relatively constant following the storm.
 
-```{r 13Fig, fig.cap="Influence of Hurricane Irma landfall on the mean dissolved oxygen levels (mg/L) of ocean and bayside waters in Key Largo, Florida. Hurricane Irma landfall occured on September 10, 2017 (indicated by dashed line).", echo=FALSE}
+```{r 16Fig, fig.cap="Influence of Hurricane Irma landfall on the mean dissolved oxygen levels (mg/L) of ocean and bayside waters in Key Largo, Florida. Hurricane Irma landfall occured on September 10, 2017 (indicated by dashed line).", echo=FALSE}
 knitr::include_graphics("../../results/Hurricane_Irma_Figures/imra_mean_do_plot.png")
 ```
 
 Dissolved oygen associated with hurricane landfall did not show any notable changes for both bayside and oceanside site locatons. There is a distinct decrease in the mean dissolved oxygen for the bay observed in the latter months of 2018. 
 
 
-```{r 14Fig, fig.cap="Influence of Hurricane Irma landfall on the mean ammonia levels (mg/L) of ocean and bayside waters in Key Largo, Florida. Hurricane Irma landfall occured on September 10, 2017 (indicated by dashed line).", echo=FALSE}
+```{r 17Fig, fig.cap="Influence of Hurricane Irma landfall on the mean ammonia levels (mg/L) of ocean and bayside waters in Key Largo, Florida. Hurricane Irma landfall occured on September 10, 2017 (indicated by dashed line).", echo=FALSE}
 knitr::include_graphics("../../results/Hurricane_Irma_Figures/imra_mean_amm_plot.png")
 ```
 
 Ammonia levels associated wit Hurricane Irma showed a dramatic spike in bayside site locations immediately following landfalland a small increase for oceanside sites. There is an additional drop and upspike in bayside ammonia associated with the spring-summer of 2018. 
 
-```{r 15Fig, fig.cap="Influence of Hurricane Irma landfall on the mean pH levels of ocean and bayside waters in Key Largo, Florida. Hurricane Irma landfall occured on September 10, 2017 (indicated by dashed line).", echo=FALSE}
+```{r 18Fig, fig.cap="Influence of Hurricane Irma landfall on the mean pH levels of ocean and bayside waters in Key Largo, Florida. Hurricane Irma landfall occured on September 10, 2017 (indicated by dashed line).", echo=FALSE}
 knitr::include_graphics("../../results/Hurricane_Irma_Figures/imra_mean_ph_plot.png")
 ```
 
