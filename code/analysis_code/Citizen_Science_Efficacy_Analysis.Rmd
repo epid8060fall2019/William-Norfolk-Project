@@ -137,7 +137,7 @@ effic_water_temp <- ggplot(cs_fknms_combined, aes(x = location, y = water_temp, 
 
 effic_water_temp
 
-ggsave(filename = "../../results/effic_water_temp.png", plot = effic_water_temp) 
+ggsave(filename = "../../results/Efficacy_Figures/effic_water_temp.png", plot = effic_water_temp) 
 
 ```
 
@@ -148,7 +148,7 @@ effic_sal <- ggplot(cs_fknms_combined, aes(x = location, y = salinity, fill = So
 
 effic_sal
 
-ggsave(filename = "../../results/effic_sal.png", plot = effic_sal) 
+ggsave(filename = "../../results/Efficacy_Figures/effic_sal.png", plot = effic_sal) 
 
 ```
 
@@ -159,7 +159,7 @@ effic_do <- ggplot(cs_fknms_combined, aes(x = location, y = dissolved_oxygen, fi
 
 effic_do
 
-ggsave(filename = "../../results/effic_do.png", plot = effic_do) 
+ggsave(filename = "../../results/Efficacy_Figures/effic_do.png", plot = effic_do) 
 
 ```
 
@@ -170,7 +170,7 @@ effic_amm <- ggplot(cs_fknms_combined, aes(x = location, y = ammonia, fill = Sou
 
 effic_amm
 
-ggsave(filename = "../../results/effic_amm.png", plot = effic_amm) 
+ggsave(filename = "../../results/Efficacy_Figures/effic_amm.png", plot = effic_amm) 
 
 ```
 

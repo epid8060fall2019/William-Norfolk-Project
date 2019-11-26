@@ -135,7 +135,7 @@ temp_by_year <- ggarrange(month_vs_temp_16, month_vs_temp_17, month_vs_temp_18, 
 
 temp_by_year
 
-ggsave(filename = "../../results/temp_by_year.png", plot = temp_by_year) 
+ggsave(filename = "../../results/Bivariate_Figures/temp_by_year.png", plot = temp_by_year) 
 
 ```
 
@@ -164,7 +164,7 @@ sal_by_year <- ggarrange(month_vs_sal_16, month_vs_sal_17, month_vs_sal_18, mont
 
 sal_by_year
 
-ggsave(filename = "../../results/sal_by_year.png", plot = sal_by_year) 
+ggsave(filename = "../../results/Bivariate_Figures/sal_by_year.png", plot = sal_by_year) 
 ```
 Salinity looks pretty consistent with the exploratory plots as well. Ocean side water are consistently higher in salinity than the bay side, which is expected since the bay is an estuary. Additionally, there is a wider range of salinity on the bay side, which is consistent with exploratory analysis. There is an odd jump in the salinity around April-May for 2016 and 2019. This may simply be a result of few observations taken during that time or it is possibly due to a very low rainfall year (salinitly tends to spike in the bay when rainfall is reduced). In 2017, there is a distinct salinity drop in bayside locations. The timing of this drop is correlated with the timing of Hurricane Irma landfall. We will explore more details of Irma impacts in the _Hurricane_Irma_Analysis_ script. 
 
@@ -191,7 +191,7 @@ do_by_year <- ggarrange(month_vs_do_16, month_vs_do_17, month_vs_do_18, month_vs
 
 do_by_year
 
-ggsave(filename = "../../results/do_by_year.png", plot = do_by_year) 
+ggsave(filename = "../../results/Bivariate_Figures/do_by_year.png", plot = do_by_year) 
 ```
 
 Dissolved oxygen does not appear to show any distict seasonal patterns for either the bay side or the ocean side. There is a somewhat notable drop in the dissolved oxygen levels towards the end of the 2019 data for bayside samples, however or dataset ends in July of that year so it is unclear if this is just a standard fluctuation or not. It would be advised to monitor that situation if the pattern continued. 
@@ -220,7 +220,7 @@ amm_by_year <- ggarrange(month_vs_amm_16, month_vs_amm_17, month_vs_amm_18, mont
 
 amm_by_year
 
-ggsave(filename = "../../results/amm_by_year.png", plot = amm_by_year) 
+ggsave(filename = "../../results/Bivariate_Figures/amm_by_year.png", plot = amm_by_year) 
 ```
 Ammonia appears quite interesting. Most of the observations are fairly consistent with very low to negligable ammonia levels in the water. There is a distinct increase in fall 2017 which is consistent with the timing of Hurricane Irma landfall.
 
@@ -246,7 +246,7 @@ ph_by_year <- ggarrange(month_vs_ph_16, month_vs_ph_17, month_vs_ph_18, month_vs
 
 ph_by_year
 
-ggsave(filename = "../../results/ph_by_year.png", plot = ph_by_year) 
+ggsave(filename = "../../results/Bivariate_Figures/ph_by_year.png", plot = ph_by_year) 
 ```
 pH visualization does not show any distinct patterns across various seasons of measurement. This is consistent with expected results due to the fact that both the ocean and bay are strongly influenced by the alkaline limestone bedrock of the Keys. 
 

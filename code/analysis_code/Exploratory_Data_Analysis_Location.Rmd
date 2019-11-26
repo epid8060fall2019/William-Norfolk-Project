@@ -53,7 +53,7 @@ bay_v_ocean_ph <- ggplot(island_side_filter, aes(x = island_side, y = ph, color 
 
 bay_v_ocean_ph
 
-ggsave(filename = "../../results/bay_v_ocean_ph.png",plot = bay_v_ocean_ph) 
+ggsave(filename = "../../results/Exploratory_Location_Figures/bay_v_ocean_ph.png",plot = bay_v_ocean_ph) 
 
 
 ```
@@ -76,7 +76,7 @@ bay_v_ocean_salinity <- ggplot(island_side_filter, aes(x = island_side, y = sali
 
 bay_v_ocean_salinity
 
-ggsave(filename = "../../results/bay_v_ocean_salinity.png",plot = bay_v_ocean_salinity) 
+ggsave(filename = "../../results/Exploratory_Location_Figures/bay_v_ocean_salinity.png",plot = bay_v_ocean_salinity) 
 
 ```
 
@@ -94,7 +94,7 @@ bay_v_ocean_water_temp <- ggplot(island_side_filter, aes(x = island_side, y = wa
 
 bay_v_ocean_water_temp 
 
-ggsave(filename = "../../results/bay_v_ocean_water_temp.png",plot = bay_v_ocean_water_temp) 
+ggsave(filename = "../../results/Exploratory_Location_Figures/bay_v_ocean_water_temp.png",plot = bay_v_ocean_water_temp) 
 
 ```
 
@@ -112,7 +112,7 @@ bay_v_ocean_dissolved_oxygen <- ggplot(island_side_filter, aes(x = island_side, 
 
 bay_v_ocean_dissolved_oxygen
 
-ggsave(filename = "../../results/bay_v_ocean_dissolved_oxygen.png",plot = bay_v_ocean_dissolved_oxygen) 
+ggsave(filename = "../../results/Exploratory_Location_Figures/bay_v_ocean_dissolved_oxygen.png",plot = bay_v_ocean_dissolved_oxygen) 
 
 ```
 
@@ -130,7 +130,7 @@ bay_v_ocean_ammonia <- ggplot(island_side_filter, aes(x = island_side, y = ammon
 
 bay_v_ocean_ammonia
 
-ggsave(filename = "../../results/bay_v_ocean_ammonia.png",plot = bay_v_ocean_ammonia) 
+ggsave(filename = "../../results/Exploratory_Location_Figures/bay_v_ocean_ammonia.png",plot = bay_v_ocean_ammonia) 
 
 ```
 
@@ -146,7 +146,7 @@ site_type_salinity <- ggplot(island_side_filter, aes(x = site_type, y = salinity
 
 site_type_salinity
 
-ggsave(filename = "../../results/site_type_salinity.png",plot = site_type_salinity) 
+ggsave(filename = "../../results/Exploratory_Location_Figures/site_type_salinity.png",plot = site_type_salinity) 
 
 ```
 
@@ -160,7 +160,7 @@ site_type_water_temp <- ggplot(island_side_filter, aes(x = site_type, y = water_
 
 site_type_water_temp
 
-ggsave(filename = "../../results/site_type_water_temp.png",plot = site_type_water_temp) 
+ggsave(filename = "../../results/Exploratory_Location_Figures/site_type_water_temp.png",plot = site_type_water_temp) 
 
 
 ```
@@ -175,7 +175,7 @@ site_type_dissolved_oxygen <- ggplot(island_side_filter, aes(x = site_type, y = 
 
 site_type_dissolved_oxygen
 
-ggsave(filename = "../../results/site_type_dissolved_oxygen.png",plot = site_type_dissolved_oxygen) 
+ggsave(filename = "../../results/Exploratory_Location_Figures/site_type_dissolved_oxygen.png",plot = site_type_dissolved_oxygen) 
 
 ```
 
@@ -189,12 +189,7 @@ site_type_ammonia <- ggplot(island_side_filter, aes(x = site_type, y = ammonia, 
 
 site_type_ammonia
 
-ggsave(filename = "../../results/site_type_ammonia.png",plot = site_type_ammonia) 
+ggsave(filename = "../../results/Exploratory_Location_Figures/site_type_ammonia.png",plot = site_type_ammonia) 
 
 ```
 
-
-
-Edit writing.
-
-Basic R sript for realtime visualization analysis-Objective 4-may be more appropriate for final analysis section.
