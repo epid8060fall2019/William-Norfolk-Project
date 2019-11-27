@@ -112,21 +112,21 @@ year_19 <- year_19[!is.na(year_19$island_side), ]
 
 ```{r water temp seasonality}
 
-month_vs_temp_16 <- ggplot(year_16, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("Water Temperature (C)") + labs(color = "Island Side")
+month_vs_temp_16 <- ggplot(year_16, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2016)") + ylab("Water Temp (C)") + labs(color = "Island Side")
 
 
 month_vs_temp_16 
 
-month_vs_temp_17 <- ggplot(year_17, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2017)") + ylab("Water Temperature (C)") + labs(color = "Island Side")
+month_vs_temp_17 <- ggplot(year_17, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2017)") + ylab("Water Temp (C)") + labs(color = "Island Side")
 
 month_vs_temp_17
 
 
-month_vs_temp_18 <- ggplot(year_18, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2018)") + ylab("Water Temperature (C)") + labs(color = "Island Side")
+month_vs_temp_18 <- ggplot(year_18, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2018)") + ylab("Water Temp (C)") + labs(color = "Island Side")
 
 month_vs_temp_18
 
-month_vs_temp_19 <- ggplot(year_19, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2019)") + ylab("Water Temperature (C)") + labs(color = "Island Side")
+month_vs_temp_19 <- ggplot(year_19, aes(x = Month, y = water_temp, color = island_side)) + geom_jitter(alpha = 0.25) + scale_x_continuous(limits=c(1, 12), breaks = 1:12) + scale_y_continuous(limits=c(15, 40)) + geom_smooth(se = FALSE) + xlab("Month (2019)") + ylab("Water Temp (C)") + labs(color = "Island Side")
 
 
 month_vs_temp_19

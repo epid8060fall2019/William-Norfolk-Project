@@ -70,7 +70,7 @@ irma_temp_plot
 
 mean_temp_irma <- aggregate(water_temp ~ Month + Year +island_side, irma_subset, mean)
 
-irma_mean_temp_plot <- ggplot(mean_temp_irma, aes(x = Month, y = water_temp, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1) + ylab("Water Temperature (C)") +labs(color = "Island Side")+ geom_point()
+irma_mean_temp_plot <- ggplot(mean_temp_irma, aes(x = Month, y = water_temp, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1) + ylab("Mean Water Temperature (C)") +labs(color = "Island Side")+ geom_point()
 
 irma_mean_temp_plot 
 
@@ -85,7 +85,7 @@ irma_sal_plot
 
 mean_sal_irma <- aggregate(salinity ~ Month + Year +island_side, irma_subset, mean)
 
-irma_mean_sal_plot <- ggplot(mean_sal_irma, aes(x = Month, y = salinity, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1) + ylab("Salinity (ppt)") + labs(color = "Island Side") +geom_point()
+irma_mean_sal_plot <- ggplot(mean_sal_irma, aes(x = Month, y = salinity, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1) + ylab("Mean Salinity (ppt)") + labs(color = "Island Side") +geom_point()
 
 irma_mean_sal_plot
 
@@ -101,7 +101,7 @@ irma_amm_plot
 
 mean_amm_irma <- aggregate(ammonia ~ Month + Year +island_side, irma_subset, mean)
 
-irma_mean_amm_plot <- ggplot(mean_amm_irma, aes(x = Month, y = ammonia, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1) + ylab("Ammonia (mg/L)") + labs(color = "Island Side") + geom_point()
+irma_mean_amm_plot <- ggplot(mean_amm_irma, aes(x = Month, y = ammonia, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1) + ylab("Mean Ammonia (mg/L)") + labs(color = "Island Side") + geom_point()
 
 irma_mean_amm_plot
 
@@ -116,7 +116,7 @@ irma_do_plot
 
 mean_do_irma <- aggregate(dissolved_oxygen ~ Month + Year +island_side, irma_subset, mean)
 
-irma_mean_do_plot <- ggplot(mean_do_irma, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1) + ylab("Dissolved Oxygen (mg/L)") + labs(color = "Island Side") + geom_point()
+irma_mean_do_plot <- ggplot(mean_do_irma, aes(x = Month, y = dissolved_oxygen, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1) + ylab("Mean Dissolved Oxygen (mg/L)") + labs(color = "Island Side") + geom_point()
 
 irma_mean_do_plot
 
@@ -131,7 +131,7 @@ irma_ph_plot
 
 mean_ph_irma <- aggregate(ph ~ Month + Year +island_side, irma_subset, mean)
 
-irma_mean_ph_plot <- ggplot(mean_ph_irma, aes(x = Month, y = ph, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1) + ylab("pH") + labs(color = "Island Side") + geom_point()
+irma_mean_ph_plot <- ggplot(mean_ph_irma, aes(x = Month, y = ph, color = island_side)) + geom_line(alpha = 1) + theme(legend.position = "bottom") + geom_vline(xintercept = 9.33, color = "black", linetype = "dotted", size = 1) + ylab("Mean pH") + labs(color = "Island Side") + geom_point()
 
 irma_mean_ph_plot
 
