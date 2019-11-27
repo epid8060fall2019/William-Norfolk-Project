@@ -90,10 +90,10 @@ Bivariate analysis measured the correlations between the individual water qualit
 Hurricane Irma analysis investigated the water quality effects of the September 10, 2017 landfall of Hurricane Irma in the Florida Keys. A hurricane-influenced data subset was created and the time series data was visualized to show changes in the baseline water quality parameters in response to storm landfall. Hurricane-influenced data was compared to non-influenced data using a Two-sample Kolmogorov-Smirnov test to determine if the hurricane had any significant effects on the water quality following landfall.
 
 #### Citizen Science Efficacy Analysis
-Citizen science efficacy analysis compared the water quality measures collected through citizen science monitoring to professionally collected water quality data by the FKNMS. Water quality parameters were compared only using sites which were commonly sampled in both programs and had at least 20 total observations per site.  
+Citizen science efficacy analysis compared the water quality measures collected through citizen science monitoring to professionally collected water quality data by the FKNMS. Water quality parameters were compared using common sampling sites with at least 20 recorded observations from both datasets. Site comparison was done using: Tarpon Basin, Grecian Dry Rocks, Key Largo Dry Rocks, Molasses, and Rodriguez Key. Grecian Dry Rocks, Molasses, and Key Largo Dry Rocks all represented a coral reef site type. Tarpon Basin represented a seagrass/mangrove habitat site and Rodriguez Key represented a patch reef/hardbottom site. Comparative analysis of pH measures was unable to be conducted due to insufficent pH data in the FKNMS database. 
 
 #### Unsupervised Learning Analysis
-Agglomerative hierarchical cluster analysis was used to determine how individual sampling sites were grouped in terms of the water quality condition. Systematic subsetting of cluster data was used to investigate the patterns of grouping within specific site types, sampling months, and years of measurement.
+Agglomerative hierarchical cluster analysis was used to determine how individual sampling sites were grouped in terms of the water quality condition. Systematic subsetting of cluster data was used to investigate the patterns of grouping within specific site types, sampling months, and years of measurement. Dendrograms of cluster analysis were constructed using Ward's minimum variance method and ideal cluter values were assessed using the silhouette and within-cluster sum of squares metrics. Tanglegrams were used to compare dendrogram similarity and entanglemnt was computed as a metric of similarity. Cluster analysis was broken into three groups: total cluster analysis, site type cluster analysis, and representitive site seasonal cluster analysis. Total cluster analysis grouped all of the sampling sites from all years of study. Site type cluster analysis explored the similarity and dissimilarity of sampling locations within each of the three major site types. Representitive site seasonal cluster analysis compared the month-wise grouping three most frequently visited sites (one of each type) in the study.
 
 ## Results
 
@@ -198,9 +198,66 @@ knitr::include_graphics("../../results/Hurricane_Irma_Figures/imra_mean_ph_plot.
 ```
 
 
-Water quality parameters of September-Febuary from Irma landfall were compared using a Two-sample Kolmogorov-Smirnov test to water quality measures from the year prior to determine if any of the five parameters were statistically significant. The results of the Kolmogorov-Smirnov test showed a p-value of 0.227 for water temperature, 0.002 for salinity, 0.499 for dissolved oxygen, 0.002 for ammonia, and 0.334 for pH. These results suggest that the salinity and ammonia levels were siginifcantly influenced by the landfall of Hurricane Irma. This significance is consistent with the visuals of univariate, bivariate, and Hurricane Irma analysis. 
+Water quality parameters from September-Febuary from 2017-2018 were compared to measures from 2016-2017 using a Two-sample Kolmogorov-Smirnov test to determine if any of the five parameters were significantly significant. The results of the Kolmogorov-Smirnov test showed a p-value of 0.227 for water temperature, 0.002 for salinity, 0.499 for dissolved oxygen, 0.002 for ammonia, and 0.334 for pH. These results suggest that the salinity and ammonia levels were siginifcantly influenced by the landfall of Hurricane Irma. This significance is consistent with the visuals produced from univariate, bivariate, and Hurricane Irma analysis. 
+
+### Citizen Science Efficacy Analysis
+Citizen science efficacy analysis compared the MarineLab citizen science water quality data to measures collected through the FKNMS water quality monitoring program. Comparison of water temperature measures showed similar patterns of temperature range for all sites. Minor fluctuations in the interquartile range and median values are seen across the comparison however, no distinct pattern of variaton is discernable. Comparative water temperature results can be viewed in Figure 17. Comparative salinity analysis showed a distinctive decrease in the size of the interquartile range of salinity measures for FKNMS observations compared to citizen science observations.Both FKNMS and citizen science show Tarpon Basin to have the largest range of salinity which is consistent with the findings of the bivariate analysis. The resuts of comparitave salinity analysis can be viewed in Figure 18.
+
+```{r 17Fig, fig.cap="Comparative analysis of water temperature (C) measures collected from citizen science data verses FKNMS data.", echo=FALSE}
+knitr::include_graphics("../../results/Efficacy_Figures/effic_water_temp.png")
+```
+
+```{r 18Fig, fig.cap="Comparative analysis of salinity (ppt) measures collected from citizen science data verses FKNMS data.", echo=FALSE}
+knitr::include_graphics("../../results/Efficacy_Figures/effic_sal.png")
+```
+
+Comparative analysis of dissolved oxygen shows a relatively consistent pattern across both data sources. The upper limits of the interquartile range for citizen science observations is typically consistent with the median value for FKNMS data showing a small bias toward recuded dissolved oxygen levels in citizen science measures. The results of comparative dissolved oxygen analysis can be viewed in Figure 19. Comparative analysis of ammonia observations shows a distinctly higher level in measured in FKNMS data when compared to citizen science data. The interquartile range of citizen science measures for all sites rest entirely at the 0 mg/L level whereas, FKNMS data shows a slightly larger range from 0-0.5 mg/L. Interestingly, the FKNMS observations show a greater number of high outliers compared to no high level outliers in the citizen science data. The results of comparative ammonia analysis can be viewed in Figure 20.  
+
+```{r 19Fig, fig.cap="Comparative analysis of dissolved oxygen (mg/L) measures collected from citizen science data verses FKNMS data.", echo=FALSE}
+knitr::include_graphics("../../results/Efficacy_Figures/effic_do.png")
+```
+
+```{r 20Fig, fig.cap="Comparative analysis of ammonia (mg/L) measures collected from citizen science data verses FKNMS data.", echo=FALSE}
+knitr::include_graphics("../../results/Efficacy_Figures/effic_amm.png")
+```
+
 
 ### Unsupervised Learning Analysis
+Unsupervised learning analysis used agglomerated hierarchical clustering to determine the grouping characteristics of sampling sites based exclusively on water quality parameters. The overall results of this analysis showed largely that clustering at the lowest levels of the dendrogram (most similar) and the highest levels of the dendrogram (least similar) were often consistent with other components of site characteristics such as: geographical location, water depth, and benthic biotic commiunity structure. The mid-levels (moderate similarity) of the dendrograms were typically highly variable and not consistent with any known patterns of site characteristics. The total cluster analysis dendrogram split into 5 distinct clusters by water quality. The majority of coral reef site locations were clustered into a single group (purple in Figure 21). The remaining 4 clusters showed a mixture of seagrass/mangrove, patch reefs/hardbottom, and two coral reef locations. The reef site known as The Elbow was notably clustered into a group by itself. The dendrogram of all sampling sites can be viewed in Figure 21.
+
+```{r 21Fig, fig.cap="Total Cluster Analysis Dendrogram: Agglomerative hierarchical clustering using the agnes algorithm, Ward's minimum variance, and silhouette cluster validation.", echo=FALSE}
+knitr::include_graphics("../../results/Unsupervised_Modeling_Figures/sample_site_dendro_agnes.png")
+```
+
+Site type cluster analysis seperated sampling locations by site type to visualize patterns of grouping within types. Seagrass/mangrove cluster analysis showed a fairly diverse grouping with locations splitting into 5 clusters. Many of most closest related pairs were geographically close locations (Pelican Key & Bush Point, Tarpon Basin & Dana's Cove, El Radabob & Boat Ramp). Notably, the most geographically distant location Nest Key was clustered into a solo group. The results of seagrass/mangrove site clustering can be viewed in Figure 22. Patch reef/hardbottom cluster analysis showed the most diverse grouping of all three site types splitting into 6 clusters. All sampling locations within this subset were assigned with individual cluster groups with the exception of two: Mosquito and Higdon's. The results of patch reef/hardbottom cluster analysis can be viewed in Figure 23. Coral reef cluster analysis showed the lowest diversity splitting into 2 cluster groups. The smaller cluster (blue in Figure 24) contained the two northernmost reef sites The Elbow and Ocean Reef Club, where as the second cluster (red in Figure 24) contained all mid-southern sites. Similarly to seagrass/mangrove clustering the most closely related pairs (Horseshoe & Grecian Dry Rocks, North North Dry Rocks & Key Largo Dry Rocks) were geographically close. The results of coral reef cluster analysis can be viewed in Figure 24.
+
+
+```{r 22Fig, fig.cap="Seagrass/Mangrove Site Type Cluster Analysis Dendrogram: Agglomerative hierarchical clustering using the agnes algorithm, Ward's minimum variance, and silhouette cluster validation.", echo=FALSE}
+knitr::include_graphics("../../results/Unsupervised_Modeling_Figures/sg_mg_good_dend.png")
+```
+
+```{r 23Fig, fig.cap="Patch Reef/Hardbottom Site Type Cluster Analysis Dendrogram: Agglomerative hierarchical clustering using the agnes algorithm, Ward's minimum variance, and silhouette cluster validation.", echo=FALSE}
+knitr::include_graphics("../../results/Unsupervised_Modeling_Figures/pr_h_good_dend.png")
+```
+
+```{r 24Fig, fig.cap="Coral Reef Site Type Cluster Analysis Dendrogram: Agglomerative hierarchical clustering using the agnes algorithm, Ward's minimum variance, and silhouette cluster validation.", echo=FALSE}
+knitr::include_graphics("../../results/Unsupervised_Modeling_Figures/cr_good_dend.png")
+```
+
+Representitive site seasonal cluster analysis compared the seasonal grouping of observations from each of the three representitive sites (most frequently visited) in the study: Tarpon Basin as seagrass/mangrove, Rodriguez Key as patch reef/hardbottom, and Grecian Dry Rocks as a coral reef. The results of Tarpon Basin seasonal analysis produced a dendrogram with 2 clusters. All months were containd within a single cluster with the exception of October which was the only fall month included in this analysis. Additionally, the pattern of closely-related pairs was consistent with seasonal groupings of the months of th year. The results of Tarpon Basin cluster analysis can be viewed in Figure 25. Rodriguez Key seasonal cluster analysis produced a dendrogram with 4 clusters. All summer months were grouped within the same cluster (purple in Figure 26) however, the remaining groups show no discernable pattern of organization. The results of Rodriguez Key cluster analysis can be seen in Figure 26. Grecian Dry Rocks seasonal cluster analysis also produced a dendrogram with 4 clusters. All months were ret
+ained within a single group with the exception of July and December. No discernable pattern of grouping was observed in the remaining cluster (red in Figure 27). The results of Grecian Dry Rocks cluster analysis can be viewed in Figure 27. 
+
+```{r 25Fig, fig.cap="Tarpon Basin Seasonal Cluster Analysis Dendrogram: Agglomerative hierarchical clustering using the agnes algorithm, Ward's minimum variance, and silhouette cluster validation.", echo=FALSE}
+knitr::include_graphics("../../results/Unsupervised_Modeling_Figures/good_adend_tarpon.png")
+```
+
+```{r 26Fig, fig.cap="Rodriguez Key Seasonal Cluster Analysis Dendrogram: Agglomerative hierarchical clustering using the agnes algorithm, Ward's minimum variance, and silhouette cluster validation.", echo=FALSE}
+knitr::include_graphics("../../results/Unsupervised_Modeling_Figures/good_adend_roddy.png")
+```
+
+```{r 27Fig, fig.cap="Grecian Dry Rocks Seasonal Cluster Analysis Dendrogram: Agglomerative hierarchical clustering using the agnes algorithm, Ward's minimum variance, and silhouette cluster validation.", echo=FALSE}
+knitr::include_graphics("../../results/Unsupervised_Modeling_Figures/good_adend_grecian.png")
+```
 
 ## Discussion
 

@@ -25,6 +25,7 @@ library(dendextend)
 library(cluster)
 library(NbClust)
 library(mclust)
+library(filesstrings)
 
 #Note it will be very important to call functions using the :: library notation due to the frequency of function masking by our libraries. 
 
@@ -190,14 +191,28 @@ Next lets make a nice dendrogram.
 ```{r}
 
 
-sample_site_dendro_agnes <- fviz_dend(cluster_site_agnes, k = 5, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Agglomerated Dendrogram (agnes) by Sample Site")
+sample_site_dendro_agnes <- fviz_dend(cluster_site_agnes, k = 5, show_labels = TRUE, cex = 0.55, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Agglomerated Dendrogram (agnes) of All Sample Sites")
 
 sample_site_dendro_agnes
 
-sample_site_dendro_hclust <- fviz_dend(cluster_site_hclust, k = 5, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Agglomerated Dendrogram (hclust) by Sample Site")
+sample_site_dendro_hclust <- fviz_dend(cluster_site_hclust, k = 5, show_labels = TRUE, cex = 0.6, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Agglomerated Dendrogram (hclust) by Sample Site")
 
 sample_site_dendro_hclust
+
+
 ```
+
+
+```{r save the total dendrogram}
+#Save the dendro as a png and set the demensions
+png("sample_site_dendro_agnes.png", width = 650,height = 400)
+print(sample_site_dendro_agnes)
+dev.off()
+
+#Use filesstrings to move the file to the repo folder
+file.move("./sample_site_dendro_agnes.png", "../../results/Unsupervised_Modeling_Figures", overwrite = TRUE)#Be sure to include overwrite = TRUE or you will add a file everytime you rerun
+```
+
 
 Now that we can better visualize differences it looks like our two agglomerative dendrograms are very similar (which is good news!) the hclust function and agnes functions are slightly different in practice so it is not out of the question to see small differences in the results. 
 
@@ -314,6 +329,17 @@ sg_mg_good_dend
 
 
 ```
+
+```{r}
+png("sg_mg_good_dend.png", width = 650,height = 400)
+print(sg_mg_good_dend)
+dev.off()
+
+file.move("./sg_mg_good_dend.png", "../../results/Unsupervised_Modeling_Figures", overwrite = TRUE)
+```
+
+
+
 It looks like our Seagrass/Mangrove sites are reasonably distinct! It is unsprising that Nest Key is given a distinct cluster due to the fact that this site is very geographically different from all other sampling locations in the data set. Beyond this seperation, there are not noticable distinct patterns in the data. The lack of notable correlation may be due to the fact that Seagrass/Mangrove sites tend to be the most variable in terms of conditions and seasonality may be a stronger influencer of water quality parameters. 
 
 Lets take a look at patch reefs and hardbottom sites.
@@ -340,6 +366,14 @@ pr_h_good_dend <- fviz_dend(pr_h_clust, k = 6, show_labels = TRUE, cex = 0.6, re
 pr_h_good_dend
 ```
 
+```{r}
+png("pr_h_good_dend.png", width = 650,height = 400)
+print(pr_h_good_dend)
+dev.off()
+
+file.move("./pr_h_good_dend.png", "../../results/Unsupervised_Modeling_Figures", overwrite = TRUE)
+```
+
 It looks like our Patch Reef/Hardbottom sites are very distinct across the majority of samples. This is likely due to the fact that all of these sites are distant from each other, this also my be sue to sampling bias as these sites are visited the lest frequently of all the three site types due to weather inaccessibility.
 
 Lastly lets investigate Coral Reefs.
@@ -357,11 +391,19 @@ set.seed(1111)
 
 cr_clust <- agnes(cr_ready, method = "ward")
 
-cr_dend <- pltree(cr_clust, cex = 0.6, hang = -1, main = "Coral Reef Cluster Test", labels = cr_ready$location)
+cr_dend <- pltree(cr_clust, cex = 0.5, hang = -1, main = "Coral Reef Cluster Test", labels = cr_ready$location)
 
-cr_good_dend <- fviz_dend(cr_clust, k = 2, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Coral Reef Cluster Analysis")
+cr_good_dend <- fviz_dend(cr_clust, k = 2, show_labels = TRUE, cex = 0.55, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Coral Reef Cluster Analysis")
 
 cr_good_dend
+```
+
+```{r}
+png("cr_good_dend.png", width = 650,height = 400)
+print(cr_good_dend)
+dev.off()
+
+file.move("./cr_good_dend.png", "../../results/Unsupervised_Modeling_Figures", overwrite = TRUE)
 ```
 
 Coral Reef clustering shows two distinct clusters, the The Elbow and Ocean Reef Club represent the two northernmost sites in our data set so it is interesting to see them seperated from the remained of the reef. All other sites are fairly variable. There is so clustering that appears to be geographically inclied (Key Kargo Dry Rocks & North North Dry Rocks as well as French Reef & Banana). Additionally, the clustering of Horseshoe and Grecian rocks may be due to depth similarity. 
@@ -730,7 +772,7 @@ set.seed(1111)
 
 clust_tarpon_agnes <- agnes(tarpon_ready, method = "ward")
 
-good_adend_tarpon <- fviz_dend(clust_tarpon_agnes, k = 2, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Tarpon Basin Seasonal Cluster Analysis (agnes)")
+good_adend_tarpon <- fviz_dend(clust_tarpon_agnes, k = 2, show_labels = TRUE, cex = 0.8, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Tarpon Basin Seasonal Cluster Analysis (agnes)")
 
 good_adend_tarpon
 
@@ -742,6 +784,14 @@ good_hdend_tarpon <- fviz_dend(hclust_tarpon, k = 2, show_labels = TRUE, cex = 0
 
 good_hdend_tarpon
 ```
+```{r}
+png("good_adend_tarpon.png", width = 650,height = 400)
+print(good_adend_tarpon)
+dev.off()
+
+file.move("./good_adend_tarpon.png", "../../results/Unsupervised_Modeling_Figures", overwrite = TRUE)
+```
+
 It looks like our data groups relatively close to a seasonal timeline. The closest clusters are often adjacent or near months. It appears October is a very different month from the rest of the samples, this may be due to the fact that September and November observations are absent so it is our only representitive of fall.
 
 Next we will look at Rodriguez Key
@@ -775,7 +825,7 @@ set.seed(1111)
 
 clust_roddy_agnes <- agnes(roddy_ready, method = "ward")
 
-good_adend_roddy <- fviz_dend(clust_roddy_agnes, k = 4, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Rodriguez Key Seasonal Cluster Analysis (agnes)")
+good_adend_roddy <- fviz_dend(clust_roddy_agnes, k = 4, show_labels = TRUE, cex = 0.8, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Rodriguez Key Seasonal Cluster Analysis (agnes)")
 
 good_adend_roddy
 
@@ -787,6 +837,15 @@ good_hdend_roddy <- fviz_dend(hclust_roddy, k = 4, show_labels = TRUE, cex = 0.5
 
 good_hdend_roddy
 ```
+
+```{r}
+png("good_adend_roddy.png", width = 650,height = 400)
+print(good_adend_roddy)
+dev.off()
+
+file.move("./good_adend_roddy.png", "../../results/Unsupervised_Modeling_Figures", overwrite = TRUE)
+```
+
 So it looks like our summer clustering is fairly strong, however the remainder of the months are not grouped in any notable pattern.
 
 Last we will look at Grecian Dry Rocks
@@ -819,7 +878,7 @@ set.seed(1111)
 
 clust_grecian_agnes <- agnes(grecian_ready, method = "ward")
 
-good_adend_grecian <- fviz_dend(clust_grecian_agnes, k = 3, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Grecian Dry Rocks Seasonal Cluster Analysis (agnes)")
+good_adend_grecian <- fviz_dend(clust_grecian_agnes, k = 3, show_labels = TRUE, cex = 0.8, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Grecian Dry Rocks Seasonal Cluster Analysis (agnes)")
 
 good_adend_grecian
 
@@ -830,6 +889,13 @@ dend_ready_grecian <- as.dendrogram(hclust_grecian)
 good_hdend_grecian <- fviz_dend(hclust_grecian, k = 3, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "Grecian Rocks Seasonal Cluster Analysis (hclust)")
 
 good_hdend_grecian
+```
+```{r}
+png("good_adend_grecian.png", width = 650,height = 400)
+print(good_adend_grecian)
+dev.off()
+
+file.move("./good_adend_grecian.png", "../../results/Unsupervised_Modeling_Figures", overwrite = TRUE)
 ```
 
 The clustering in this instance does not appear to show seasonal grouping. It should be noted that the two individual clusters July and December are the two most extreme seasonal months so it is possible their seperation may be due to seasonal extremes. However, the majority of months do not show a distinct pattern.
