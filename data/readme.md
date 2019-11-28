@@ -4,7 +4,7 @@ This folder contains all of the raw, stored, and generated data files/templates 
 
 ## Raw Data
 
-The ```raw_data``` subfolder contains the raw water quality data used to produce the primary analysis of this project and manuscript. This folder contains two xlsx filed ```RAW_WQ_Data.xlsx``` and ```RAW_WQ_Data_TimeModified.xlsx```. ```RAW_WQ_Data.xlsx``` contains the full raw data directly from the MarineLab water quality data base. ```RAW_WQ_Data_TimeModified.xlsx``` contains the raw data from this database with modifications of the date and time variables to disable excel autoformatting which inhibits proper data upload. 
+The ```raw_data``` subfolder contains the raw water quality data used to produce the primary analysis of this project and manuscript. This folder contains three xlsx files ```RAW_WQ_Data.xlsx```, ```RAW_WQ_Data_TimeModified.xlsx```, and ```FKNMS_WQ_raw.xlsx```. ```RAW_WQ_Data.xlsx``` contains the full raw data directly from the MarineLab water quality data base. ```RAW_WQ_Data_TimeModified.xlsx``` contains the raw data from this database with modifications of the date and time variables to disable excel autoformatting which inhibits proper data upload. ```FKNMS_WQ_raw.xlsx``` contains the raw FKNMS sanctuary data used to complete the ```Citizen_Science_Efficacy_Analysis```.
 
 ## Processed Data
 
