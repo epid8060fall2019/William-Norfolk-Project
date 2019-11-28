@@ -108,12 +108,14 @@ cluster_site_agnes <- agnes(cluster_ready, method = "ward") #Agglomerative clust
 cluster_site_diana <- diana(cluster_ready) #Divisive clustering is similar to the agnes function, however no method is needed to provide to this function
 
 #Plot the trees. Note agnes can use pltree or plot but hclust must use plot
-good_tree_hclust <- plot(cluster_site_hclust, cex = 0.6, hang = -1, main = "Agglomerative (hclust) Dendrogram of Sample Locations")
-good_tree_agnes <- pltree(cluster_site_agnes, cex = 0.6, hang = -1, main = "Agglomerative (agnes) Dendrogram of Sample Locations")
-good_tree_diana <- pltree(cluster_site_diana, cex = 0.6, hang = -1, main = "Divisive Dendrogram of Sample Locations")
+good_tree_hclust <- plot(cluster_site_hclust, cex = 0.6, hang = -1, main = "Agglomerative (hclust) Dendrogram of All Sample Locations")
+good_tree_agnes <- pltree(cluster_site_agnes, cex = 0.6, hang = -1, main = "Agglomerative (agnes) Dendrogram of All Sample Locations")
+good_tree_diana <- pltree(cluster_site_diana, cex = 0.6, hang = -1, main = "Divisive Dendrogram of All Sample Locations")
 
 
 ```
+
+
 
 So it looks like all three dendrograms look fairly different. There are no very distinct patterns that jump out immediately but we will need to do a bit more analysis to learn our optimal cluster number (k) before we can really start to interpret the results. 
 
@@ -227,10 +229,12 @@ q <- as.dendrogram(cluster_site_hclust)
 all_site_dend <- dendlist(q, p)
 
 
-xx <- tanglegram(cluster_site_hclust, cluster_site_agnes, highlight_distinct_edges = FALSE, common_subtrees_color_branches = FALSE, lwd = 2, k_branches = 5, lab.cex = 0.7, main = paste("All Sites (hclust vs agnes) Entanglement =", round(entanglement(all_site_dend), 2)))
+hclust_vs_agnes_tangle <- tanglegram(cluster_site_hclust, cluster_site_agnes, highlight_distinct_edges = FALSE, common_subtrees_color_branches = FALSE, lwd = 2, k_branches = 5, lab.cex = 0.7, main = paste("All Sites (hclust vs agnes) Entanglement =", round(entanglement(all_site_dend), 2)))
 
 all_site_dend %>% untangle("step1side") %>% tanglegram()
 ```
+
+
 From the tanglegram it looks like most of our sites are in agreement between the two methods. Most of the disagreement appears to be within the 5 major clusters (i.e. disagreement about where in the cluster exaclty the site belongs) which are relatively minor. The only large difference is the Elbow site which jumps clustering with the different alogrithms, it will be important to keep an eye on this location.
 
 ### Unsupervised Modeling Discussion
@@ -602,6 +606,15 @@ good_hdend_16 <- fviz_dend(hclust_16, k = 2, show_labels = TRUE, cex = 0.5, rect
 good_hdend_16
 
 ```
+
+```{r}
+png("good_adend_16.png", width = 650,height = 400)
+print(good_adend_16)
+dev.off()
+
+file.move("./good_adend_16.png", "../../results/Unsupervised_Modeling_Figures", overwrite = TRUE)
+```
+
 Looks like the Grotto is very different from all other measures this year. Similarly, the boat ramp and Nest Key are quite distinct also.
 
 Now for 2017!
@@ -625,6 +638,15 @@ good_hdend_17 <- fviz_dend(hclust_16, k = 4, show_labels = TRUE, cex = 0.5, rect
 
 good_hdend_17
 ```
+
+```{r}
+png("good_adend_17.png", width = 650,height = 400)
+print(good_adend_17)
+dev.off()
+
+file.move("./good_adend_17.png", "../../results/Unsupervised_Modeling_Figures", overwrite = TRUE)
+```
+
 2017 looks very similar to 2016, structurally with The Grotto, Boat Ramp, and Nest Key showing as the most distant from all other locations.
 
 Next 2018
@@ -649,6 +671,14 @@ good_hdend_18 <- fviz_dend(hclust_18, k = 8, show_labels = TRUE, cex = 0.5, rect
 good_hdend_18
 ```
 
+```{r}
+png("good_adend_18.png", width = 650,height = 400)
+print(good_adend_18)
+dev.off()
+
+file.move("./good_adend_18.png", "../../results/Unsupervised_Modeling_Figures", overwrite = TRUE)
+```
+
 2018 is the most unique so far however, no distinct patterns are notable.
 
 And finally 2019 
@@ -671,6 +701,14 @@ dend_ready_19 <- as.dendrogram(hclust_19)
 good_hdend_19 <- fviz_dend(hclust_19, k = 4, show_labels = TRUE, cex = 0.5, rect = FALSE, color_labels_by_k = FALSE, horiz = TRUE, rect_lty = 5, rect_border = 8, main = "2019 Cluster Analysis")
 
 good_hdend_19
+```
+
+```{r}
+png("good_adend_19.png", width = 650,height = 400)
+print(good_adend_19)
+dev.off()
+
+file.move("./good_adend_19.png", "../../results/Unsupervised_Modeling_Figures", overwrite = TRUE)
 ```
 
 2019 looks the most consistent with geographical location as the previous years however, this pattern is not seen in all sites.
