@@ -40,45 +40,55 @@ glimpse(WQ_clean_data)
 Lets start by taking a look at the five water quality parameters plotted against one another with bivariate visualizations. For this data we will use jitter plots.
 
 ```{r WQ params vs each other}
-temp_and_salt <- ggplot(WQ_clean_data, aes(x = salinity, y = water_temp, color = island_side)) + geom_jitter()
+temp_and_salt <- ggplot(WQ_clean_data, aes(x = salinity, y = water_temp, color = island_side)) + geom_jitter() + xlab("Salinity (ppt)") + ylab("Water Temperature (C)") + ggtitle("Water Temperature vs. Salinity")
 
 temp_and_salt
+ggsave(filename = "../../results/Bivariate_Figures/temp_and_salt.png", plot = temp_and_salt)
 
-temp_and_ph <- ggplot(WQ_clean_data, aes(x = ph, y = water_temp, color = island_side)) + geom_jitter()
+temp_and_ph <- ggplot(WQ_clean_data, aes(x = ph, y = water_temp, color = island_side)) + geom_jitter() + xlab("pH") + ylab("Water Temperature (C)") + ggtitle("Water Temperature vs. pH")
 
 temp_and_ph
+ggsave(filename = "../../results/Bivariate_Figures/temp_and_ph.png", plot = temp_and_ph)
 
-temp_and_do <- ggplot(WQ_clean_data, aes(x = dissolved_oxygen, y = water_temp, color = island_side)) + geom_jitter()
+temp_and_do <- ggplot(WQ_clean_data, aes(x = dissolved_oxygen, y = water_temp, color = island_side)) + geom_jitter() + xlab("Dissolved Oxygen (mg/L)") + ylab("Water Temperature (C)") + ggtitle("Water Temperature vs. Dissolved Oxygen")
 
 temp_and_do
+ggsave(filename = "../../results/Bivariate_Figures/temp_and_do.png", plot = temp_and_do)
 
-temp_and_ammonia <- ggplot(WQ_clean_data, aes(x = ammonia, y = water_temp, color = island_side)) + geom_jitter()
+temp_and_ammonia <- ggplot(WQ_clean_data, aes(x = ammonia, y = water_temp, color = island_side)) + geom_jitter() + xlab("Ammonia (mg/L)") + ylab("Water Temperature (C)") + ggtitle("Water Temperature vs. Ammonia")
 
 temp_and_ammonia
+ggsave(filename = "../../results/Bivariate_Figures/temp_and_ammonia.png", plot = temp_and_ammonia)
 
-salt_and_ph <- ggplot(WQ_clean_data, aes(x = salinity, y = ph, color = island_side)) + geom_jitter()
+salt_and_ph <- ggplot(WQ_clean_data, aes(x = salinity, y = ph, color = island_side)) + geom_jitter() + xlab("Salinity (ppt)") + ylab("pH") + ggtitle("pH vs. Salinity")
 
 salt_and_ph
+ggsave(filename = "../../results/Bivariate_Figures/salt_and_ph.png", plot = salt_and_ph)
 
-salt_and_do <- ggplot(WQ_clean_data, aes(x = salinity, y = dissolved_oxygen, color = island_side)) + geom_jitter()
+salt_and_do <- ggplot(WQ_clean_data, aes(x = salinity, y = dissolved_oxygen, color = island_side)) + geom_jitter() + xlab("Salinity (ppt)") + ylab("Dissolved Ovygen (mg/L") + ggtitle("Dissolved Oxygen vs. Salinity")
 
 salt_and_do
+ggsave(filename = "../../results/Bivariate_Figures/salt_and_do.png", plot = salt_and_do)
 
-salt_and_ammonia <- ggplot(WQ_clean_data, aes(x = salinity, y = ammonia, color = island_side)) + geom_jitter()
+salt_and_ammonia <- ggplot(WQ_clean_data, aes(x = salinity, y = ammonia, color = island_side)) + geom_jitter() + xlab("Salinity (ppt)") + ylab( "Ammonia (mg/L)") + ggtitle("Ammonia vs. Salinity")
 
 salt_and_ammonia
+ggsave(filename = "../../results/Bivariate_Figures/salt_and_ammonia.png", plot = salt_and_ammonia)
 
-ph_and_do <- ggplot(WQ_clean_data, aes(x = ph, y = dissolved_oxygen, color = island_side)) + geom_jitter()
+ph_and_do <- ggplot(WQ_clean_data, aes(x = ph, y = dissolved_oxygen, color = island_side)) + geom_jitter() + xlab("pH") + ylab("Dissolved Oxygen (mg/L)") + ggtitle("Dissolved Oxygen vs. pH")
 
 ph_and_do
+ggsave(filename = "../../results/Bivariate_Figures/ph_and_do.png", plot = ph_and_do)
 
-ph_and_ammonia <- ggplot(WQ_clean_data, aes(x = ph, y = ammonia, color = island_side)) + geom_jitter()
+ph_and_ammonia <- ggplot(WQ_clean_data, aes(x = ph, y = ammonia, color = island_side)) + geom_jitter() + xlab("pH") + ylab("Ammonia (mg/L)") + ggtitle("Ammonia vs. pH")
 
 ph_and_ammonia
+ggsave(filename = "../../results/Bivariate_Figures/ph_and_ammonia.png", plot = ph_and_ammonia)
 
-do_and_ammonia <- ggplot(WQ_clean_data, aes(x = ammonia, y = dissolved_oxygen, color = island_side)) + geom_jitter()
+do_and_ammonia <- ggplot(WQ_clean_data, aes(x = ammonia, y = dissolved_oxygen, color = island_side)) + geom_jitter() + xlab("Ammonia (mg/L)") + ylab("Dissolved Oxygen (mg/L)") + ggtitle("Dissolved Oxygen vs. Ammonia")
 
 do_and_ammonia
+ggsave(filename = "../../results/Bivariate_Figures/do_and_ammonia.png", plot = do_and_ammonia)
 
 ```
 
@@ -281,6 +291,9 @@ raster_by_island_side_temp
 raster_by_site_type_temp <- ggplot(temp_drop_na_2, aes(x = Month, y = site_type, fill = water_temp)) + geom_raster(interpolate = TRUE) + scale_fill_gradientn(colors = c("blue", "yellow"))
 
 raster_by_site_type_temp
+ggsave(filename = "../../results/Bivariate_Figures/raster_by_site_type_temp.png", plot = raster_by_site_type_temp) 
+
+
 ```
 
 ```{r salinity raster}
@@ -299,6 +312,8 @@ raster_by_island_side_sal
 raster_by_site_type_sal <- ggplot(sal_drop_na_2, aes(x = Month, y = site_type, fill = salinity)) + geom_raster(interpolate = TRUE) + scale_fill_gradientn(colors = c("blue", "yellow"))
 
 raster_by_site_type_sal
+
+ggsave(filename = "../../results/Bivariate_Figures/raster_by_site_type_sal.png", plot = raster_by_site_type_sal) 
 ```
 
 ```{r dissolved oxygen raster}
@@ -317,6 +332,7 @@ raster_by_island_side_do
 raster_by_site_type_do <- ggplot(do_drop_na_2, aes(x = Month, y = site_type, fill = dissolved_oxygen)) + geom_raster(interpolate = TRUE) + scale_fill_gradientn(colors = c("blue", "yellow"))
 
 raster_by_site_type_do
+ggsave(filename = "../../results/Bivariate_Figures/raster_by_site_type_do.png", plot = raster_by_site_type_do) 
 ```
 
 ```{r ammonia raster}
@@ -335,6 +351,7 @@ raster_by_island_side_amm
 raster_by_site_type_amm <- ggplot(amm_drop_na_2, aes(x = Month, y = site_type, fill = ammonia)) + geom_raster(interpolate = TRUE) + scale_fill_gradientn(colors = c("blue", "yellow"))
 
 raster_by_site_type_amm
+ggsave(filename = "../../results/Bivariate_Figures/raster_by_site_type_amm.png", plot = raster_by_site_type_amm) 
 ```
 
 ```{r ph raster}
@@ -353,6 +370,7 @@ raster_by_island_side_ph
 raster_by_site_type_ph <- ggplot(ph_drop_na_2, aes(x = Month, y = site_type, fill = ph)) + geom_raster(interpolate = TRUE) + scale_fill_gradientn(colors = c("blue", "yellow"))
 
 raster_by_site_type_ph
+ggsave(filename = "../../results/Bivariate_Figures/raster_by_site_type_ph.png", plot = raster_by_site_type_ph) 
 ```
 
 Unsuprisingly, the raster visualizations show results consistent with the individual jitter-smooth plots above. Most of the distinct patterns are easily visualized using the raster images, however the rasters strongly emphasize the missing data values form our dataset more than any of the actual predictor information. There is a large piece of missing data in August (primairly from Seagrass/Mangrove sites) is is due to the fact that the sampling facility is typically closed for the majority of this month, and the few trips that are operated at this time tend to be reef trips since the weather is typically very good. Additionally, there is a data gap for Patch Reef/Hardbottom locations in January. Is likely due to the fact that winter winds typicaly make patch/hardbottom site more difficult to access safely at this time. 
@@ -446,8 +464,10 @@ mean_temp_plot_grecian <- mean_temp_grecian %>% ggplot(aes(x = Date, y = water_t
 
 mean_temp_plot_grecian
 
-grid.arrange(mean_temp_plot_roddy, mean_temp_plot_tarpon, mean_temp_plot_grecian, nrow = 3)
+rep_sites_temp <- grid.arrange(mean_temp_plot_roddy, mean_temp_plot_tarpon, mean_temp_plot_grecian, nrow = 3)
 
+rep_sites_temp
+ggsave(filename = "../../results/Bivariate_Figures/rep_sites_temp.png", plot = rep_sites_temp) 
 
 ```
 
@@ -478,7 +498,10 @@ mean_sal_plot_grecian <- mean_sal_grecian %>% ggplot(aes(x = Date, y = salinity)
 
 mean_sal_plot_grecian
 
-grid.arrange(mean_sal_plot_roddy, mean_sal_plot_tarpon, mean_sal_plot_grecian, nrow = 3)
+rep_sites_sal <- grid.arrange(mean_sal_plot_roddy, mean_sal_plot_tarpon, mean_sal_plot_grecian, nrow = 3)
+rep_sites_sal
+
+ggsave(filename = "../../results/Bivariate_Figures/rep_sites_sal.png", plot = rep_sites_sal)
 ```
 
 Salinity shows the distinct between ocean and bayside sites as expected. Additionall we can see a dip in the salinity of Tarpon Basin sharply near the Irma timeframe, this suggests that the bay may have been more impacted by the storm. This makes sense as the bay is shallower. There is also an interesting decline in the salinity of Grecian Dry Rocks at the end of 2019, I am unsure as to what may be the cause of this decline. 
@@ -508,8 +531,9 @@ mean_do_plot_grecian <- mean_do_grecian %>% ggplot(aes(x = Date, y = dissolved_o
 
 mean_do_plot_grecian
 
-grid.arrange(mean_do_plot_roddy, mean_do_plot_tarpon, mean_do_plot_grecian, nrow = 3)
-
+rep_sites_do <- grid.arrange(mean_do_plot_roddy, mean_do_plot_tarpon, mean_do_plot_grecian, nrow = 3)
+rep_sites_do
+ggsave(filename = "../../results/Bivariate_Figures/rep_sites_do.png", plot = rep_sites_do)
 
 
 ```
@@ -541,7 +565,9 @@ mean_amm_plot_grecian <- mean_amm_grecian %>% ggplot(aes(x = Date, y = ammonia))
 
 mean_amm_plot_grecian
 
-grid.arrange(mean_amm_plot_roddy, mean_amm_plot_tarpon, mean_amm_plot_grecian, nrow = 3)
+rep_sites_amm <- grid.arrange(mean_amm_plot_roddy, mean_amm_plot_tarpon, mean_amm_plot_grecian, nrow = 3)
+rep_sites_amm
+ggsave(filename = "../../results/Bivariate_Figures/rep_sites_amm.png", plot = rep_sites_amm)
 ```
 
 Ammonia is similar to other visuals created above, relatively flat across the board with intermittant spikes and a substantial spike around Irma.
@@ -571,7 +597,9 @@ mean_ph_plot_grecian <- mean_ph_grecian %>% ggplot(aes(x = Date, y = ph)) + geom
 
 mean_ph_plot_grecian
 
-grid.arrange(mean_ph_plot_roddy, mean_ph_plot_tarpon, mean_ph_plot_grecian, nrow = 3)
+rep_sites_ph <- grid.arrange(mean_ph_plot_roddy, mean_ph_plot_tarpon, mean_ph_plot_grecian, nrow = 3)
+rep_sites_ph
+ggsave(filename = "../../results/Bivariate_Figures/rep_sites_ph.png", plot = rep_sites_ph)
 ```
  pH is also quite interesting. Similar to dissolved oxygen, there is a notable drop in pH around hurricane Irma land fall that is not present in the group data. This again suggests the bay was strongly affected by this storm.
 
