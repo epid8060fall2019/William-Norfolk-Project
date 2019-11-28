@@ -283,7 +283,7 @@ The results of this study suggest that citizen science data collection is an app
 ## Supplemental Information
 All raw data, processing scripts, analysis scripts, figures, and manuscript products can be found within the GitHub repository for this project at: [https://github.com/epid8060fall2019/William-Norfolk-Project](https://github.com/epid8060fall2019/William-Norfolk-Project).
 
-Supplemental figures and tables can be found within the supplementary materials script located in the project repository.
+Supplemental figures and tables can be found within the supplementary materials script titled _Supplementary_Materials.Rmd_ located within _products_ folder and _manuscript_ subfolder in the project repository.
 
 FKNMS water quality metadata can be accessed at: [http://ocean.floridamarine.org/FKNMS_wqpp/waterQualityNew.htm](http://ocean.floridamarine.org/FKNMS_wqpp/waterQualityNew.htm).
 

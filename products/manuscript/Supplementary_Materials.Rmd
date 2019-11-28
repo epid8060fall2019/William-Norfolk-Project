@@ -154,9 +154,9 @@ knitr::include_graphics("../../results/Unsupervised_Modeling_Figures/good_adend_
 knitr::include_graphics("../../results/Unsupervised_Modeling_Figures/good_adend_19.png")
 ```
 
+## Citizen Science Processing Script
 
-
-
+For detailed instructions to install, input data, and run the citizen science water quality processing script please see the complete instructions found within the ReadMe file in the ```code``` subfolder of the project repository. For a detailed description of coding decisions and output formats please see the embedded commentary within the script titled ```citizen_science_processing_script``` found in the ```processing_code``` subfolder in the project repository. 
 
 
 
