@@ -15,6 +15,8 @@ For a detailed breakdown of the Hurricane Irma analysis please reference the wri
 
 For a detailed breakdown of the Citizen Science Efficacy analysis please reference the written commentary embedded into the Rmd file titled ```Citizen_Science_Efficacy_Analysis``` in the ```analysis_code``` subfolder. Commentary is also viewable via the docx output file of the matching name to the script of interest.
 
+For a detailed breakdown of the Unsupervised Learning analysis please reference the written commentary embedded into the Rmd file titled ```Unsupervised_Learning_Analysis``` in the ```analysis_code``` subfolder. Commentary is also viewable via the docx output file of the matching name to the script of interest.
+
 # How to Run the Citizen Science Processing Script with New Program Data
 ## _Run This Script to Produce a Quick Analysis of Program Data_ 
 

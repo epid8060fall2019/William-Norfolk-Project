@@ -46,8 +46,11 @@ Hurricane Irma analysis investigates the effects of the September 10, 2017 landf
 
 ### Citizen Science Efficacy Analysis
 
-Citizen science analysis investigates the utility of citizen science data collection through the usage of tree-based modeling to produce standard water quality predictors to seperate different aquatic ecosystems. Instructions for running the Citizen Science Efficacy analysis code can be found in the ReadMe file in the folder ```code```. All figures of interest generated in this script are saved as png files under the folder ```results```.
+Citizen science efficacy analysis compares the results of citizen science-collected data to data collected by the Florida Key National Marine Sanctuary. Instructions for running the Citizen Science Efficacy analysis code can be found in the ReadMe file in the folder ```code```. All figures of interest generated in this script are saved as png files under the folder ```results```.
 
+### Unsupervised Learning Analysis
+
+Unsupervised learning analysis uses agglomerative hierarchical cluster analysis to visualize patterns of data clustering based on location and season. Instructions for running the Unsupervised Learning analysis code can be found in the ReadMe file in the folder ```code```. All figures of interest generated in this script are saved as png files under the folder ```results```.
 
 
 
