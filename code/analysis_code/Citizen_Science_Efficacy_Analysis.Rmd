@@ -176,8 +176,77 @@ ggsave(filename = "../../results/Efficacy_Figures/effic_amm.png", plot = effic_a
 
 Ammonia shows an interesting pattern as well. It appeas that the citizen science data may underestimate the total ammonia in the water when compared to FKNMS. Similar to salinity, this is likely due to the measurement specificty of the data collection tools. Additionally, FKNMS outlier data appears to be substantially higher than any citizen science outlier data.
 
+As a final comparison, we will use a Welch's two-sample t-test to compare the FKNMS findings with the citizen science findings to see if there are any significant differences in the data between the two organizations.
 
-Based on the overall comparison of both datasets, the efficacy of citizen science data is situationally dependant. Viewing the water quality comparison boxplots, the citizen science data captured the major trends in water quality of all of the comparable sites. However, it is evident by the visualizations that the methods employed by the FKNMS team are more accurate and percise than those used by the citizen scientists. This result is not suprising due to the fact that citizen science data collection in itself is intended largely for the purpose of monitoring and therefore tools are typically less sensetive and cheaper. Regarding the efficacy of the data, we conclude that the utlity of citizen science data is dependant on the overall goal of the research. If a research study aims to capture large-scale trends and/or general patterns of water quality, citizen science data collection is a viable option. However, if a study is interested in specific details and/or very accurate measures of water quality parameters this methods is not ideal for data collection. 
+First we must make subsets of the data for each site of interest for comparison.
+
+We will start with Grecian Dry Rocks.
+```{r}
+grecian_only_cs <- subset(cs_total, location == "Grecian Dry Rocks")
+grecian_only_fknms <- subset(fknms_fix_names, location == "Grecian Dry Rocks")
+
+t.test(grecian_only_cs$water_temp, grecian_only_fknms$water_temp)
+t.test(grecian_only_cs$salinity, grecian_only_fknms$salinity)
+t.test(grecian_only_cs$dissolved_oxygen, grecian_only_fknms$dissolved_oxygen)
+t.test(grecian_only_cs$ammonia, grecian_only_fknms$ammonia)
+```
+
+Next we will compare Key Largo Dry Rocks
+
+```{r}
+kldr_only_cs <- subset(cs_total, location == "Key Largo Dry Rocks")
+kldr_only_fknms <- subset(fknms_fix_names, location == "Key Largo Dry Rocks")
+
+t.test(kldr_only_cs$water_temp, kldr_only_fknms$water_temp)
+t.test(kldr_only_cs$salinity, kldr_only_fknms$salinity)
+t.test(kldr_only_cs$dissolved_oxygen, kldr_only_fknms$dissolved_oxygen)
+t.test(kldr_only_cs$ammonia, kldr_only_fknms$ammonia)
+```
+
+Next we compare Molasses.
+
+```{r}
+mo_only_cs <- subset(cs_total, location == "Molasses")
+mo_only_fknms <- subset(fknms_fix_names, location == "Molasses")
+
+t.test(mo_only_cs$water_temp, mo_only_fknms$water_temp)
+t.test(mo_only_cs$salinity, mo_only_fknms$salinity)
+t.test(mo_only_cs$dissolved_oxygen, mo_only_fknms$dissolved_oxygen)
+t.test(mo_only_cs$ammonia, mo_only_fknms$ammonia)
+```
+
+
+Next we compare Rodriguez Key.
+
+```{r}
+roddy_only_cs <- subset(cs_total, location == "Rodriguez Key")
+roddy_only_fknms <- subset(fknms_fix_names, location == "Rodriguez Key")
+
+t.test(roddy_only_cs$water_temp, roddy_only_fknms$water_temp)
+t.test(roddy_only_cs$salinity, roddy_only_fknms$salinity)
+t.test(roddy_only_cs$dissolved_oxygen, roddy_only_fknms$dissolved_oxygen)
+t.test(roddy_only_cs$ammonia, roddy_only_fknms$ammonia)
+```
+
+
+And finally we compare Tarpon Basin.
+
+```{r}
+tarp_only_cs <- subset(cs_total, location == "Tarpon Basin")
+tarp_only_fknms <- subset(fknms_fix_names, location == "Tarpon Basin")
+
+t.test(tarp_only_cs$water_temp, tarp_only_fknms$water_temp)
+t.test(tarp_only_cs$salinity, tarp_only_fknms$salinity)
+t.test(tarp_only_cs$dissolved_oxygen, tarp_only_fknms$dissolved_oxygen)
+t.test(tarp_only_cs$ammonia, tarp_only_fknms$ammonia)
+```
+
+
+Based on the overall comparison of both datasets, the efficacy of citizen science data is situationally dependant. Viewing the water quality comparison boxplots, the citizen science data captured the major trends in water quality of all of the comparable sites. However, it is evident by the visualizations that the methods employed by the FKNMS team are more accurate and percise than those used by the citizen scientists. This result is not suprising due to the fact that citizen science data collection in itself is intended largely for the purpose of monitoring and therefore tools are typically less sensetive and cheaper. 
+
+Viewing the results of the t-test we see that ammonia was significantly different between the two sites in all instances. This suggests that there may be a need to improve the tools used to measure ammonia levels by the citizen scientists, however this may be a limiting resource dependant on funding. Salinity was significant in two of the three locations, this is likely due to the differences in the equipment senestivity of the two agencies however this significance was not consistent across all measures. This result suggests that while sainily measures from FKNMS are more accurate and percise the citizen science measures still capture the general trends of the salinity with some biases introduced by equipment specificity. Of the remaining paramaters, significance was present in at least one of the samples for each variable, however there is no distinct pattern of significance for dissolved oxygen and temperature seen for all sites. This result suggests that this significance is likely due to an confounding factor (season, specific location at the site, time of day, etc.) rather than the usage of citicen science vs. FKNMS data.
+
+Regarding the efficacy of the data, we conclude that the utlity of citizen science data is dependant on the overall goal of the research. If a research study aims to capture large-scale trends and/or general patterns of water quality, citizen science data collection is a viable option. However, if a study is interested in specific details and/or very accurate measures of water quality parameters this methods is not ideal for data collection. 
 
 
 

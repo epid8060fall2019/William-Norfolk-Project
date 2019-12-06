@@ -93,7 +93,7 @@ island_side_filter %>% ggplot() +
 island_side_filter %>% ggplot() + 
   geom_jitter(aes(x = island_side, y = water_temp))
 
-bay_v_ocean_water_temp <- ggplot(island_side_filter, aes(x = island_side, y = water_temp, color = island_side)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Bay vs. Ocean Water Temperature") + xlab("Island Side") + ylab("Water Temperature (C)") + theme(legend.position = "none", axis.text.x = element_text(face = "bold")) + scale_x_discrete(labels = island__side_labs)
+bay_v_ocean_water_temp <- ggplot(island_side_filter, aes(x = island_side, y = water_temp, color = island_side)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Bay vs. Ocean Water Temp") + xlab("Island Side") + ylab("Water Temperature (C)") + theme(legend.position = "none", axis.text.x = element_text(face = "bold")) + scale_x_discrete(labels = island__side_labs)
 
 bay_v_ocean_water_temp 
 
@@ -176,7 +176,7 @@ Similar to salinity, we see a wide range of water temperature in seagrasss/mangr
 site_type_filter %>% ggplot() + 
   geom_jitter(aes(x = site_type, y = water_temp))
 
-site_type_water_temp <- ggplot(island_side_filter, aes(x = site_type, y = water_temp, color = site_type)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Water Temperature by Site Type") + xlab("Site Type") + ylab("Water Temperature (C)") + theme(legend.position = "none", axis.text.x = element_text(face = "bold")) + scale_x_discrete(labels = site_labs)
+site_type_water_temp <- ggplot(island_side_filter, aes(x = site_type, y = water_temp, color = site_type)) + geom_violin(width = 1) + geom_jitter(alpha = 0.25) + ggtitle("Water Temp by Site Type") + xlab("Site Type") + ylab("Water Temperature (C)") + theme(legend.position = "none", axis.text.x = element_text(face = "bold")) + scale_x_discrete(labels = site_labs)
 
 site_type_water_temp
 
