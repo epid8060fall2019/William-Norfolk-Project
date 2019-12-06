@@ -1,0 +1,119 @@
+# Overview
+
+Title of project:Analysis of citizen science water quality monitoring in Key Largo, Florida
+
+Author of project: William Norfolk
+
+Reviewer: Megan Lott
+
+
+# Specific project content evaluation
+
+## Background, Context and Motivation
+
+
+### Feedback and Comments
+
+Right off the bat, this project is clearly well-written and has been thoroughly prepared. The introduction is well-written and motivating. Do you want to add in the MarineLab site? Excited to see that these scipts will be living on as a tool for MarineLab's analysis in the future. 
+
+### Summary assessment
+
+* strong contextualization and motivation
+
+
+## Question description
+
+### Feedback and Comments
+
+The questions are provided very clearly and can be addressed using the availible citizen science data collected by students at MarineLab. 
+
+### Summary assessment
+
+* question/hypotheses fully clear
+
+
+## Data description
+
+### Feedback and Comments
+
+The Methods collection does a nice job detailing the field collection methods and documentation prior to data entry. The data set was acquired directly from the director at MarineLab. Although this data is not openly availble, the director may be contacted to extend access. 
+
+How many observations are you working with?
+
+"cleaned for optimal analysis in R" - tidy format as described by Whickham? 
+
+Such a great idea to provide the processing and analysis scripts for future use. I'm having trouble finding the data "shell". How does the "shell" help prevent input errors? What happens to your processing script if there are different sites, missing data, anomalies? What would the students be excited to see out of their data? This is awesome!
+
+### Summary assessment
+
+* source and overall structure of data well explained
+
+
+## Data wrangling and exploratory analysis
+
+### Feedback and Comments
+
+It is helpful to see the subsections of your analysis. 
+
+### Summary assessment
+
+* essentially no weaknesses in wrangling and exploratory component. 
+
+
+## Appropriateness of Analysis
+Were the analysis methods appropriate for the data? Was the analysis done properly? Were different components of the analysis (e.g. performance measure, variable selection, data pre-processing, model evaluation) done in the best way possible and explained well?
+
+### Feedback and Comments
+
+Did you conduct any statistical comparisons between the MarineLab data and FKNMS data? What sorts of faCtors/varaibles are compared in the Agglomerative hierarchical cluster analysis? In this analysis, did you consider any confounding factors - sampling period? Sites commonly visited on the same day?
+
+### Summary assessment
+
+* strong and reasonable analysis
+
+## Presentation
+
+### Feedback and Comments
+
+The figures are very informative and clearly labeled. 
+
+### Summary assessment
+
+* results are very well presented
+
+
+## Discussion/Conclusions
+
+### Feedback and Comments
+
+The discussion explores seasonal variations in water quality parameters. Do you recognize any patterns over years? It seems that ammonia levels are increasing from 2016 to 2019. Are there explanations for this? In what ways does this analysis benefit from high temperal resolution? On what time scale is it useful to examine these parameters? Can you make suggestions for citizen scientist monitoring efforts based on this analysis?
+
+### Summary assessment
+
+* strong, complete and clear discussion
+
+# Overall project content evaluation
+
+
+## Structure
+
+The files are extremely well documented and informative. It is clear that Billy put a lot of thought and effort into making these pieces reproducible. It might be helpful to have a single folder for the citizen scientist resources that you aim to share with MarineLab.
+
+### Summary assessment
+
+* well structured
+* fully and well documented
+* fully reproducible without issues
+
+
+## Thoroughness
+
+### Feedback and Comments
+
+This analysis is very thorough. It was a fun read and interesting to explore the tremds in this data. There was a lot of effort put intot his analysis to examine the availible data from different perspectives. The analysis aims to answer five unique research questions and has broader impacts embedded in its motivation. Great work.
+
+### Summary assessment
+
+* strong level of thorougness
+
+
