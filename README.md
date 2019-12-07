@@ -4,7 +4,7 @@
 
 ## How to Locate All Raw Data, Processing, and/or Analysis Scripts
 
-All code, figures, and text are reproducible from various subfolders within the project directory.
+All code, figures, and text are reproducible from various subfolders within the project directory detailed below.
 
 ## **Raw Data**
 

@@ -20,9 +20,9 @@ For a detailed breakdown of the Unsupervised Learning analysis please reference 
 # How to Run the Citizen Science Processing Script with New Program Data
 ## _Run This Script to Produce a Quick Analysis of Program Data_ 
 
-This script will produce quick simple figures that can be readily viewed by MarineLab program participants to visualize the data they have collected throughout the program.This script is designed in such a way that individuals that are unfamilar with the usage of Rstudio can successfully generate simple figures to view collected data with a minimal amount of reading.
+This script will produce quick simple figures that can be readily viewed by MarineLab program participants to visualize the data they have collected throughout the program. This script is designed in such a way that individuals that are unfamilar with the usage of Rstudio can successfully generate simple figures to view collected data with a minimal amount of reading. _Note this script is designed to function using data collected through the MarineLab water quality monitoring program and is not appropriate for data processing beyond the scope of these methods._
 
-This script operates using the excel sheet titled ```individual_program_data_template_example``` which can be found inside this project directory under the ```data``` folder and inside the ```individual_program_data``` subfolder. 
+This script operates using the predesigned data entry shell (excel sheet) titled ```individual_program_data_template_example``` which can be found inside the project directory under the ```data``` folder and inside the ```individual_program_data``` subfolder. 
 
 To run this script you must first download this project from GitHub. Go to the main project repository found at this [link](https://github.com/epid8060fall2019/William-Norfolk-Project). Select the **green** buttom called clone or download. Download the zip. Unzip the file, and save it to your local computer (ideally in its own folder).
 
