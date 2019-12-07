@@ -1,6 +1,6 @@
 # Analysis of citizen science water quality monitoring in Key Largo, Florida. 
 
-This is the MADA fall 2019 Class Project Repository for William Norfolk.
+**This is the MADA fall 2019 Class Project Repository for William Norfolk.**
 
 ## How to Locate All Raw Data, Processing, and/or Analysis Scripts
 
