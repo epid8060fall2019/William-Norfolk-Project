@@ -1,3 +1,8 @@
+---
+output:
+  word_document: default
+  html_document: default
+---
 # Overview
 
 Title of project: Analysis of citizen science water quality monitoring in Key Largo, Florida.
